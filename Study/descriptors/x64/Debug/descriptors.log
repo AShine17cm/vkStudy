@@ -1,0 +1,21 @@
+﻿  dx_descriptors.cpp
+E:\VulkanProj\mgEngine\base\VulkanFrameBuffer.hpp(85,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\mgEngine\base\VulkanFrameBuffer.hpp(87,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\mgEngine\base\VulkanFrameBuffer.hpp(106,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\mgEngine\base\VulkanFrameBuffer.hpp(108,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\mgEngine\base\VulkanFrameBuffer.hpp(139,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\mgEngine\base\VulkanFrameBuffer.hpp(171,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\mgEngine\base\VulkanFrameBuffer.hpp(192,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\mgEngine\base\VulkanFrameBuffer.hpp(287,1): warning C4267: “return”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\descriptors\PipelineHub.h(28,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\descriptors\PipelineHub.h(46,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\descriptors\PipelineHub.h(64,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\descriptors\PipelineHub.h(114,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\descriptors\PipelineHub.h(158,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\descriptors\Frame.h(95,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\descriptors\Frame.h(106,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\descriptors\Frame.h(114,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\descriptors\Scene.h(19,1): error C2661: “geos::GeoCube::GeoCube”: 没有重载函数接受 2 个参数
+E:\VulkanProj\vkStudy\Study\descriptors\Scene.h(20,1): error C2661: “geos::GeoCube::GeoCube”: 没有重载函数接受 2 个参数
+E:\VulkanProj\vkStudy\Study\descriptors\dx_descriptors.cpp(159,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\descriptors\dx_descriptors.cpp(206,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据

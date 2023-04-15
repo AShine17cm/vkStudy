@@ -1,0 +1,30 @@
+﻿  dx_instacing.cpp
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(85,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(87,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(106,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(108,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(139,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(171,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(192,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(287,1): warning C4267: “return”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\InstanceByVertexBuffers.h(35,1): error C2664: “geos::GeoCube::GeoCube(const geos::GeoCube &)”: 无法将参数 1 从“float”转换为“const geos::GeoCube &”
+E:\VulkanProj\vkStudy\Study\instancing\InstanceByVertexBuffers.h(35,1): message : 原因如下: 无法从“float”转换为“const geos::GeoCube”
+E:\VulkanProj\vkStudy\Study\instancing\InstanceByVertexBuffers.h(35,1): message : 无构造函数可以接受源类型，或构造函数重载决策不明确
+E:\VulkanProj\vkStudy\Study\base\Geo.h(186,2): message : 参见“geos::GeoCube::GeoCube”的声明
+E:\VulkanProj\vkStudy\Study\instancing\InstanceByVertexBuffers.h(48,23): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\InstanceByVertexBuffers.h(76,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\PipelineHub.h(29,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\PipelineHub.h(47,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\PipelineHub.h(63,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\PipelineHub.h(133,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\PipelineHub.h(160,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\PipelineHub.h(161,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\PipelineHub.h(172,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\Frame.h(82,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\Frame.h(88,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\Frame.h(92,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\Frame.h(98,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\Scene.h(22,1): error C2661: “geos::GeoCube::GeoCube”: 没有重载函数接受 2 个参数
+E:\VulkanProj\vkStudy\Study\instancing\Scene.h(23,1): error C2661: “geos::GeoCube::GeoCube”: 没有重载函数接受 2 个参数
+E:\VulkanProj\vkStudy\Study\instancing\dx_instacing.cpp(166,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\instancing\dx_instacing.cpp(214,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据

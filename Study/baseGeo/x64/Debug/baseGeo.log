@@ -1,0 +1,22 @@
+﻿  dx_baseGeo.cpp
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(85,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(87,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(106,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(108,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(139,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(171,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(192,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(287,1): warning C4267: “return”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\PipelineHub.h(27,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\PipelineHub.h(33,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\PipelineHub.h(114,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\Frame.h(51,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\Frame.h(54,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\Frame.h(59,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\Frame.h(63,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\Scene.h(60,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\Scene.h(140,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\dx_baseGeo.cpp(161,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\dx_baseGeo.cpp(208,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+LINK : fatal error LNK1104: 无法打开文件“vulkan-1.lib”
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(1074,5): error MSB6006: “link.exe”已退出，代码为 1104。

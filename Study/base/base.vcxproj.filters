@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="geo">
+      <UniqueIdentifier>{2304c447-d29d-4c06-8ed8-ff349c36e9f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="thirdParty">
+      <UniqueIdentifier>{e2137e70-9848-465a-bc34-1dd03adf2371}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TestCode.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="buffers.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanTools.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanDevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="commands.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="framebuffers.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="descriptors.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pipelines.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="textures.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="vertices.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="z_test.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="shaders.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="renderpasses.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="surfaces.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SwapChain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Geo.cpp">
+      <Filter>geo</Filter>
+    </ClCompile>
+    <ClCompile Include="GeoCube.cpp">
+      <Filter>geo</Filter>
+    </ClCompile>
+    <ClCompile Include="batches.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="materials.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mipmaps.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GeoPlane.cpp">
+      <Filter>geo</Filter>
+    </ClCompile>
+    <ClCompile Include="GeoSquarePillar.cpp">
+      <Filter>geo</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Buffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="buffers.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanTools.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanDevice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="commands.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="framebuffers.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanFrameBuffer.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="descriptors.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="pipelines.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="textures.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="vertices.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="z_test.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="renderpasses.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="surfaces.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SwapChain.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Geo.h">
+      <Filter>geo</Filter>
+    </ClInclude>
+    <ClInclude Include="batches.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="materials.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mipmaps.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="InstancingDescriptorSet.h">
+      <Filter>geo</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,75 @@
+﻿  batches.cpp
+E:\VulkanProj\vkStudy\Study\base\batches.cpp(38,25): warning C4244: “=”: 从“uint32_t”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\batches.cpp(39,26): warning C4244: “=”: 从“uint32_t”转换到“float”，可能丢失数据
+  Buffer.cpp
+  buffers.cpp
+  commands.cpp
+E:\VulkanProj\vkStudy\Study\base\commands.cpp(35,79): warning C4244: “参数”: 从“ULONG64”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\commands.cpp(42,76): warning C4244: “参数”: 从“ULONG64”转换到“uint32_t”，可能丢失数据
+  descriptors.cpp
+E:\VulkanProj\vkStudy\Study\base\descriptors.cpp(32,45): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\descriptors.cpp(125,75): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  framebuffers.cpp
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(85,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(87,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(106,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(108,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(139,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(171,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(192,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(287,1): warning C4267: “return”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  Geo.cpp
+E:\VulkanProj\vkStudy\Study\base\Geo.cpp(28,70): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\Geo.cpp(30,66): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\Geo.cpp(64,51): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\Geo.cpp(72,54): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\Geo.cpp(88,65): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  GeoCube.cpp
+  GeoPlane.cpp
+  GeoSquarePillar.cpp
+  materials.cpp
+E:\VulkanProj\vkStudy\Study\base\materials.cpp(24,19): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  mipmaps.cpp
+  pipelines.cpp
+E:\VulkanProj\vkStudy\Study\base\pipelines.cpp(85,55): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  renderpasses.cpp
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(85,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(87,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(106,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(108,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(139,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(171,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(192,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(287,1): warning C4267: “return”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\renderpasses.cpp(64,55): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\renderpasses.cpp(122,53): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  shaders.cpp
+E:\VulkanProj\vkStudy\Study\base\shaders.cpp(48,136): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\shaders.cpp(57,64): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\shaders.cpp(103,37): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\shaders.cpp(153,37): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  surfaces.cpp
+  SwapChain.cpp
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(85,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(87,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(106,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(108,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(139,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(171,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(192,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(287,1): warning C4267: “return”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  TestCode.cpp
+  Texture.cpp
+E:\VulkanProj\vkStudy\Study\base\Texture.cpp(34,32): warning C4244: “参数”: 从“VkDeviceSize”转换到“uint32_t”，可能丢失数据
+  textures.cpp
+E:\VulkanProj\vkStudy\Study\base\textures.cpp(118,123): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  正在生成代码...
+  正在编译...
+  vertices.cpp
+  VulkanDevice.cpp
+E:\VulkanProj\vkStudy\Study\base\VulkanDevice.cpp(187,52): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanDevice.cpp(190,61): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  VulkanTools.cpp
+  z_test.cpp
+  正在生成代码...
+  base.vcxproj -> E:\VulkanProj\vkStudy\Study\x64\Debug\base.lib
