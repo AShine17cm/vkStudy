@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>E:\VulkanProj\mgEngine\x64\Debug\descriptors.exe</FullPath>
+      <FullPath>E:\VulkanProj\vkStudy\Study\x64\Debug\descriptors.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

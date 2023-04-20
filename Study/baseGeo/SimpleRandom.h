@@ -1,3 +1,4 @@
+/* 生成随机数 */
 #pragma once
 #include <random>
 #include <glm.hpp>

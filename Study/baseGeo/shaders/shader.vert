@@ -19,6 +19,7 @@ layout(set=0, binding = 0) uniform UniformBufferObject
 layout(push_constant) uniform PushConstants
 {
     mat4 model;
+    vec4 tex;
 } pushs;
 
 layout(location=0)out vec2 uv;

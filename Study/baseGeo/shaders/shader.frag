@@ -5,6 +5,7 @@
 layout(push_constant) uniform PushConstants
 {
     mat4 model;
+    vec4 tex;
 } pushs;
 
 layout(set=1,binding=0) uniform sampler2D texSampler;

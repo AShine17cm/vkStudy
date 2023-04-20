@@ -5,10 +5,10 @@ using namespace mg;
 
 struct Resource
 {
+    textures::Texture* tex_ui;
     textures::Texture* tex_depth;   //场景的深度测试
     textures::Texture* tex_figure;  //模型
     textures::Texture* tex_floor;   //地板
-
     void prepare(VulkanDevice* vulkanDevice,VkExtent2D swapchainExtent) 
     {
         textures::MgImageInfo extent = { {0,0,1},1,1 };
@@ -29,6 +29,8 @@ struct Resource
             VK_FORMAT_R8G8B8A8_SRGB ,
             VK_IMAGE_USAGE_SAMPLED_BIT ,
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL };
+        tex_ui = new textures::Texture(vulkanDevice, extent);
+        tex_ui->load("../textures/ui.psd");
         tex_figure = new textures::Texture(vulkanDevice, extent);
         tex_figure->load("../textures/rock 01.jpg");
         tex_floor = new textures::Texture(vulkanDevice, extent);
@@ -37,6 +39,7 @@ struct Resource
     }
     void cleanup() 
     {
+        tex_ui->destroy();
         tex_figure->destroy();
         tex_floor->destroy();
         tex_depth->destroy();

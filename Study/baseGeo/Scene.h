@@ -15,11 +15,19 @@ struct  Scene
 {
 	static const int countInstance = 16;
 	static const int countTextureArray = 8;
+	/* 走 PushConstant的数据 */
+	struct PerObjectData
+	{
+		glm::mat4 model;
+		glm::vec4 texIndex;
+	};
+	/* 渲染数据 */
 	struct InstanceData
 	{
 		glm::mat4 model;
-		glm::vec4 texIndex;	//alignas int 在shader中取不到正确的值
+		glm::vec4 texIndex;	//alignas int 在shader中取不到正确的值?
 	};
+	/* 场景运动 */
 	struct  InstancePose
 	{
 		glm::vec3 pos;		//未使用
@@ -28,6 +36,7 @@ struct  Scene
 	};
 	std::array<InstanceData, countInstance> instances;
 	std::array<InstancePose, countInstance> poses;
+	std::array<vec4, 6> uiPts;
 
 	View* view;
 
@@ -39,7 +48,14 @@ struct  Scene
 	//创建 模型
 	void prepare(VulkanDevice* vulkanDevice, VkExtent2D extent)
 	{
-		
+		/* ui点 */
+		uiPts[0] = { -0.95,-0.7f,0,1 };
+		uiPts[1] = { -0.95,-0.95,0,0 };
+		uiPts[2] = { -0.45f,-0.95,1,0 };
+
+		uiPts[3] = { -0.45f,-0.7f,1,1 };
+		uiPts[4] = uiPts[0];
+		uiPts[5] = uiPts[2];
 		/* 相机控制 */
 		view = new View({ 0,0,1 }, 9.0f, { -3.0f,6.0f }, extent);
 		ground = new geos::GeoPlane(8, { 0,0,-2 });
@@ -122,17 +138,18 @@ struct  Scene
 			//target->modelMatrix= glm::rotate(target->modelMatrix, glm::radians(68.0f), glm::vec3(0.0f, 0, 1.0f));
 		}
 	}
-	/* time是相对时间 */
-	void update(Frame* pFrame, float time, float deltaTime)
+	/* 更新-UBO 资源 */
+	void update(Frame* pFrame, float time, float deltaTime,int opKey)
 	{
-		view->update(deltaTime);
-		float ang = time * glm::radians(30.0f);
+		view->update(deltaTime,opKey);
+		float ang = time * glm::radians(30.0f);//time是相对时间
 
 		updateInstance(ang);
 		// 
 		//拷贝数据
-		memcpy(pFrame->sceneUbo.mapped, &view->data, sizeof(View::UniformBufferObject));
-		memcpy(pFrame->instanceUbo.mapped, instances.data(), sizeof(InstanceData) * countInstance);
+		memcpy(pFrame->ui_ubo.mapped, uiPts.data(), sizeof(vec4) * 6);
+		memcpy(pFrame->view_ubo.mapped, &view->data, sizeof(View::UniformBufferObject));
+		memcpy(pFrame->instance_ubo.mapped, instances.data(), sizeof(InstanceData) * countInstance);
 	}
 	void updateInstance(float offsetAng) 
 	{
@@ -163,7 +180,8 @@ struct  Scene
 	*/
 	void draw(VkCommandBuffer cmd, VkPipelineLayout piLayout, int batchIdx)
 	{
-		uint32_t size = sizeof(mat4);
+		PerObjectData pod = { glm::mat4(1),{0,0,0,0} };
+		uint32_t size = sizeof(PerObjectData);
 		VkDeviceSize offsets[] = { 0 };
 		switch (batchIdx)
 		{
@@ -171,20 +189,27 @@ struct  Scene
 			{
 				for (uint32_t i = 0; i < pillars.size(); i++)
 				{
-					vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pillars[i]->modelMatrix);
+					pod.model = pillars[i]->modelMatrix;
+					vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
 					pillars[i]->drawGeo(cmd);
 				}
 			}
 			break;
 			case 1:
 				/* 实例化渲染 */
-				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &cube->modelMatrix);
+				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
 				cube->drawGeo(cmd,countInstance);
 				break;
 			case 2:
 				//最后画ground 故意的
-				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &ground->modelMatrix);
+				pod.model = ground->modelMatrix;
+				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
 				ground->drawGeo(cmd);
+				break;
+			case 3:
+				//画 UI
+				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
+				vkCmdDraw(cmd, 6, 1, 0, 0);
 				break;
 		}
 

@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>E:\VulkanProj\mgEngine\x64\Debug\baseGeo.exe</FullPath>
+      <FullPath>E:\VulkanProj\vkStudy\Study\baseGeo\baseGeo.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

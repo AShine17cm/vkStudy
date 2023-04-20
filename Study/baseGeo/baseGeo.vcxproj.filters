@@ -35,6 +35,12 @@
     <None Include="shaders\instancing.vert">
       <Filter>shaders</Filter>
     </None>
+    <None Include="shaders\ui.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\ui.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">
@@ -55,10 +61,10 @@
     <ClInclude Include="View.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="Inputs.h">
+    <ClInclude Include="SimpleRandom.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleRandom.h">
+    <ClInclude Include="Input.h">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -20,6 +20,7 @@ layout(set=0, binding = 0) uniform UniformBufferObject
 layout(push_constant) uniform PushConstants
 {
     mat4 model;
+    vec4 tex;
 } pushs;
 
 /*------ 实例化 数据 ------*/

@@ -2,7 +2,6 @@
 #include <vector>
 #include "glm.hpp"
 #include "Geo.h"
-#include "Inputs.h"
 
 using namespace mg;
 
@@ -33,7 +32,7 @@ struct  View
 	float acc = 1.0f;
 	int frameCount = 0;
 	int lastFrame = -1;
-	Inputs inputs;
+
 	View(vec3 focus, float baseRadius, vec2 range, VkExtent2D extent)
 	{
 		this->focus = focus;
@@ -68,30 +67,26 @@ struct  View
 		data.camera = { x,y,z };
 		data.view = glm::lookAt(data.camera, focus, { 0,0,1.0f });
 	}
-	void update(float deltaTime)
+	void update(float deltaTime,int op)
 	{
 		frameCount += 1;
 		float deltaHAngle = 0;
 		float deltaRadius = 0;
 		float deltaVAngle = 0;
-		float speedHAngle = 720;
-		float speedVAngle = 360;
-		float speedRadius = 150.0f;
-		/* 必须在<--控制台窗口-->使用  而非 Vulkan窗口 */
-		inputs.tryGet();
-		int op = inputs.key;
+		float speedHAngle = 360;
+		float speedVAngle = 180;
+		float speedRadius = 50.0f;
 		/* 做加速度 */
 		if (op > 0)
 		{
-			acc = acc + deltaTime*100.0f;
+			acc = acc + deltaTime;
 			lastFrame = frameCount;
 		}
 		else if(frameCount-lastFrame>1000)
 		{
 			acc = 1.0f;
 		}
-		acc = glm::clamp(acc, 1.0f, 10.0f);
-
+		acc = glm::clamp(acc, 1.0f, 2.0f)*0.1f;
 		switch (op)
 		{
 		case 'a'://左右

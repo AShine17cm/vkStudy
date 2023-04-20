@@ -5,6 +5,7 @@
 layout(push_constant) uniform PushConstants/* 未使用 */
 {
     mat4 model;
+    vec4 tex;
 } pushs;
 
 /*------ 实例化 数据 ------*/

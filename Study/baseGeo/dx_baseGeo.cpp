@@ -4,6 +4,7 @@
 #include "PipelineHub.h"
 #include "Frame.h"
 #include "Scene.h"
+#include "Input.h"
 
 class GeneralApp {
 public:
@@ -41,7 +42,8 @@ private:
     Scene scene;
     /* resource */
     Resource resource;
-    
+    Input* input;
+
     std::vector<VkCommandBuffer> commandBuffers;
 
     std::vector<VkSemaphore> imageAvailableSemaphores;
@@ -50,13 +52,12 @@ private:
 
     VkFormat depthFormat = VK_FORMAT_D24_UNORM_S8_UINT;
 
-
     void initWindow() {
         glfwInit();
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-        window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+        window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan MG", nullptr, nullptr);
         glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
     }
@@ -88,16 +89,16 @@ private:
             VkImageView images[] = { swapchain->imageViews[i],resource.tex_depth->view };
             framebuffers::createFramebuffers(swapchain->extent, renderPass, images, attachmentCount, device, &swapChainFramebuffers[i]);
         }
-
-
         createCommandBuffers();
         createSyncObjects();
+        input = new Input();
     }
 
     void mainLoop() {
         while (!glfwWindowShouldClose(window)) {
+            input->Process(window); //键盘输入
+            drawFrame( );
             glfwPollEvents();
-            drawFrame();
         }
 
         vkDeviceWaitIdle(device);
@@ -191,25 +192,29 @@ private:
 
     void createGraphicsPipeline() {
 
-        piHub.prepare(device, renderPass);
+        piHub.prepare(device, renderPass,sizeof(Scene::PerObjectData));
     }
 
     void createResources() 
     {
-        uint32_t countUBO = MAX_FRAMES_IN_FLIGHT * ((1 + 4 + 1) + (1 + 1));
-        uint32_t countSampler = MAX_FRAMES_IN_FLIGHT * (1 + 1+1);
+        /* 没统计 */
+        uint32_t countUBO = MAX_FRAMES_IN_FLIGHT * (128);
+        uint32_t countSampler = MAX_FRAMES_IN_FLIGHT * (128);
         /* Pool */
         std::vector<VkDescriptorPoolSize> poolSizes =
         {
             {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,countUBO},
             {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,countSampler}
         };
-        uint32_t maxSets = MAX_FRAMES_IN_FLIGHT * ((1 + 1) + (1 + 1));
+        uint32_t maxSets = MAX_FRAMES_IN_FLIGHT * (8);
         mg::descriptors::createDescriptorPool(poolSizes.data(), poolSizes.size(), device, &descriptorPool, nullptr, maxSets);
         /* Tex 和 depth-Tex */
         resource.prepare(vulkanDevice,swapchain->extent);
 
-        VkDeviceSize bufferSizes[2] = { sizeof(View::UniformBufferObject),sizeof(Scene::InstanceData)*Scene::countInstance };
+        VkDeviceSize bufferSizes[3] = { 
+            sizeof(View::UniformBufferObject),
+            sizeof(Scene::InstanceData)*Scene::countInstance,
+            sizeof(vec4)*6};
         /* Frame */
         frames.resize(MAX_FRAMES_IN_FLIGHT);
         for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
@@ -242,7 +247,7 @@ private:
         /* 正常渲染 */
         mg::batches::BeginRenderpass(cmd, renderPass, swapChainFramebuffers[imageIndex],clears.data(), 2, swapchain->extent);
         mg::batches::SetViewport(cmd, swapchain->extent);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_scene, dstSet, 1, &frame->set_scene, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_view, dstSet, 1, &frame->set_view, 0, nullptr);
         
         drawScene(cmd, frame);
         vkCmdEndRenderPass(cmd);
@@ -277,6 +282,12 @@ private:
         batchIdx = 2;
         scene.draw(cmd, piHub.piLayout_solidTex, batchIdx);
 
+        /* ui */
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_ui);
+        dstSet = 0;
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ui, dstSet, 1, &frame->set_ui, 0, nullptr);
+        batchIdx = 3;
+        scene.draw(cmd, piHub.piLayout_ui, batchIdx);
     }
     void createSyncObjects() {
         imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -311,10 +322,10 @@ private:
         float deltaTime = time - lastTime;
         lastTime = time;
         /* 更新 模型和Camera */
-        scene.update(pFrame,time,deltaTime);
+        scene.update(pFrame,time,deltaTime,input->GetKey());
     }
 
-    void drawFrame() {
+    void drawFrame( ) {
         vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
