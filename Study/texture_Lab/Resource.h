@@ -1,0 +1,77 @@
+#pragma once
+#include "Texture.h"
+#include "vulkan/vulkan.h"
+#include "SubImageView.h"
+using namespace mg;
+
+struct Resource
+{
+    textures::Texture* tex_ui;
+    textures::Texture* tex_depth;   //场景的深度测试
+    textures::Texture* tex_array;   //两层贴图 用于立柱
+    textures::Texture* tex_mips;    //mip-maps, 用于实例化的立方体
+    textures::Texture* tex_floor;   //地板
+    SubImageView* subView;          //只包含部分 <layer,mip-level>的视图
+
+    void prepare(VulkanDevice* vulkanDevice,VkExtent2D swapchainExtent) 
+    {
+        textures::MgImageInfo imgInfo = { {0,0,1},1,1 };
+        /* Depth */
+        imgInfo = { {swapchainExtent.width,swapchainExtent.height, 1},1,1 };
+        imgInfo.formats = {
+            VK_IMAGE_TYPE_2D,
+            VK_FORMAT_D24_UNORM_S8_UINT,
+            VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT|VK_IMAGE_USAGE_SAMPLED_BIT,//加Input_attachment_bit 可以转shader_readonly
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+        };
+        tex_depth = new textures::Texture(vulkanDevice, imgInfo);
+        tex_depth->load(nullptr);
+
+        /* Textures */
+        imgInfo.formats = {
+            VK_IMAGE_TYPE_2D,
+            VK_FORMAT_R8G8B8A8_SRGB ,
+            VK_IMAGE_USAGE_SAMPLED_BIT ,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL };
+        tex_ui = new textures::Texture(vulkanDevice, imgInfo);
+        tex_ui->load("../textures/ui.psd");
+        tex_floor = new textures::Texture(vulkanDevice, imgInfo);
+        tex_floor->load("../textures/ground 01.jpg");
+
+        /* 带mip-maps的贴图 */
+        imgInfo.mipLevels = 8;
+        tex_mips = new textures::Texture(vulkanDevice, imgInfo);
+        tex_mips->load("../textures/rock 03.jpg");
+        tex_mips->Insert("../textures/mip 256.jpg", 0, 1);
+        tex_mips->Insert("../textures/mip 128.jpg", 0, 2);
+        tex_mips->Insert("../textures/mip 64.jpg", 0, 3);
+        tex_mips->Insert("../textures/mip 32.jpg", 0, 4);
+        tex_mips->Insert("../textures/mip 16.jpg", 0, 5);
+        tex_mips->Insert("../textures/mip 8.jpg", 0, 6);
+        tex_mips->Insert("../textures/mip 4.jpg", 0, 7);
+        /* 多层贴图 - View要使用 2D-Array格式 */
+        imgInfo.mipLevels = 1;
+        imgInfo.layers = 2;
+        tex_array = new textures::Texture(vulkanDevice, imgInfo);
+        tex_array->viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+        tex_array->load("../textures/rock 01.jpg");
+        tex_array->Insert("../textures/rock 02.jpg", 1, 0);
+        /* 只包含部分 <layer,mip-level>的视图 */
+        textures::MgImgViewInfo viewInfo{};
+        viewInfo.imgFormat = tex_mips->info.formats.format;
+        viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        viewInfo.baseMipLevel = 2;
+        viewInfo.mipLevCount = 3;
+        subView = new SubImageView(tex_mips, viewInfo);
+
+    }
+    void cleanup() 
+    {
+        subView->clean(tex_mips->vulkanDevice->logicalDevice);
+        tex_ui->destroy();
+        tex_array->destroy();
+        tex_mips->destroy();
+        tex_floor->destroy();
+        tex_depth->destroy();
+    }
+};

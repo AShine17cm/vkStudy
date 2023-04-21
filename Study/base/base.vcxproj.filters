@@ -161,8 +161,5 @@
     <ClInclude Include="mipmaps.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="InstancingDescriptorSet.h">
-      <Filter>geo</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

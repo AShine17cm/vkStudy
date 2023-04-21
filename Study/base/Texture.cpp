@@ -27,15 +27,28 @@ namespace textures
 		}
 
 		VkDeviceSize imageSize = info.extent3D.width * info.extent3D.height *info.extent3D.depth* 4;
-
-		std::vector<uint32_t> offsets = { 0 };
+		textures::MgImgViewInfo viewInfo{};
+		viewInfo.layerCount = info.layers;
+		viewInfo.mipLevCount = info.mipLevels;
+		viewInfo.imgFormat = info.formats.format;
+		viewInfo.viewType = viewType;
 		//数据格式 相关
-		//textures::createTexture_Simple(info,data,vulkanDevice,&image,&memory);
-		textures::createTexture(info,imageSize,vulkanDevice,&image, &memory,data,offsets.data(),nullptr,0);
-		textures::createImageView(vulkanDevice->logicalDevice,image, &view,info,viewType);
+		textures::createTexture(info,imageSize,vulkanDevice,&image, &memory,data,nullptr,0);
+		textures::createImageView(vulkanDevice->logicalDevice,image, &view,viewInfo);
 		textures::createSampler(vulkanDevice,info.mipLevels,&sampler,nullptr, 0,VK_SAMPLER_ADDRESS_MODE_REPEAT);
 
 		updateDescriptor();
+	}
+	/* 后续操作，必须比创建时的 <width,height>区域 =/小 */
+	void Texture::Insert(const char* filename,uint32_t target_Layer,uint32_t target_mipLevel) 
+	{
+		void* data = nullptr;
+		int width = 0, height = 0, channels = 0;
+		data = stbi_load(filename, &width, &height, &channels, STBI_rgb_alpha);
+
+		VkDeviceSize imageSize = width * height * info.extent3D.depth * 4;
+		MgInsertPiece piece = { info,target_Layer,target_mipLevel,imageSize};
+		textures::InsertPiece(vulkanDevice, &image,data, piece);
 	}
 	void Texture::updateDescriptor()
 	{

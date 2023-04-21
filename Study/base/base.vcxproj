@@ -192,7 +192,6 @@
     <ClInclude Include="descriptors.h" />
     <ClInclude Include="framebuffers.h" />
     <ClInclude Include="Geo.h" />
-    <ClInclude Include="InstancingDescriptorSet.h" />
     <ClInclude Include="materials.h" />
     <ClInclude Include="mg.h" />
     <ClInclude Include="mipmaps.h" />

@@ -14,6 +14,10 @@ namespace textures
 			//Image
 			Image_None = 100,
 			Image_Cube = 101,
+			Image_Layer=102,
+			Image_Array=103,
+			Image_Mipmap=104,
+			Image_Depth=105,
 
 			//Sampler
 			Sampler_None = 300,
@@ -33,6 +37,53 @@ namespace textures
 				VkImageLayout imagelayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			}formats;
 		};
+		struct  MgImgViewInfo		//image资源的一部分
+		{
+			uint32_t baseLayer = 0;
+			uint32_t baseMipLevel = 0;
+			uint32_t layerCount = 1;
+			uint32_t mipLevCount = 1;
+			VkFormat imgFormat = VK_FORMAT_R8G8B8A8_SRGB;
+			VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D;
+		};
+		struct MgInsertPiece		//用于插入 一块数据<layer，mip-level>
+		{
+			VkExtent3D imgExtend3D;
+
+			uint32_t target_Layer = -1;
+			uint32_t target_MipLevel = -1;
+
+			VkDeviceSize dataSize = 0;
+			VkImageLayout img_Layout;
+
+			MgInsertPiece(MgImageInfo imgInfo,uint32_t target_Layer,uint32_t target_MipLevel,VkDeviceSize dataSize) 
+			{
+				imgExtend3D = imgInfo.extent3D;
+				img_Layout = imgInfo.formats.imagelayout;
+
+				this->target_Layer = target_Layer;
+				this->target_MipLevel = target_MipLevel;
+				this->dataSize = dataSize;
+			}
+			VkBufferImageCopy  GetCopy() 
+			{
+				uint32_t layerCount = 1;		//只操作一层
+				VkBufferImageCopy  copy{};
+				copy.imageOffset = { 0,0,0 };	//数据块从0开始
+				copy.imageSubresource = { VK_IMAGE_ASPECT_COLOR_BIT,target_MipLevel,target_Layer,layerCount };
+				/* piece size */
+				copy.imageExtent = { imgExtend3D.width >> target_MipLevel,imgExtend3D.height >> target_MipLevel,1 };
+				copy.bufferOffset = 0;
+				return copy;
+			}
+			/* 操作时 设置最佳的 image-layout */
+			VkImageSubresourceRange GetLayoutRange() {
+				uint32_t operate_Count = 1;
+				uint32_t operate_MipLevCount = 1;
+				VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT,target_MipLevel,operate_MipLevCount,target_Layer,operate_Count };
+				return subresourceRange;
+			}
+		};
 		//可处理Array, 内存布局和ktx相关
 		void createTexture(
 			MgImageInfo info,
@@ -41,9 +92,11 @@ namespace textures
 			VkImage* image,
 			VkDeviceMemory* imageMemory,
 			void* texData,
-			uint32_t* offsets,
+			//uint32_t* offsets,
 			MgTextureEx* extend,
 			uint32_t exCount);
+		/* 在某一层，某一个mipLevel中插入数据 */
+		void InsertPiece(VulkanDevice* device,VkImage *image,void* texData,MgInsertPiece piece);
 		/*
 		不使用stage-memory-host
 		layers-miplevel 为 1
@@ -62,8 +115,7 @@ namespace textures
 			VkDevice device,
 			VkImage image,
 			VkImageView* view,
-			MgImageInfo imgInfo,
-			VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D);
+			MgImgViewInfo viewInfo);
 
 		void createSampler(
 			VulkanDevice* device,

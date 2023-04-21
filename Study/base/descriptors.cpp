@@ -76,7 +76,8 @@ namespace mg
 			allocateInfo.pSetLayouts = layouts;
 			allocateInfo.descriptorSetCount = layoutCount;
 			allocateInfo.pNext = pNext;
-
+			//VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT or VK_DESCRIPTOR_BINDING_UPDATE_UNUSED_WHILE_PENDING_BIT 
+			
 			MG_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocateInfo, descriptorSet));
 		}
 

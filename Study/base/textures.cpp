@@ -1,14 +1,12 @@
-//#include <exception>
-//#include "vulkan/vulkan.h"
-//#include "mg/mgVulkanDevice.h"
 #include "textures.h"
 #include "VulkanTools.h"
-//#include "framebuffers.h"
+
 namespace mg
 {
 namespace textures
 {
 
+		/* 创建 layer=1,mipLevels=1的贴图 */
 		void createTexture(
 			MgImageInfo info,
 			uint32_t size,
@@ -16,7 +14,6 @@ namespace textures
 			VkImage* image,
 			VkDeviceMemory* imageMemory,
 			void* texData,
-			uint32_t* offsets,
 			MgTextureEx* extends,
 			uint32_t exCount)
 		{
@@ -52,7 +49,7 @@ namespace textures
 					break;
 				}
 			}
-
+			/* 创建image,分配内存 */
 			MG_CHECK_RESULT(vkCreateImage(logicalDevice, &imageCI, nullptr, image));
 			vkGetImageMemoryRequirements(logicalDevice, *image, &memReqs);
 			memAI.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -60,22 +57,21 @@ namespace textures
 			memAI.memoryTypeIndex = device->getMemoryType(memReqs.memoryTypeBits,VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 			MG_CHECK_RESULT(vkAllocateMemory(logicalDevice, &memAI, nullptr, imageMemory));
 			MG_CHECK_RESULT(vkBindImageMemory(logicalDevice, *image, *imageMemory, 0));
-			/* image创建 */
+			/* 没有初始化数据 */
 			if (nullptr == texData)
 			{
-				//12.26
-				//bool hasDepth = framebuffers::hasDepth(info.formats.format);
-				////VkImageAspectFlags aspect = hasDepth ? VK_IMAGE_ASPECT_DEPTH_BIT|VK_IMAGE_ASPECT_STENCIL_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
-				//if(!hasDepth)
-				//{
-				//	VkImageSubresourceRange sRange = { VK_IMAGE_ASPECT_COLOR_BIT,0,info.mipLevels,0,info.layers };
-				//	setImageLayout(cmdBuffer, *image, VK_IMAGE_LAYOUT_UNDEFINED, info.formats.imagelayout, &sRange);
-				//	device->flushCommandBuffer(cmdBuffer, device->graphicsQueue);
-				//}
 				return;
 			}
-
-
+			MgInsertPiece piece = { info, 0, 0, size };
+			InsertPiece(device, image, texData, piece);
+		}
+		/* 在某一层，某一个mipLevel中插入数据 */
+		void InsertPiece(VulkanDevice* device, VkImage* image, void* texData, MgInsertPiece piece) 
+		{
+			VkDevice logicalDevice = device->logicalDevice;
+			VkCommandBuffer cmdBuffer = device->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+			VkMemoryRequirements memReqs;
+			VkMemoryAllocateInfo memAI{};
 			/* 使用 stagingBuffer */
 			VkBuffer		stagingBuffer;
 			VkDeviceMemory	stagingMemory;
@@ -83,7 +79,7 @@ namespace textures
 			bufferCI.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 			bufferCI.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 			bufferCI.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-			bufferCI.size = size;
+			bufferCI.size = piece.dataSize;
 
 			MG_CHECK_RESULT(vkCreateBuffer(logicalDevice, &bufferCI, nullptr, &stagingBuffer));
 			vkGetBufferMemoryRequirements(logicalDevice, stagingBuffer, &memReqs);
@@ -95,30 +91,17 @@ namespace textures
 
 			void* mapped;
 			MG_CHECK_RESULT(vkMapMemory(logicalDevice, stagingMemory, 0, memReqs.size, 0, &mapped));
-			memcpy(mapped, texData, size);
+			memcpy(mapped, texData, piece.dataSize);
 			vkUnmapMemory(logicalDevice, stagingMemory);
-			/* 使用staging - buffer */
 
-			VkImageSubresourceRange subresourceRange= { VK_IMAGE_ASPECT_COLOR_BIT,0,info.mipLevels,0,info.layers };
-			std::vector<VkBufferImageCopy> copys;
-			//copys 和ktx相关的内存布局
-			for (uint32_t layer = 0; layer < info.layers; layer++)
-			{
-				for (uint32_t level = 0; level < info.mipLevels; level++)
-				{
-					VkBufferImageCopy copy{};
-					copy.imageSubresource = { VK_IMAGE_ASPECT_COLOR_BIT,level,layer,1 };
-					copy.imageExtent = { info.extent3D.width >> level,info.extent3D.height >> level,1 };
-					copy.bufferOffset = offsets[layer * info.mipLevels + level];
-					copys.push_back(copy);
-				}
-			}
-			//从stagingBuffer拷贝,优化Image-layout
-			setImageLayout(cmdBuffer, *image,VK_IMAGE_LAYOUT_UNDEFINED,VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,&subresourceRange);
-			vkCmdCopyBufferToImage(cmdBuffer, stagingBuffer, *image,VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,copys.size(), copys.data());
+			VkBufferImageCopy  copy = piece.GetCopy();
+			VkImageSubresourceRange subresourceRange = piece.GetLayoutRange();
+			//从staging拷贝前,优化Image-layout
+			setImageLayout(cmdBuffer, *image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &subresourceRange);
+			vkCmdCopyBufferToImage(cmdBuffer, stagingBuffer, *image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy);
 			//拷贝完成，重新优化image layout
-			setImageLayout(cmdBuffer, *image,VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,info.formats.imagelayout,&subresourceRange);
-			device->flushCommandBuffer(cmdBuffer,device->graphicsQueue);
+			setImageLayout(cmdBuffer, *image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, piece.img_Layout, &subresourceRange);
+			device->flushCommandBuffer(cmdBuffer, device->graphicsQueue);
 
 			vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
 			vkFreeMemory(logicalDevice, stagingMemory, nullptr);
@@ -195,18 +178,17 @@ namespace textures
 			VkDevice device,
 			VkImage image,
 			VkImageView* view,
-			MgImageInfo extent,
-			VkImageViewType viewType)
+			MgImgViewInfo info)
 		{
 			VkImageViewCreateInfo viewCI{};
 			viewCI.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-			viewCI.format =extent.formats.format;
+			viewCI.format =info.imgFormat;
 			viewCI.image = image;
 			viewCI.components = { VK_COMPONENT_SWIZZLE_R , VK_COMPONENT_SWIZZLE_G , VK_COMPONENT_SWIZZLE_B , VK_COMPONENT_SWIZZLE_A };
-			viewCI.viewType = viewType;
-			viewCI.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT,0,extent.mipLevels,0,extent.layers };
+			viewCI.viewType =info.viewType;
+			viewCI.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT,info.baseMipLevel,info.mipLevCount,info.baseLayer,info.layerCount };
 
-			switch (extent.formats.format)
+			switch (info.imgFormat)
 			{
 			case VK_FORMAT_D16_UNORM:
 			case VK_FORMAT_D16_UNORM_S8_UINT:

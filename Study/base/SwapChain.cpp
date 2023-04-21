@@ -67,16 +67,13 @@ namespace mg
         vkGetSwapchainImagesKHR(device, swapChain, &imageCount, images.data());
 
         imageFormat = surfaceFormat.format;
-        //把信息放进 ImageInfo
-        textures::MgImageInfo imgInfo{};
-        imgInfo.formats.format = imageFormat;
-        imgInfo.layers = 1;
-        imgInfo.mipLevels = 1;
+        textures::MgImgViewInfo viewInfo{};
+        viewInfo.imgFormat = imageFormat;
         //swapchain的image views
         imageViews.resize(imageCount);
         for (size_t i = 0; i < imageCount; i++)
         {
-            textures::createImageView(device, images[i], &imageViews[i], imgInfo);
+            textures::createImageView(device, images[i], &imageViews[i], viewInfo);
         }
 	}
 

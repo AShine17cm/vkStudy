@@ -17,7 +17,7 @@ namespace textures
 		VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D;
 
 		VkImage image;
-		VkImageView view;
+		VkImageView view;			//所有<layer,mip-levels> 的视图
 		VkDeviceMemory memory;
 
 		VkDescriptorImageInfo descriptor;
@@ -27,7 +27,8 @@ namespace textures
 		void updateDescriptor();
 		void destroy();
 		void load(const char* filename);
-
+		/* 将数据插入到 某<layer,MipLevel> */
+		void Insert(const char* filename,uint32_t target_Layer,uint32_t target_mipLevel);
 	private:
 
 	};

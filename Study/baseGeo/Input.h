@@ -9,7 +9,8 @@ struct Input
     float clearTimer;
     int GetKey() {
         if (opKey > 0)return opKey;
-        if (funcKey > 0)return funcKey;
+        if (funcKey > 0)return funcKey- GLFW_KEY_0;
+        return -1;
     }
 	void Process(GLFWwindow* window) 
     {

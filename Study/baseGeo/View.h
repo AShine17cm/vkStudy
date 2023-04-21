@@ -6,8 +6,7 @@
 using namespace mg;
 
 /* 
-	相机-灯光
-	输入-控制
+	相机-灯光,	输入-控制
 */
 
 struct  View
