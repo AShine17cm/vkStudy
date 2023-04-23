@@ -42,6 +42,7 @@ struct  Scene
 
 	geos::Geo* ground;
 	geos::GeoCube* cube;
+	geos::GeoSphere* sphere;
 
 	std::vector<geos::GeoSquarePillar*> pillars;		//方柱，非实例化
 
@@ -60,7 +61,8 @@ struct  Scene
 		view = new View({ 0,0,1 }, 9.0f, { -3.0f,6.0f }, extent);
 		ground = new geos::GeoPlane(8, { 0,0,-2 });
 		ground->prepareBuffer(vulkanDevice);
-
+		sphere = new geos::GeoSphere(0.6f, { 0.2f,0.2f }, 32, 24);
+		sphere->prepareBuffer(vulkanDevice);
 		/* 方柱 */
 		vec2 baseSize = { 0.3f,0.4f };
 		vec2 topSize = { 0.2f,0.25f };
@@ -126,9 +128,10 @@ struct  Scene
 
 		/* 设置物体的初始 位置-姿势 */
 		ground->pos = { 0,0,0 };
+		sphere->pos = { 0,0,1 };
 		cube->pos = {0,0,2};
-
 		ground->modelMatrix = glm::translate(ground->modelMatrix, ground->pos);
+		sphere->modelMatrix = glm::translate(sphere->modelMatrix, sphere->pos);
 		cube->modelMatrix = glm::translate(cube->modelMatrix, cube->pos);
 
 		/* 在水平面上 旋转模型 */
@@ -201,11 +204,16 @@ struct  Scene
 				cube->drawGeo(cmd,countInstance);
 				break;
 			case 2:
+				/* 球体 */
+				pod.model = sphere->modelMatrix;
+				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
+				sphere->drawGeo(cmd);
 				//最后画ground 故意的
 				pod.model = ground->modelMatrix;
 				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
 				ground->drawGeo(cmd);
 				break;
+
 			case 3:
 				//画 UI
 				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
@@ -217,6 +225,7 @@ struct  Scene
 	void cleanup()
 	{
 		ground->clean();
+		sphere->clean();
 		for (uint32_t i = 0; i < pillars.size(); i++)
 		{
 			pillars[i]->clean();

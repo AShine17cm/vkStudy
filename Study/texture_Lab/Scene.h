@@ -42,6 +42,7 @@ struct  Scene
 
 	geos::Geo* ground;
 	geos::GeoCube* cube;
+	geos::GeoSphere* sphere;
 
 	std::vector<geos::GeoSquarePillar*> pillars;		//方柱，非实例化
 
@@ -60,6 +61,22 @@ struct  Scene
 		view = new View({ 0,0,1 }, 9.0f, { -6.0f,6.0f }, extent);
 		ground = new geos::GeoPlane(8, { 0,0,-2 });
 		ground->prepareBuffer(vulkanDevice);
+		sphere = new geos::GeoSphere(0.6f, { 0.2f,0.2f }, 32, 24);
+		sphere->prepareBuffer(vulkanDevice);
+		/* 立方体  将被Instancing的物体 */
+		float size = 0.3f;
+		vec3 clipA = { 0.5f,0.3f,0.2f };
+		vec3 clipB = { 0.4f,0.2f,0.45f };
+		cube = new geos::GeoCube(size, clipA, clipB);
+		cube->prepareBuffer(vulkanDevice);
+
+		/* 设置物体的初始 位置-姿势 */
+		ground->pos = { 0,0,0 };
+		sphere->pos = { 0,0,0.6f };
+		cube->pos = { 0,0,2 };
+		ground->modelMatrix = glm::translate(ground->modelMatrix, ground->pos);
+		sphere->modelMatrix = glm::translate(sphere->modelMatrix, sphere->pos);
+		cube->modelMatrix = glm::translate(cube->modelMatrix, cube->pos);
 
 		/* 方柱 */
 		vec2 baseSize = { 0.3f,0.4f };
@@ -67,7 +84,6 @@ struct  Scene
 		vec2 heights = { 0.8f,0.8f };   //x 是绝对值，y是比例
 		vec2 topCenter = { 0.0f,0.05f };
 		vec2 uvPlane = { 1.0f,1.0f };
-
 		Random rnd(0, { 0,1.0f });
 
 		float PI = glm::pi<float>();
@@ -96,14 +112,8 @@ struct  Scene
 			pillars.push_back(pillar);
 		}
 
-		glm::mat4 idenity = glm::mat4(1.0f);
-		/* 立方体  将被Instancing的物体 */
-		float size = 0.3f;
-		vec3 clipA = { 0.5f,0.3f,0.2f };
-		vec3 clipB = { 0.4f,0.2f,0.45f };
-		cube = new geos::GeoCube(size, clipA, clipB);
-		cube->prepareBuffer(vulkanDevice);
 		/* Instancing的环阵 初始化 */
+		glm::mat4 idenity = glm::mat4(1.0f);
 		radius = 1.6f;
 		stepAng = PI*2.0f / countInstance;
 		float instanceH = 0.6f;
@@ -123,29 +133,19 @@ struct  Scene
 			float spd = rnd.generate();
 			poses[i].spd=spd;
 		}
-
-		/* 设置物体的初始 位置-姿势 */
-		ground->pos = { 0,0,0 };
-		cube->pos = {0,0,2};
-
-		ground->modelMatrix = glm::translate(ground->modelMatrix, ground->pos);
-		cube->modelMatrix = glm::translate(cube->modelMatrix, cube->pos);
-
-		/* 在水平面上 旋转模型 */
-		geos::Geo* target = nullptr;
-		if (nullptr != target)
-		{
-			//target->modelMatrix= glm::rotate(target->modelMatrix, glm::radians(68.0f), glm::vec3(0.0f, 0, 1.0f));
-		}
 	}
 	/* 更新-UBO 资源 */
 	void update(Frame* pFrame, float time, float deltaTime,int opKey)
 	{
 		view->update(deltaTime,opKey);
 		float ang = time * glm::radians(30.0f);//time是相对时间
-
 		updateInstance(ang);
-		// 
+		/* 在水平面上 旋转模型 */
+		geos::Geo* target = nullptr;
+		if (nullptr != target)
+		{
+			//target->modelMatrix= glm::rotate(target->modelMatrix, glm::radians(68.0f), glm::vec3(0.0f, 0, 1.0f));
+		}
 		//拷贝数据
 		memcpy(pFrame->ui_ubo.mapped, uiPts.data(), sizeof(vec4) * 6);
 		memcpy(pFrame->view_ubo.mapped, &view->data, sizeof(View::UniformBufferObject));
@@ -204,12 +204,18 @@ struct  Scene
 				cube->drawGeo(cmd,countInstance);
 				break;
 			case 2:
+				/* 球体 */
+				pod.model = sphere->modelMatrix;
+				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
+				sphere->drawGeo(cmd);
+				break;
+			case 3:
 				/* texture */
 				pod.model = ground->modelMatrix;
 				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
 				ground->drawGeo(cmd);
 				break;
-			case 3:
+			case 4:
 				//画 UI
 				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
 				vkCmdDraw(cmd, 6, 1, 0, 0);
@@ -220,6 +226,7 @@ struct  Scene
 	void cleanup()
 	{
 		ground->clean();
+		sphere->clean();
 		for (uint32_t i = 0; i < pillars.size(); i++)
 		{
 			pillars[i]->clean();

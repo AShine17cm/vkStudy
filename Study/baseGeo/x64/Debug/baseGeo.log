@@ -17,8 +17,8 @@ E:\VulkanProj\vkStudy\Study\baseGeo\Frame.h(66,1): warning C4267: “参数”: 
 E:\VulkanProj\vkStudy\Study\baseGeo\Frame.h(71,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\baseGeo\Frame.h(75,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\baseGeo\Frame.h(80,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\baseGeo\Scene.h(76,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\baseGeo\Scene.h(157,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\Scene.h(78,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\baseGeo\Scene.h(160,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\baseGeo\dx_baseGeo.cpp(162,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\baseGeo\dx_baseGeo.cpp(210,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
   baseGeo.vcxproj -> E:\VulkanProj\vkStudy\Study\baseGeo\baseGeo.exe

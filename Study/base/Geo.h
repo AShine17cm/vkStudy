@@ -204,5 +204,32 @@ namespace geos
 		vec2 uvPlane;		//uv 投影参考大小
 		GeoSquarePillar(vec2 baseSize,vec2 topSize,vec2 topCenter,vec2 height,vec2 uvPlane);
 	};
+	/*
+	圆柱体
+	*/
+	//class GeoCylinder:public Geo
+	//{
+	//public:
+	//	float radius;
+	//	float height;
+	//	float clipAng;	//斜切角度
+	//	int uSegs;		//环切面数量
+	//	GeoCylinder(float radius, float height, float clipAng, int uSegs);
+
+	//private:
+
+	//};
+	class  GeoSphere:public Geo
+	{
+	public:
+		float radius;
+		vec2 clips;		//上下切高度
+		int uSegs, vSegs;	//U,V细分数量
+		/* clips是比值，不是绝对值 */
+		GeoSphere(float radius, vec2 clips, int uSegs,int vSegs);
+
+	private:
+
+	};
 
 }

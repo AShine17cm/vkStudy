@@ -11,7 +11,7 @@ struct Resource
     textures::Texture* tex_array;   //两层贴图 用于立柱
     textures::Texture* tex_mips;    //mip-maps, 用于实例化的立方体
     textures::Texture* tex_floor;   //地板
-    SubImageView* subView;          //只包含部分 <layer,mip-level>的视图
+    SubImageView* subView;          //只包含Image的部分 <layer,mip-level>
 
     void prepare(VulkanDevice* vulkanDevice,VkExtent2D swapchainExtent) 
     {

@@ -93,6 +93,9 @@
     <ClCompile Include="GeoSquarePillar.cpp">
       <Filter>geo</Filter>
     </ClCompile>
+    <ClCompile Include="GeoSphere.cpp">
+      <Filter>geo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h">

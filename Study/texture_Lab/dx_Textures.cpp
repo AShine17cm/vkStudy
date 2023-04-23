@@ -281,18 +281,25 @@ private:
         batchIdx = 1;
         scene.draw(cmd, piHub.piLayout_instance, batchIdx);
 
-        /* 地板的贴图 */
+        /* 球体 */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
-        dstSet = 1;             //tint-texture
+        dstSet = 1;    
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_tex, dstSet, 1, &frame->set_ground, 0, nullptr);
         batchIdx = 2;
+        scene.draw(cmd, piHub.piLayout_tex, batchIdx);
+
+        /* 地板的贴图 */
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
+        dstSet = 1;    
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_tex, dstSet, 1, &frame->set_ground, 0, nullptr);
+        batchIdx = 3;
         scene.draw(cmd, piHub.piLayout_tex, batchIdx);
 
         /* ui */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_ui);
         dstSet = 0;
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ui, dstSet, 1, &frame->set_ui, 0, nullptr);
-        batchIdx = 3;
+        batchIdx = 4;
         scene.draw(cmd, piHub.piLayout_ui, batchIdx);
     }
     void createSyncObjects() {
