@@ -8,19 +8,21 @@ using namespace glm;
 struct PipelineHub
 {
 	/* 基础的 set-layout */
-	VkDescriptorSetLayout setLayout_ubo;
-	VkDescriptorSetLayout setLayout_tex;
-	VkDescriptorSetLayout setLayout_ui;
+	VkDescriptorSetLayout setLayout_ubo;	//<ubo>
+	VkDescriptorSetLayout setLayout_tex;	//<tex>
+	VkDescriptorSetLayout setLayout_ui;		//<ubo,tex>
 	/* set-layout 组合的 pipe-layout */
-	VkPipelineLayout piLayout_ui;
-	VkPipelineLayout piLayout_view;
-	VkPipelineLayout piLayout_tex;
-	VkPipelineLayout piLayout_instance;
+	VkPipelineLayout piLayout_ui;			//<ubo,tex>
+	VkPipelineLayout piLayout_view;			//<ubo> camera-light
+	VkPipelineLayout piLayout_tex;			//<ubo,tex>
+	VkPipelineLayout piLayout_instance;		//<ubo,ubo,tex>
+	/* 使用同一个 pipeline-layout */
+	VkPipeline pi_Tex;						//shader::<tex.vert tex.frag>
+	VkPipeline pi_TexArray;					//shader::<texArray.vert texArray.frag>
+	VkPipeline pi_TexCube;					//shader::<texCube.vert texCube.frag>
 
-	VkPipeline pi_ui;
-	VkPipeline pi_Tex;
-	VkPipeline pi_TexArray;
-	VkPipeline pi_Instance;
+	VkPipeline pi_ui;						//shader::<ui.vert ui.frag>
+	VkPipeline pi_Instance;					//shader::<instancing.vert instancing.frag>
 
 	void prepare(VkDevice device, VkRenderPass renderPass,uint32_t constantSize)
 	{
@@ -77,6 +79,9 @@ struct PipelineHub
 		createPipeline(device, renderPass, &shaderFiles, &piLayout_tex, &pi_Tex, 0);
 		shaderFiles = { "shaders/texArray.vert.spv", "shaders/texArray.frag.spv" };
 		createPipeline(device, renderPass, &shaderFiles, &piLayout_tex, &pi_TexArray, 0);
+		shaderFiles = { "shaders/texCube.vert.spv", "shaders/texCube.frag.spv" };
+		createPipeline(device, renderPass, &shaderFiles, &piLayout_tex, &pi_TexCube, 0);
+
 		shaderFiles = { "shaders/instancing.vert.spv", "shaders/instancing.frag.spv" };
 		createPipeline(device, renderPass, &shaderFiles, &piLayout_instance, &pi_Instance,0);
 		shaderFiles = { "shaders/ui.vert.spv","shaders/ui.frag.spv" };
@@ -136,9 +141,10 @@ struct PipelineHub
 	}
 	void cleanup(VkDevice device)
 	{
-		vkDestroyPipeline(device, pi_ui, nullptr);
 		vkDestroyPipeline(device, pi_Tex, nullptr);
 		vkDestroyPipeline(device, pi_TexArray, nullptr);
+		vkDestroyPipeline(device, pi_TexCube, nullptr);
+		vkDestroyPipeline(device, pi_ui, nullptr);
 		vkDestroyPipeline(device, pi_Instance, nullptr);
 
 		vkDestroyPipelineLayout(device, piLayout_ui, nullptr);

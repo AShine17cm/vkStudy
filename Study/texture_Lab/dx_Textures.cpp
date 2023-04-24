@@ -282,9 +282,9 @@ private:
         scene.draw(cmd, piHub.piLayout_instance, batchIdx);
 
         /* ÇòÌå */
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_TexCube);
         dstSet = 1;    
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_tex, dstSet, 1, &frame->set_ground, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_tex, dstSet, 1, &frame->set_cube, 0, nullptr);
         batchIdx = 2;
         scene.draw(cmd, piHub.piLayout_tex, batchIdx);
 

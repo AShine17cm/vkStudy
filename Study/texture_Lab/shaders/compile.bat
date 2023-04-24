@@ -5,6 +5,8 @@ set s1=tex.vert
 set s2=tex.frag
 set a1=texArray.vert
 set a2=texArray.frag
+set c1=texCube.vert
+set c2=texCube.frag
 set inst1=instancing.vert
 set inst2=instancing.frag
 
@@ -14,6 +16,8 @@ set inst2=instancing.frag
 %glslc% %s2% -o %s2%.spv
 %glslc% %a1% -o %a1%.spv
 %glslc% %a2% -o %a2%.spv
+%glslc% %c1% -o %c1%.spv
+%glslc% %c2% -o %c2%.spv
 %glslc% %inst1% -o %inst1%.spv
 %glslc% %inst2% -o %inst2%.spv
 pause

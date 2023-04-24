@@ -1,0 +1,33 @@
+VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+可用于 < sampler2D / sampler2DArray / samplerCube / samplerCubeArray >
+因此 /*也可以*/ 共享一个 VkDescriptorSetLayout 或者 VkPipelineLayout
+但是 /*不能*/ 使用同一个 VkPipeline, 因为shader不同
+
+Texture类
+初始会加载 第一层数据 <layer=0  mipLevel=0>
+可以使用Insert 加载特定层的数据
+ImageView 会创建为 全部数据层 <layerCount,  mipLevelCount>
+
+SubImageView
+相对于 ImageView, 只使用部分层的数据
+
+Mip-Maps
+只需调整 创建信息 mipLevels
+
+VkDescriptorImageInfo    	和ImageView绑
+VkSampler		使用的mip-levels 不能超过ImageView的mip-levels
+
+Texture Array  
+需要改变 ImageView.Type=VK_IMAGE_VIEW_TYPE_2D_ARRAY
+Shader中为  sampler2DArray
+
+Cube-Map
+创建信息需要额外的flags=VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT
+ImageView.type=VK_IMAGE_VIEW_TYPE_CUBE
+
+Cube-Map-Array
+Image的创建信息 layers=6*cube的数量
+viewType=VK_IMAGE_VIEW_TYPE_CUBE_ARRAY
+layers=6*cube的数量
+
+

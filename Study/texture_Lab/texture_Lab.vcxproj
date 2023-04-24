@@ -173,6 +173,8 @@
     <None Include="shaders\tex.vert" />
     <None Include="shaders\texArray.frag" />
     <None Include="shaders\texArray.vert" />
+    <None Include="shaders\texCube.frag" />
+    <None Include="shaders\texCube.vert" />
     <None Include="shaders\ui.frag" />
     <None Include="shaders\ui.vert" />
   </ItemGroup>

@@ -47,6 +47,12 @@
     <None Include="shaders\texArray.vert">
       <Filter>shaders</Filter>
     </None>
+    <None Include="shaders\texCube.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\texCube.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">

@@ -35,6 +35,7 @@ namespace textures
 				VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
 				VkImageUsageFlags usageFlags = VK_IMAGE_USAGE_SAMPLED_BIT;
 				VkImageLayout imagelayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+				VkImageCreateFlags createFalgs = 0;// VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
 			}formats;
 		};
 		struct  MgImgViewInfo		//image资源的一部分

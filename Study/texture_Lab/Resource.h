@@ -6,12 +6,14 @@ using namespace mg;
 
 struct Resource
 {
-    textures::Texture* tex_ui;
     textures::Texture* tex_depth;   //场景的深度测试
-    textures::Texture* tex_array;   //两层贴图 用于立柱
-    textures::Texture* tex_mips;    //mip-maps, 用于实例化的立方体
+    textures::Texture* tex_ui;      //一个操作说明
+    textures::Texture* tex_array;   //两层贴图 立柱-环阵
+    textures::Texture* tex_mips;    //mip-maps 立方体-旋转环阵
     textures::Texture* tex_floor;   //地板
-    SubImageView* subView;          //只包含Image的部分 <layer,mip-level>
+    textures::Texture* tex_cube;    //球体的反射
+    SubImageView* subView;          //Image的部分 <layer,mip-level>, 键盘<1,2>切换<tex_mips,subView>
+
 
     void prepare(VulkanDevice* vulkanDevice,VkExtent2D swapchainExtent) 
     {
@@ -63,6 +65,18 @@ struct Resource
         viewInfo.baseMipLevel = 2;
         viewInfo.mipLevCount = 3;
         subView = new SubImageView(tex_mips, viewInfo);
+        /* Cube-Map */
+        imgInfo.mipLevels = 1;
+        imgInfo.layers = 6;
+        imgInfo.formats.createFalgs = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+        tex_cube = new textures::Texture(vulkanDevice, imgInfo);
+        tex_cube->viewType = VK_IMAGE_VIEW_TYPE_CUBE;
+        tex_cube->load("../textures/cube 0.jpg");
+        tex_cube->Insert("../textures/cube 1.jpg", 1, 0);
+        tex_cube->Insert("../textures/cube 2.jpg", 2, 0);
+        tex_cube->Insert("../textures/cube 3.jpg", 3, 0);
+        tex_cube->Insert("../textures/cube 4.jpg", 4, 0);
+        tex_cube->Insert("../textures/cube 5.jpg", 5, 0);
 
     }
     void cleanup() 
@@ -73,5 +87,6 @@ struct Resource
         tex_mips->destroy();
         tex_floor->destroy();
         tex_depth->destroy();
+        tex_cube->destroy();
     }
 };

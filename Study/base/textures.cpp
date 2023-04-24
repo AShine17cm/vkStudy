@@ -33,11 +33,11 @@ namespace textures
 			imageCI.imageType		= info.formats.type;
 			imageCI.format			= info.formats.format;
 			imageCI.usage			= info.formats.usageFlags | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+			imageCI.flags			= info.formats.createFalgs;
 			imageCI.initialLayout	= VK_IMAGE_LAYOUT_UNDEFINED;//VK_IMAGE_LAYOUT_PREINITIALIZED
 			imageCI.samples			= VK_SAMPLE_COUNT_1_BIT;
 			imageCI.sharingMode		= VK_SHARING_MODE_EXCLUSIVE;
 			imageCI.tiling			= VK_IMAGE_TILING_OPTIMAL;
-
 			//ºÏ≤È¿©’π
 			for (uint32_t i = 0; i < exCount; i++) 
 			{

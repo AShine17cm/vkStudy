@@ -18,6 +18,7 @@ struct Frame
 	VkDescriptorSet set_instance;		//实例化
 	VkDescriptorSet set_pillar;			//tex	模型
 	VkDescriptorSet set_ground;			//tex	地板
+	VkDescriptorSet set_cube;
 	VkDescriptorSet set_mips;
 
 	mg::Buffer ui_ubo;
@@ -42,6 +43,7 @@ struct Frame
 		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &set_pillar);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &set_ground);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &set_mips);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &set_cube);
 
 		vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -81,6 +83,8 @@ struct Frame
 		//模型
 		infos = { &res->tex_array->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), set_pillar, device);
+		infos = { &res->tex_cube->descriptor };
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), set_cube, device);
 
 		//地板
 		infos = { &res->tex_floor->descriptor };
