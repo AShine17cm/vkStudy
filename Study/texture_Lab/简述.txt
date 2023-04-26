@@ -1,5 +1,5 @@
 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
-可用于 < sampler2D / sampler2DArray / samplerCube / samplerCubeArray >
+可用于 < sampler2D / sampler2DArray / samplerCube / samplerCubeArray / sampler3D >
 因此 /*也可以*/ 共享一个 VkDescriptorSetLayout 或者 VkPipelineLayout
 但是 /*不能*/ 使用同一个 VkPipeline, 因为shader不同
 
@@ -29,5 +29,10 @@ Cube-Map-Array
 Image的创建信息 layers=6*cube的数量
 viewType=VK_IMAGE_VIEW_TYPE_CUBE_ARRAY
 layers=6*cube的数量
+
+Texture3D
+需要额外设置depth
+format=VK_IMAGE_TYPE_3D
+viewType=VK_IMAGE_VIEW_TYPE_3D
 
 

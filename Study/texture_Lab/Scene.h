@@ -34,18 +34,18 @@ struct  Scene
 		glm::vec3 rot;		//未使用
 		float spd;
 	};
+	View* view;
 	std::array<InstanceData, countInstance> instances;
 	std::array<InstancePose, countInstance> poses;
 	std::array<vec4, 6> uiPts;
 
-	View* view;
-
+	std::vector<geos::GeoSquarePillar*> pillars;		//方柱，非实例化
+	std::vector<geos::GeoCube*> cubes;					//测试 3D-Texture
 	geos::Geo* ground;
 	geos::GeoCube* cube;
 	geos::GeoSphere* sphere;
 
-	std::vector<geos::GeoSquarePillar*> pillars;		//方柱，非实例化
-
+	float deltaTime;
 	//创建 模型
 	void prepare(VulkanDevice* vulkanDevice, VkExtent2D extent)
 	{
@@ -111,7 +111,22 @@ struct  Scene
 			pillar->modelMatrix = glm::rotate(pillar->modelMatrix, ang, { 0,0,1.0f });
 			pillars.push_back(pillar);
 		}
-
+		/* 一队 Cube */
+		int countCube = 7;
+		float left = 3.2f;
+		float space = 0.4f;
+		float step = 1.0f / (countCube - 1);
+		float linePos = -4.5f;
+		for (int i = 0; i < countCube; i++)
+		{
+			float size = 0.2f + step * i;
+			linePos = linePos + size + space;
+			auto tmp = new geos::GeoCube(0.2f+step*i, clipA, clipB);
+			tmp->prepareBuffer(vulkanDevice);
+			tmp->pos = { left,linePos,size/2 };
+			tmp->modelMatrix = glm::translate(tmp->modelMatrix, tmp->pos);
+			cubes.push_back(tmp);
+		}
 		/* Instancing的环阵 初始化 */
 		glm::mat4 idenity = glm::mat4(1.0f);
 		radius = 1.6f;
@@ -137,6 +152,7 @@ struct  Scene
 	/* 更新-UBO 资源 */
 	void update(Frame* pFrame, float time, float deltaTime,int opKey)
 	{
+		this->deltaTime = deltaTime;
 		view->update(deltaTime,opKey);
 		float ang = time * glm::radians(30.0f);//time是相对时间
 		updateInstance(ang);
@@ -199,23 +215,34 @@ struct  Scene
 			}
 			break;
 			case 1:
+				/* 3d-texture */
+				for (uint32_t i = 0; i < cubes.size(); i++)
+				{
+					//glm::vec4 posVS =glm::vec4( cubes[i]->pos,1.0) * view->data.view;
+					pod.model = cubes[i]->modelMatrix;
+					pod.texIndex = { i,0,0,0 };
+					vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
+					cubes[i]->drawGeo(cmd);
+				}
+				break;
+			case 2:
 				/* instancing */
 				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
 				cube->drawGeo(cmd,countInstance);
 				break;
-			case 2:
+			case 3:
 				/* 球体 */
 				pod.model = sphere->modelMatrix;
 				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
 				sphere->drawGeo(cmd);
 				break;
-			case 3:
+			case 4:
 				/* texture */
 				pod.model = ground->modelMatrix;
 				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
 				ground->drawGeo(cmd);
 				break;
-			case 4:
+			case 5:
 				//画 UI
 				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
 				vkCmdDraw(cmd, 6, 1, 0, 0);
@@ -227,10 +254,14 @@ struct  Scene
 	{
 		ground->clean();
 		sphere->clean();
+		cube->clean();
 		for (uint32_t i = 0; i < pillars.size(); i++)
 		{
 			pillars[i]->clean();
 		}
-		cube->clean();
+		for (uint32_t i = 0; i < cubes.size(); i++)
+		{
+			cubes[i]->clean();
+		}
 	}
 };

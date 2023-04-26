@@ -53,6 +53,12 @@
     <None Include="shaders\texCube.vert">
       <Filter>shaders</Filter>
     </None>
+    <None Include="shaders\tex3D.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\tex3D.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">
@@ -80,6 +86,9 @@
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="SubImageView.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tex3D.h">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

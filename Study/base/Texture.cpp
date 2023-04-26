@@ -14,19 +14,21 @@ namespace textures
 		this->vulkanDevice = vulkanDevice;
 		this->info = imgInfo;
 	}
-	void Texture::load(const char* filename) 
+	void Texture::load(const char* filename,int channels) 
 	{
 		//第三方库相关
 		void* data = nullptr;
 		if (nullptr != filename) 
 		{
-			int width=0, height=0, channels=0;
+			int width = 0, height = 0;
+			//channels = 0;
 			data=stbi_load(filename, &width, &height, &channels, STBI_rgb_alpha);
 			info.extent3D.width = width;
 			info.extent3D.height = height;
 		}
+		if (VK_FORMAT_R8G8B8A8_SRGB == info.formats.format)channels = 4;//简单处理
 
-		VkDeviceSize imageSize = info.extent3D.width * info.extent3D.height *info.extent3D.depth* 4;
+		VkDeviceSize imageSize = info.extent3D.width * info.extent3D.height *info.extent3D.depth* channels;
 		textures::MgImgViewInfo viewInfo{};
 		viewInfo.layerCount = info.layers;
 		viewInfo.mipLevCount = info.mipLevels;

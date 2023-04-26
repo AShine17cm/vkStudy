@@ -2,6 +2,8 @@
 #include "Texture.h"
 #include "vulkan/vulkan.h"
 #include "SubImageView.h"
+#include "tex3D.h"
+
 using namespace mg;
 
 struct Resource
@@ -13,7 +15,7 @@ struct Resource
     textures::Texture* tex_floor;   //地板
     textures::Texture* tex_cube;    //球体的反射
     SubImageView* subView;          //Image的部分 <layer,mip-level>, 键盘<1,2>切换<tex_mips,subView>
-
+    Tex3D* tex_3D;
 
     void prepare(VulkanDevice* vulkanDevice,VkExtent2D swapchainExtent) 
     {
@@ -77,10 +79,13 @@ struct Resource
         tex_cube->Insert("../textures/cube 3.jpg", 3, 0);
         tex_cube->Insert("../textures/cube 4.jpg", 4, 0);
         tex_cube->Insert("../textures/cube 5.jpg", 5, 0);
-
+        /* Texture 3D */
+        tex_3D = new Tex3D(vulkanDevice, 128, 128, 128);
+        tex_3D->generate();
     }
     void cleanup() 
     {
+        tex_3D->clean();
         subView->clean(tex_mips->vulkanDevice->logicalDevice);
         tex_ui->destroy();
         tex_array->destroy();

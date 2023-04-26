@@ -171,6 +171,8 @@
     <None Include="shaders\instancing.vert" />
     <None Include="shaders\tex.frag" />
     <None Include="shaders\tex.vert" />
+    <None Include="shaders\tex3D.frag" />
+    <None Include="shaders\tex3D.vert" />
     <None Include="shaders\texArray.frag" />
     <None Include="shaders\texArray.vert" />
     <None Include="shaders\texCube.frag" />
@@ -187,6 +189,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SimpleRandom.h" />
     <ClInclude Include="SubImageView.h" />
+    <ClInclude Include="tex3D.h" />
     <ClInclude Include="View.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

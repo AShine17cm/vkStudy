@@ -268,8 +268,15 @@ private:
         /* 模型 方柱 */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_TexArray);
         dstSet = 1;             //texture
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_tex, dstSet, 1, &frame->set_pillar, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_tex, dstSet, 1, &frame->set_tex_array, 0, nullptr);
         batchIdx = 0;
+        scene.draw(cmd, piHub.piLayout_tex, batchIdx);
+
+        /* 一队 立方体 */
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex3D);
+        dstSet = 1;
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_tex, dstSet, 1, &frame->set_3D_tex, 0, nullptr);
+        batchIdx = 1;
         scene.draw(cmd, piHub.piLayout_tex, batchIdx);
 
         /* 实例化 Cube */
@@ -278,28 +285,28 @@ private:
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_instance, dstSet, 1, &frame->set_instance, 0, nullptr);
         dstSet = 2;
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_instance, dstSet, 1, &frame->set_mips, 0, nullptr);
-        batchIdx = 1;
+        batchIdx = 2;
         scene.draw(cmd, piHub.piLayout_instance, batchIdx);
 
         /* 球体 */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_TexCube);
         dstSet = 1;    
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_tex, dstSet, 1, &frame->set_cube, 0, nullptr);
-        batchIdx = 2;
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_tex, dstSet, 1, &frame->set_cube_map, 0, nullptr);
+        batchIdx = 3;
         scene.draw(cmd, piHub.piLayout_tex, batchIdx);
 
         /* 地板的贴图 */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
         dstSet = 1;    
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_tex, dstSet, 1, &frame->set_ground, 0, nullptr);
-        batchIdx = 3;
+        batchIdx = 4;
         scene.draw(cmd, piHub.piLayout_tex, batchIdx);
 
         /* ui */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_ui);
         dstSet = 0;
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ui, dstSet, 1, &frame->set_ui, 0, nullptr);
-        batchIdx = 4;
+        batchIdx = 5;
         scene.draw(cmd, piHub.piLayout_ui, batchIdx);
     }
     void createSyncObjects() {

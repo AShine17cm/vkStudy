@@ -20,6 +20,7 @@ struct PipelineHub
 	VkPipeline pi_Tex;						//shader::<tex.vert tex.frag>
 	VkPipeline pi_TexArray;					//shader::<texArray.vert texArray.frag>
 	VkPipeline pi_TexCube;					//shader::<texCube.vert texCube.frag>
+	VkPipeline pi_Tex3D;					//shader::<tex3D.vert tex3D.frag>
 
 	VkPipeline pi_ui;						//shader::<ui.vert ui.frag>
 	VkPipeline pi_Instance;					//shader::<instancing.vert instancing.frag>
@@ -81,6 +82,8 @@ struct PipelineHub
 		createPipeline(device, renderPass, &shaderFiles, &piLayout_tex, &pi_TexArray, 0);
 		shaderFiles = { "shaders/texCube.vert.spv", "shaders/texCube.frag.spv" };
 		createPipeline(device, renderPass, &shaderFiles, &piLayout_tex, &pi_TexCube, 0);
+		shaderFiles = { "shaders/tex3D.vert.spv", "shaders/tex3D.frag.spv" };
+		createPipeline(device, renderPass, &shaderFiles, &piLayout_tex, &pi_Tex3D, 0);
 
 		shaderFiles = { "shaders/instancing.vert.spv", "shaders/instancing.frag.spv" };
 		createPipeline(device, renderPass, &shaderFiles, &piLayout_instance, &pi_Instance,0);
@@ -112,7 +115,7 @@ struct PipelineHub
 		std::vector<VkVertexInputBindingDescription> bindings;
 		VkPipelineVertexInputStateCreateInfo vertexInputSCI{};
 		vertexInputSCI.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		/* UI的数据 在Set中，不走vertex */
+		/* UI的数据 在Descriptor-Set中，不走vertex */
 		if(kind==0) vertexInputSCI= geos::Geo::getVertexInput(&attributes, &bindings);
 
 		/* Color Blend*/
@@ -144,6 +147,7 @@ struct PipelineHub
 		vkDestroyPipeline(device, pi_Tex, nullptr);
 		vkDestroyPipeline(device, pi_TexArray, nullptr);
 		vkDestroyPipeline(device, pi_TexCube, nullptr);
+		vkDestroyPipeline(device, pi_Tex3D, nullptr);
 		vkDestroyPipeline(device, pi_ui, nullptr);
 		vkDestroyPipeline(device, pi_Instance, nullptr);
 

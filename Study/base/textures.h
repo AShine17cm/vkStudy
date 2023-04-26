@@ -73,7 +73,7 @@ namespace textures
 				copy.imageOffset = { 0,0,0 };	//数据块从0开始
 				copy.imageSubresource = { VK_IMAGE_ASPECT_COLOR_BIT,target_MipLevel,target_Layer,layerCount };
 				/* piece size */
-				copy.imageExtent = { imgExtend3D.width >> target_MipLevel,imgExtend3D.height >> target_MipLevel,1 };
+				copy.imageExtent = { imgExtend3D.width >> target_MipLevel,imgExtend3D.height >> target_MipLevel,imgExtend3D.depth};
 				copy.bufferOffset = 0;
 				return copy;
 			}

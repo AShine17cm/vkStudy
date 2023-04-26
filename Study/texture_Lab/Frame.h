@@ -16,10 +16,11 @@ struct Frame
 	VkDescriptorSet set_ui;				//ui
 	VkDescriptorSet set_view;			//view-proj-light-camera
 	VkDescriptorSet set_instance;		//实例化
-	VkDescriptorSet set_pillar;			//tex	模型
 	VkDescriptorSet set_ground;			//tex	地板
-	VkDescriptorSet set_cube;
+	VkDescriptorSet set_tex_array;		//tex	模型
+	VkDescriptorSet set_cube_map;
 	VkDescriptorSet set_mips;
+	VkDescriptorSet set_3D_tex;
 
 	mg::Buffer ui_ubo;
 	mg::Buffer view_ubo;				//相机 灯光
@@ -40,10 +41,11 @@ struct Frame
 		descriptors::allocateDescriptorSet(&pipes->setLayout_ui, 1, descriptorPool, device, &set_ui);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_ubo, 1, descriptorPool, device, &set_view);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_ubo, 1, descriptorPool, device, &set_instance);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &set_pillar);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &set_ground);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &set_tex_array);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &set_mips);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &set_cube);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &set_cube_map);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &set_3D_tex);
 
 		vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -74,17 +76,16 @@ struct Frame
 		infos = { &instance_ubo.descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), set_instance, device);
 
-		/* 一些 Texture */
+		/* mips,tex-array,cube-map,3D-tex */
 		types = { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER };
 		infos = { &res->tex_mips->descriptor };
-		//infos = { &res->subView->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), set_mips, device);
-
-		//模型
 		infos = { &res->tex_array->descriptor };
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), set_pillar, device);
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), set_tex_array, device);
 		infos = { &res->tex_cube->descriptor };
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), set_cube, device);
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), set_cube_map, device);
+		infos = { &res->tex_3D->texture->descriptor };
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), set_3D_tex, device);
 
 		//地板
 		infos = { &res->tex_floor->descriptor };

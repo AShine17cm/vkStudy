@@ -44,8 +44,8 @@ struct  View
 		data.light = { 0,0,6,4 };
 		/* ≥ı º÷µ */
 		vAngle = 45;
-		hAngle = 0;
-		radius = baseRadius;
+		hAngle = 200;
+		radius = baseRadius+(range.x+range.y)/2;
 	}
 	void setPose(float radius, float hAngle, float vAngle)
 	{
