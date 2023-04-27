@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>E:\VulkanProj\vkStudy\Study\x64\Debug\offscreen_mirror.exe</FullPath>
+      <FullPath>E:\VulkanProj\vkStudy\Study\offscreen_mirror\offscreen_mirror.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

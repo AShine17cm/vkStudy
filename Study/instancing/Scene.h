@@ -19,8 +19,10 @@ struct  Scene
     //创建 组织 geo
 	void prepare(VulkanDevice* vulkanDevice) 
 	{
-        sceneObject.push_back(new geos::GeoCube(0.2f, { -0.5f,0.3f,0.1f })); sceneObject[0]->name = "Small Cube";
-        sceneObject.push_back(new geos::GeoCube(0.3f, { 0.5f,0.8f,0.15f })); sceneObject[1]->name = "Big Cube";
+        vec3 clipA = { 0.5f,0.3f,0.2f };
+        vec3 clipB = { 0.4f,0.2f,0.45f };
+        sceneObject.push_back(new geos::GeoCube(0.2f,clipA,clipB)); sceneObject[0]->name = "Small Cube";
+        sceneObject.push_back(new geos::GeoCube(0.3f, clipA,clipB)); sceneObject[1]->name = "Big Cube";
         for (uint32_t i = 0; i < sceneObject.size(); i++)
         {
             sceneObject[i]->prepareBuffer(vulkanDevice);

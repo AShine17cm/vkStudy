@@ -32,7 +32,9 @@ struct InstanceByVertexBuffers
 
 	void prepare(VulkanDevice* vulkanDevice, uint32_t texLayerCount) 
 	{
-		geo = new geos::GeoCube(0.1f);
+		vec3 clipA = { 0.5f,0.3f,0.2f };
+		vec3 clipB = { 0.4f,0.2f,0.45f };
+		geo = new geos::GeoCube(0.1f,clipA,clipB);
 		geo->prepareBuffer(vulkanDevice);
 		geo->name = "Instancing Item";
 

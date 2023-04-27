@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>E:\VulkanProj\mgEngine\x64\Debug\instancing.exe</FullPath>
+      <FullPath>E:\VulkanProj\vkStudy\Study\instancing\instancing.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

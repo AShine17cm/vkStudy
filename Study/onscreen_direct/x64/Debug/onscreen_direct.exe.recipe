@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>E:\VulkanProj\vkStudy\Study\x64\Debug\onscreen_direct.exe</FullPath>
+      <FullPath>E:\VulkanProj\vkStudy\Study\onscreen_direct\onscreen_direct.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

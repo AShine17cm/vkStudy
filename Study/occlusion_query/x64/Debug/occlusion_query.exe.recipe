@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>E:\VulkanProj\mgEngine\x64\Debug\occlusion_query.exe</FullPath>
+      <FullPath>E:\VulkanProj\vkStudy\Study\occlusion_query\occlusion_query.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />
