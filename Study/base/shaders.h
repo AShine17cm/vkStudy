@@ -50,7 +50,7 @@ namespace shaders
 			VkPipeline *pipeline,
 			VkPipelineCache pipelineCache = nullptr,
 			void** extends = nullptr,
-			mg::MgPipelineEx* extendTypes = nullptr,
+			mg::pipelines::MgPipelineEx* extendTypes = nullptr,
 			uint32_t extendCount = 0
 		);
 		void createPipelineDerived(
@@ -62,7 +62,7 @@ namespace shaders
 			VkPipeline* pipeline,
 			VkPipelineCache pipelineCache = nullptr,
 			void** extends = nullptr,
-			mg::MgPipelineEx* extendTypes = nullptr,
+			mg::pipelines::MgPipelineEx* extendTypes = nullptr,
 			uint32_t extendCount = 0
 		);
 		void cleanup(VkDevice device);

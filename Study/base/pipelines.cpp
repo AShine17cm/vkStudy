@@ -131,6 +131,12 @@ namespace mg
 				case MgPipelineEx::DynamicState:
 					pipelineCI.pDynamicState = (VkPipelineDynamicStateCreateInfo*)extends[i];
 					break;
+				case MgPipelineEx::ShadowMap: //ÒõÓ°ÌùÍ¼£¬¿ªÆôÆ«ÒÆ
+					rasterStateCI.depthBiasEnable = VK_TRUE;
+					dynamicStates.push_back(VK_DYNAMIC_STATE_DEPTH_BIAS);
+					dynamicSCI.dynamicStateCount = dynamicStates.size();
+					dynamicSCI.pDynamicStates = dynamicStates.data();
+					break;
 				default:
 					break;
 				}

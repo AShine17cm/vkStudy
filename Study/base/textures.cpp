@@ -246,6 +246,10 @@ namespace textures
 				case MgTextureEx::Sampler_BorderWhite:
 					samplerCI.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 					break;
+				case MgTextureEx::Sampler_ShadowMap:
+					//samplerCI.minFilter = VK_FILTER_LINEAR;
+					//samplerCI.magFilter = VK_FILTER_LINEAR;
+					break;
 				}
 			}
 			MG_CHECK_RESULT(vkCreateSampler(logicalDevice, &samplerCI, nullptr, sampler));

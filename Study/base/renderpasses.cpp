@@ -89,7 +89,7 @@ namespace mg
 
 			VkAttachmentReference attachmentRef{};
 			attachmentRef.attachment = 0;
-			attachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;// Attachment will be used as depth/stencil during render pass
+			attachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 			VkSubpassDescription subpassDesc{};
 			subpassDesc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;

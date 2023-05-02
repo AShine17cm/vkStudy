@@ -68,7 +68,7 @@ namespace shaders
 		VkPipeline *pipeline,
 		VkPipelineCache pipelineCache,
 		void** extends,
-		mg::MgPipelineEx* extendTypes,
+		mg::pipelines::MgPipelineEx* extendTypes,
 		uint32_t extendCount
 	)
 	{
@@ -118,7 +118,7 @@ namespace shaders
 		VkPipeline* pipeline,
 		VkPipelineCache pipelineCache,
 		void** extends,
-		mg::MgPipelineEx* extendTypes,
+		mg::pipelines::MgPipelineEx* extendTypes,
 		uint32_t extendCount
 	)
 	{

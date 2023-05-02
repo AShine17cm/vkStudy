@@ -1,15 +1,16 @@
-﻿  SwapChain.cpp
-E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(85,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(87,22): warning C4018: “<”: 有符号/无符号不匹配
-E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(106,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(108,22): warning C4018: “<”: 有符号/无符号不匹配
-E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(139,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(171,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(192,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(287,1): warning C4267: “return”: 从“size_t”转换到“uint32_t”，可能丢失数据
-  Texture.cpp
-E:\VulkanProj\vkStudy\Study\base\Texture.cpp(38,32): warning C4244: “参数”: 从“VkDeviceSize”转换到“uint32_t”，可能丢失数据
-  mipmaps.cpp
-  textures.cpp
+﻿  Geo.cpp
+E:\VulkanProj\vkStudy\Study\base\Geo.cpp(28,70): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\Geo.cpp(30,66): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\Geo.cpp(64,51): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\Geo.cpp(72,54): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\Geo.cpp(88,65): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  GeoCube.cpp
+  GeoPlane.cpp
+  GeoSphere.cpp
+E:\VulkanProj\vkStudy\Study\base\GeoSphere.cpp(124,39): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  GeoSquarePillar.cpp
+  batches.cpp
+E:\VulkanProj\vkStudy\Study\base\batches.cpp(38,25): warning C4244: “=”: 从“uint32_t”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\batches.cpp(39,26): warning C4244: “=”: 从“uint32_t”转换到“float”，可能丢失数据
   正在生成代码...
   base.vcxproj -> E:\VulkanProj\vkStudy\Study\x64\Debug\base.lib

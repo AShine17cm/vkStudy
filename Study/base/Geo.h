@@ -83,15 +83,10 @@ namespace geos
 		*/
 		static void generateVertex(vec3 p0, vec3 p1, vec3 p2, vec3 p3,Vertex* v0,Vertex* v1,Vertex* v2,Vertex* v3,vec2 uvPlane,bool isQuad=true) 
 		{
-			vec3 center = (p0 + p1 + p2 + p3) / 4.0f;
-			if (!isQuad) 
-			{
-				center = (p0 + p1 + p2) / 3.0f;
-			}
 			/* 一个平面公用一个 tangent */
 			vec3 tangent = glm::normalize(p1 - p0);
-			vec3 dirA = glm::normalize(p0 - center);
-			vec3 dirB = glm::normalize(p1 - center);
+			vec3 dirA = glm::normalize(p1 - p0);
+			vec3 dirB = glm::normalize(p2 - p1);
 			vec3 dirUp = glm::cross(dirB, dirA);
 			dirUp = glm::normalize(dirUp);
 			v0->pos = p0;

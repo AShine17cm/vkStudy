@@ -37,7 +37,7 @@ namespace textures
 		//数据格式 相关
 		textures::createTexture(info,imageSize,vulkanDevice,&image, &memory,data,nullptr,0);
 		textures::createImageView(vulkanDevice->logicalDevice,image, &view,viewInfo);
-		textures::createSampler(vulkanDevice,info.mipLevels,&sampler,nullptr, 0,VK_SAMPLER_ADDRESS_MODE_REPEAT);
+		textures::createSampler(vulkanDevice,info.mipLevels,&sampler,extends.data(), extends.size(),VK_SAMPLER_ADDRESS_MODE_REPEAT);
 
 		updateDescriptor();
 	}

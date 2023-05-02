@@ -1,0 +1,31 @@
+将重复的shader代码 放在 part.solid.vert 和 part.solid.frag
+ShadowCaster 用于输出 Z 到阴影贴图
+
+实例化物体的阴影需要使用单独的 Pipeline 和 Shader, 因为实例化过程需要一个单独的UBO
+
+阴影贴图需要一个单独的 RenderPass,
+阴影贴图只有一个，被多个 Command-Buffer 公用 (和用于场景深度测试的Depth-Tex一样)
+
+灯光矩阵 决定了 能 "看到" 阴影的范围, 也就是阴影贴图的覆盖范围
+灯光矩阵 和 正常渲染时的Camera矩阵没有直接关系
+阴影贴图一般 2的幂次方大小
+阴影贴图的大小和 屏幕(Swap-Chain)的大小没有直接关系
+
+阴影坐标 shadowCoord 用于采样阴影贴图
+阴影坐标 通过 灯光矩阵 把点转换到 灯光空间 生成
+阴影坐标 需要 除以 其w值 （不然会有奇怪的缩放问题） 
+
+关于这个w值，一般说法是齐次坐标，空间中的多个点 投影在屏幕上同一个像素造成的 ？
+非常不直觉，没有理解
+
+阴影的 z-alias,
+原始方法 是在测试时，手动在 shader代码里加一个 bias
+Vulkan有以下标准方法
+rasterization	打开  depthBiasEnabe
+dynamicState	加入  VK_DYNAMIC_STATE_DEPTH_BIAS
+command-Buffer	调用 vkCmdSetDepthBias
+
+
+
+
+

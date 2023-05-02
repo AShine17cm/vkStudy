@@ -3,21 +3,24 @@
 #include "VulkanDevice.h"
 namespace mg
 {
-	enum class MgPipelineEx
-	{
-		None = 0,
-		Assembly = 10,
-		Rasterization = 20,
-		DepthStencil = 30,
-		Viewport = 40,
-		Viewport_A = 41,
-		Multisample = 50,
-		DynamicState = 60,
-		//DynamicState_A=61,
-		//ColorBlend=30,
-	};
 	namespace pipelines
 	{
+		enum class MgPipelineEx
+		{
+			None = 0,
+			Assembly = 10,
+			Rasterization = 20,
+			DepthStencil = 30,
+			Viewport = 40,
+			Viewport_A = 41,
+			Multisample = 50,
+			DynamicState = 60,
+
+			UI = 101, //不同的Vertex-Layout
+			ShadowMap = 201, //需要开启 depth-bias
+			//DynamicState_A=61,
+			//ColorBlend=30,
+		};
 		//标准接口
 		void createPipeline(
 			VkPipelineShaderStageCreateInfo* shaderStages,

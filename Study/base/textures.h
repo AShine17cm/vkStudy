@@ -23,6 +23,7 @@ namespace textures
 			Sampler_None = 300,
 			Sampler_AnisotropyDisable = 301,
 			Sampler_BorderWhite = 302,
+			Sampler_ShadowMap=303,
 		};
 		struct MgImageInfo
 		{
@@ -37,6 +38,12 @@ namespace textures
 				VkImageLayout imagelayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				VkImageCreateFlags createFalgs = 0;// VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
 			}formats;
+
+			VkExtent2D getExtend2D() 
+			{
+				VkExtent2D ex2d = { extent3D.width,extent3D.height };
+				return ex2d;
+			}
 		};
 		struct  MgImgViewInfo		//image资源的一部分
 		{

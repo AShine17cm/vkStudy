@@ -1,1 +1,7 @@
 需要配置每个项目的 VulkanSDK 路径 （不人性化，菜菜）
+
+学习路径( 功能的复杂程度 )
+
+1. baseGeo
+2. texture_Lab
+3. shadow_Lab

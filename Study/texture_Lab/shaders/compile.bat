@@ -24,4 +24,5 @@ set inst2=instancing.frag
 %glslc% %d2% -o %d2%.spv
 %glslc% %inst1% -o %inst1%.spv
 %glslc% %inst2% -o %inst2%.spv
+
 pause

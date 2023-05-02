@@ -22,6 +22,8 @@ namespace textures
 
 		VkDescriptorImageInfo descriptor;
 		VkSampler sampler;
+		/* 阴影贴图的采样 */
+		std::vector<MgTextureEx> extends;
 
 		Texture(VulkanDevice* vulkanDevice,textures::MgImageInfo extent);
 		void updateDescriptor();
