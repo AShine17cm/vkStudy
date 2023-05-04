@@ -15,9 +15,10 @@ using namespace mg;
 	*/
 struct Frame
 {
-	VkDescriptorSet shadow;
+	VkDescriptorSet shadow_ubo;
 
 	VkDescriptorSet ui_ubo_tex;				//ui
+	VkDescriptorSet ui_ubo_shadow;			//阴影Map的展示
 	VkDescriptorSet scene_ubo_shadow;		//场景数据+ShadowMap
 	VkDescriptorSet instance_ubo_mips;		//实例化
 	VkDescriptorSet instance_ubo;			//实例化-阴影
@@ -27,15 +28,16 @@ struct Frame
 	VkDescriptorSet cube_map;
 	VkDescriptorSet tex_3d;
 
-
 	mg::Buffer ubo_ui;
 	mg::Buffer ubo_scene;				//相机 灯光
 	mg::Buffer ubo_instance;
 	mg::Buffer ubo_shadow;
-
+	bool mips_subView = false;
 	int opKey_cached;					//只能操作属于当前 Command-Buffer 的 DescriptorSet
-	void CacheKey(int opKey) {
-		if (opKey > 0 && (opKey == 1 || opKey == 2)) {
+	void CacheKey(int opKey) 
+	{
+		if (opKey > 0 ) 
+		{
 			opKey_cached = opKey;
 		}
 	}
@@ -45,10 +47,11 @@ struct Frame
 		/* 此方式:生成2个 内存上连续的Set,而不是2个Set组合成的一个Set */
 		//VkDescriptorSetLayout set_scr[] = { pipes->setLayout_ubo,pipes->setLayout_tex };
 		//descriptors::allocateDescriptorSet(set_scr, 2, descriptorPool, device, &set_ui);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_ubo, 1, descriptorPool, device, &shadow);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_ubo, 1, descriptorPool, device, &shadow_ubo);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_ubo, 1, descriptorPool, device, &instance_ubo);
 
 		descriptors::allocateDescriptorSet(&pipes->setLayout_ubo_tex, 1, descriptorPool, device, &ui_ubo_tex);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_ubo_tex, 1, descriptorPool, device, &ui_ubo_shadow);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_ubo_tex, 1, descriptorPool, device, &scene_ubo_shadow);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_ubo_tex, 1, descriptorPool, device, &instance_ubo_mips);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &ground_tex);
@@ -89,7 +92,7 @@ struct Frame
 		types = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER };
 		counts = { 1 };
 		infos = { &ubo_shadow.descriptor };
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), shadow, device);
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), shadow_ubo, device);
 		infos = { &ubo_instance.descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), instance_ubo, device);
 
@@ -101,6 +104,8 @@ struct Frame
 		//UI: 顶点+UI图片
 		infos = { &ubo_ui.descriptor,&res->tex_ui->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), ui_ubo_tex, device);
+		infos = { &ubo_ui.descriptor,&res->tex_shadow->descriptor };
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), ui_ubo_shadow, device);
 		//实例化: 实例位置+mips
 		infos = { &ubo_instance.descriptor,&res->tex_mips->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), instance_ubo_mips, device);
@@ -116,6 +121,7 @@ struct Frame
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), tex_3d, device);
 		infos = { &res->tex_floor->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), ground_tex, device);
+
 	}
 	/* 切换贴图格式 */
 	void update(VkDevice device, Resource* res)
@@ -127,13 +133,18 @@ struct Frame
 		std::vector<void*> infos{};
 		switch (opKey_cached)
 		{
-		case 1:
-			infos = { &ubo_instance.descriptor, &res->tex_mips->descriptor };
-			mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), instance_ubo_mips, device);
-			break;
 		case 2:
-			infos = { &ubo_instance.descriptor, &res->subView->descriptor };
-			mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), instance_ubo_mips, device);
+			mips_subView = !mips_subView;
+			if (mips_subView) 
+			{
+				infos = { &ubo_instance.descriptor, &res->subView->descriptor };
+				mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), instance_ubo_mips, device);
+			}
+			else
+			{
+				infos = { &ubo_instance.descriptor, &res->tex_mips->descriptor };
+				mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), instance_ubo_mips, device);
+			}
 			break;
 		}
 		opKey_cached = -1;

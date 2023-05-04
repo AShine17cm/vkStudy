@@ -201,11 +201,11 @@ private:
         /* Tex ºÍ depth-Tex */
         resource.prepare(vulkanDevice,passHub.extent);
 
-        VkDeviceSize bufferSizes[4] = { 
+        VkDeviceSize bufferSizes[4] = {
             sizeof(View::UniformBufferObject),
             sizeof(View::ShadowObject),
-            sizeof(Scene::InstanceData)*Scene::countInstance,
-            sizeof(vec4)*6};
+            sizeof(Scene::InstanceData) * Scene::countInstance,
+            sizeof(vec4) * 6 * Scene::countUI };
         /* Frame */
         frames.resize(MAX_FRAMES_IN_FLIGHT);
         for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
@@ -282,7 +282,7 @@ private:
     {
         uint32_t batchIdx =-1;
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_shadow);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo, 0, 1, &frame->shadow, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo, 0, 1, &frame->shadow_ubo, 0, nullptr);
         for (uint32_t i = 0; i < 4; i++) 
         {
             if (i == 2)continue;
@@ -341,6 +341,11 @@ private:
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo_tex, dstSet, 1, &frame->ui_ubo_tex, 0, nullptr);
         batchIdx = 5;
         scene.draw(cmd, piHub.piLayout_ubo_tex, batchIdx);
+        dstSet = 0;
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo_tex, dstSet, 1, &frame->ui_ubo_shadow, 0, nullptr);
+        batchIdx = 6;
+        scene.draw(cmd, piHub.piLayout_ubo_tex, batchIdx);
+
     }
     void createSyncObjects() {
         imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);

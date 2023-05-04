@@ -15,6 +15,7 @@ struct  Scene
 {
 	static const int countInstance = 16;
 	static const int countTextureArray = 8;
+	static const int countUI = 2;
 	/* 走 PushConstant的数据 */
 	struct PerObjectData
 	{
@@ -34,11 +35,12 @@ struct  Scene
 		glm::vec3 rot;		//未使用
 		float spd;
 	};
+
 	View* view;
 	std::array<InstanceData, countInstance> instances;
 	std::array<InstancePose, countInstance> poses;
-	std::array<vec4, 6> uiPts;
-
+	std::array<vec4, 6 * countUI> uiPts;
+	
 	std::vector<geos::GeoSquarePillar*> pillars;		//方柱，非实例化
 	std::vector<geos::GeoCube*> cubes;					//测试 3D-Texture
 	geos::Geo* ground;
@@ -46,6 +48,7 @@ struct  Scene
 	geos::GeoSphere* sphere;
 
 	float deltaTime;
+	bool displayShadowMap = true;
 	//创建 模型
 	void prepare(VulkanDevice* vulkanDevice, VkExtent2D extent)
 	{
@@ -53,10 +56,16 @@ struct  Scene
 		uiPts[0] = { -0.95,-0.7f,0,1 };
 		uiPts[1] = { -0.95,-0.95,0,0 };
 		uiPts[2] = { -0.45f,-0.95,1,0 };
-
 		uiPts[3] = { -0.45f,-0.7f,1,1 };
 		uiPts[4] = uiPts[0];
 		uiPts[5] = uiPts[2];
+
+		uiPts[6 + 0] = { 0.2f,-0.2f,0,1 };
+		uiPts[6 + 1] = { 0.2f,-1.0f,0,0 };
+		uiPts[6 + 2] = { 1.0f,-1.0f,1,0 };
+		uiPts[6 + 3] = { 1.0f,-0.2f,1,1 };
+		uiPts[6 + 4] = uiPts[6 + 0];
+		uiPts[6 + 5] = uiPts[6 + 2];
 		/* 相机控制 */
 		view = new View({ 0,0,1 }, 9.0f, { -6.0f,6.0f }, extent);
 		ground = new geos::GeoPlane(8, { 0,0,-2 });
@@ -152,12 +161,18 @@ struct  Scene
 	/* 更新-UBO 资源 */
 	void update(Frame* pFrame, float time, float deltaTime,int opKey)
 	{
+		switch (opKey)
+		{
+			case 1:
+				displayShadowMap = !displayShadowMap;
+			break;
+		}
 		this->deltaTime = deltaTime;
 		view->update(deltaTime,opKey);
 		float ang = time * glm::radians(30.0f);//time是相对时间
 		updateInstance(ang);
 		//拷贝数据
-		memcpy(pFrame->ubo_ui.mapped, uiPts.data(), sizeof(vec4) * 6);
+		memcpy(pFrame->ubo_ui.mapped, uiPts.data(), sizeof(vec4) * 6 * countUI);
 		memcpy(pFrame->ubo_scene.mapped, &view->data, sizeof(View::UniformBufferObject));
 		memcpy(pFrame->ubo_shadow.mapped, &view->shadowData, sizeof(View::ShadowObject));
 		memcpy(pFrame->ubo_instance.mapped, instances.data(), sizeof(InstanceData) * countInstance);
@@ -194,6 +209,7 @@ struct  Scene
 		PerObjectData pod = { glm::mat4(1),{0,0,0,0} };
 		uint32_t size = sizeof(PerObjectData);
 		VkDeviceSize offsets[] = { 0 };
+		uint32_t firstPt = 0;
 		switch (batchIdx)
 		{
 			case 0:
@@ -239,8 +255,18 @@ struct  Scene
 				break;
 			case 5:
 				//画 UI
+				firstPt = 0;
 				vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
-				vkCmdDraw(cmd, 6, 1, 0, 0);
+				vkCmdDraw(cmd, 6, 1, firstPt, 0);
+				break;
+			case 6:
+				//展示 阴影的Map
+				if (displayShadowMap) 
+				{
+					firstPt = 6;
+					vkCmdPushConstants(cmd, piLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, size, &pod);
+					vkCmdDraw(cmd, 6, 1, firstPt, 0);
+				}
 				break;
 		}
 	}

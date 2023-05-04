@@ -6,10 +6,11 @@ out gl_PerVertex
     vec4 gl_Position;
 };
 
+#define uiCount 2
 //(-1.0,-1.0)вСио╫г  (1.0,-1.0)срио╫г
 layout(set=0,binding=0) uniform ui
 {
-    vec4 pts[6];
+    vec4 pts[6*uiCount];
 }ui_ubo;
 
 layout(location=0)out vec2 uv;
