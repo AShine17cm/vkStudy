@@ -1,0 +1,14 @@
+测试 geometry-shader
+
+1. PhysicalDevicesFeature.geometryShader
+  创建 Logical Device时，将其 设为 true
+
+2. SHADER_STAGE_GEOMETRY_BIT:
+PushConstantRange 需要包含 , 因为统一用 Scene.h 来做了几何体的渲染
+相关的 DescriptorSetLayout 也需要设置
+
+3. gl_InstanceIndex
+无法在 Geometry-Shader中使用 ？
+
+4. geometry中的 instancing 矩阵
+无法直接从 vert.shader 传递矩阵到 geometry.shader, 使用了4个 vec4
