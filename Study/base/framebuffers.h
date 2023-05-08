@@ -36,7 +36,8 @@ namespace mg
 			VkImageView* attachments,
 			uint32_t attachmentCount,
 			VkDevice device,
-			VkFramebuffer* framebuffer);
+			VkFramebuffer* framebuffer,
+			uint32_t layers=1);
 
 	}
 }

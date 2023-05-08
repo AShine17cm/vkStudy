@@ -76,7 +76,7 @@ struct  View
 	/* ตฦนโ*/
 	void setLight() 
 	{
-		vec3 lightPos = { 6,-4,8 };
+		vec3 lightPos = { 6, -4, 8 };
 		vec3 lightDir = -glm::normalize(glm::vec3(-2,3,-9));
 		vec3 upDir = { 0,0,1 };
 		float lightIntensity = 0.7f;

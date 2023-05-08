@@ -42,7 +42,6 @@ float textureProj(vec4 shadowCoord,vec2 offset)//offset ”√”⁄Soft-Shadow
 }
 float filterPCF(vec4 sc)
 {
-    vec4 coord=sc/sc.w;
 	ivec2 texDim = textureSize(shadowMap, 0);
 	float scale = 1.5;
 	float dx = scale * 1.0 / float(texDim.x);
@@ -56,7 +55,7 @@ float filterPCF(vec4 sc)
 	{
 		for (int y = -range; y <= range; y++)
 		{
-			shadowFactor += textureProj(coord, vec2(dx*x, dy*y));
+			shadowFactor += textureProj(sc, vec2(dx*x, dy*y));
 			count++;
 		}
 	}

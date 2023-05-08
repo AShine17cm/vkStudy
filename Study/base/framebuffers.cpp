@@ -152,7 +152,8 @@ namespace mg
 			VkImageView* attachments,
 			uint32_t attachmentCount,
 			VkDevice device,
-			VkFramebuffer* framebuffer)
+			VkFramebuffer* framebuffer,
+			uint32_t layers)
 		{
 			VkFramebufferCreateInfo framebufferCI{};
 			framebufferCI.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -161,7 +162,7 @@ namespace mg
 			framebufferCI.renderPass = renderPass;
 			framebufferCI.attachmentCount = attachmentCount;
 			framebufferCI.pAttachments = attachments;
-			framebufferCI.layers = 1;
+			framebufferCI.layers = layers; //用 geometry shader生成多光源的阴影
 
 			MG_CHECK_RESULT(vkCreateFramebuffer(device, &framebufferCI, nullptr, framebuffer));
 		}
