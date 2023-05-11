@@ -11,6 +11,16 @@ namespace renderpasses
 		VkDevice device,
 		VkRenderPass* renderPass
 	);
+	void create_PostProcess(
+		VkFormat format,
+		VkDevice device,
+		VkRenderPass* renderPass
+	);
+	void create_MRT(
+		VkFormat* formats,
+		VkDevice device,
+		VkRenderPass* renderPass
+	);
 	//创建 只有一个depth attachment的深度 render-pass
 	void createDepthRenderPass(
 		VkFormat format,

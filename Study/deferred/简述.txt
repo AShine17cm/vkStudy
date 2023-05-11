@@ -1,0 +1,38 @@
+
+1.  MRT 渲染所需的 shader 和 image:attachment
+G-Buffer 3个
+顶点函数	输出 世界坐标内的 normal，tangent,  pos  还有 uv  		mrt.vert 
+片元函数	输出 normal,pos 还有 albedo				tex.frag  texArray.frag  texCube.frag 
+
+世界坐标：normal,pos			albedo
+R16G16B16A16_SFLOAT			R8G8B8A8_UNORM
+USAGE_COLOR_ATTACHMENT			USAGE_COLOR_ATTACHMENT
+LAYOUT_COLOR_ATTACHMENT_OPTIMAL	LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+
+2. 使用 这些 image:attachment 的 render-pass 
+
+
+阴影  geometry-shader  单Pass 渲染多光源阴影 
+阴影投射  shadowCaster.vert   shadowCaster.geom
+阴影接受  part.shadow_layers.frag
+
+3. UI 的位置 通过顶点索引计算  gl_VertexIndex/6 , glsl中 in/out 整型向量，变量必须使用flat修饰
+
+操作: 
+数字键 1： 切换 G-Buffer中的 pos-normal-albedo  以及最终的compose
+数字键 2:   切换 3个阴影
+数字键 3：打开/关闭 阴影面板
+数字键 4:  切换 mips 范围
+
+Bug:
+1. VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT （这个东西GPU 不支持，至少我这块NVIDIA不支持）
+   VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT  用这个替代 
+
+2. 错误的 创建 color-AttachmentRef数组长度为4， 接着又在栈上创建了一个 depth:AttachmentRef  
+  导致内存上存在5个连续的 AttachmentRef, 并将 错误的计数传递给 SubPass， 导致你想象不到的意外惊喜!!!
+3. 创建pipelines时，G-Buffer 阶段，需要将 ColorBlendAttachmentState 也设置为3个
+4. DescriptorImageInfo
+   延迟渲染  Compose阶段 
+   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL  不能使用创建时的这个Layout
+   VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL   需要使用这个
+5. UI的render-pass 和 compose 阶段一样, 和 G-Buffer 阶段不一样

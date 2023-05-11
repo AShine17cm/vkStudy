@@ -18,6 +18,8 @@ namespace mg
 
 			UI = 101, //不同的Vertex-Layout
 			ShadowMap = 201, //需要开启 depth-bias
+			Geo_MRT=301,
+			Deferred_Compose=401,
 			//DynamicState_A=61,
 			//ColorBlend=30,
 		};

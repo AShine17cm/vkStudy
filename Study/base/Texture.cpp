@@ -58,6 +58,12 @@ namespace textures
 		descriptor.imageView = view;
 		descriptor.imageLayout =info.formats.imagelayout;
 	}
+	void Texture::overrideDescriptor(VkImageLayout imgLayout)//延迟渲染  Compose阶段 不能使用Image创建时的Layout
+	{
+		descriptor.sampler = sampler;
+		descriptor.imageView = view;
+		descriptor.imageLayout = imgLayout;
+	}
 	void Texture::destroy()
 	{
 		vkDestroyImageView(vulkanDevice->logicalDevice, view, nullptr);

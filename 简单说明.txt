@@ -6,3 +6,5 @@
 2. texture_Lab
 3. shadow_Lab
 4. geometry_Lab
+5. geometry_ShadowLayer
+6. deferred

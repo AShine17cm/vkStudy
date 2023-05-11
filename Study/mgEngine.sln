@@ -27,6 +27,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geometry_Lab", "geometry_La
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geometry_ShadowLayer", "geometry_ShadowLayer\geometry_ShadowLayer.vcxproj", "{23CDC911-FBCF-409A-A178-0C3861340B1E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deferred", "deferred\deferred.vcxproj", "{D3101D16-B8D6-4AB9-8376-AC435243A6E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -131,6 +133,14 @@ Global
 		{23CDC911-FBCF-409A-A178-0C3861340B1E}.Release|x64.Build.0 = Release|x64
 		{23CDC911-FBCF-409A-A178-0C3861340B1E}.Release|x86.ActiveCfg = Release|Win32
 		{23CDC911-FBCF-409A-A178-0C3861340B1E}.Release|x86.Build.0 = Release|Win32
+		{D3101D16-B8D6-4AB9-8376-AC435243A6E5}.Debug|x64.ActiveCfg = Debug|x64
+		{D3101D16-B8D6-4AB9-8376-AC435243A6E5}.Debug|x64.Build.0 = Debug|x64
+		{D3101D16-B8D6-4AB9-8376-AC435243A6E5}.Debug|x86.ActiveCfg = Debug|Win32
+		{D3101D16-B8D6-4AB9-8376-AC435243A6E5}.Debug|x86.Build.0 = Debug|Win32
+		{D3101D16-B8D6-4AB9-8376-AC435243A6E5}.Release|x64.ActiveCfg = Release|x64
+		{D3101D16-B8D6-4AB9-8376-AC435243A6E5}.Release|x64.Build.0 = Release|x64
+		{D3101D16-B8D6-4AB9-8376-AC435243A6E5}.Release|x86.ActiveCfg = Release|Win32
+		{D3101D16-B8D6-4AB9-8376-AC435243A6E5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

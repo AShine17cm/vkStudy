@@ -27,6 +27,7 @@ namespace textures
 
 		Texture(VulkanDevice* vulkanDevice,textures::MgImageInfo extent);
 		void updateDescriptor();
+		void overrideDescriptor(VkImageLayout imgLayout); //延迟渲染 Composition阶段 不能使用原始的 Image-Layout
 		void destroy();
 		void load(const char* filename,int channels=4);
 		/* 将数据插入到 某<layer,MipLevel> */
