@@ -267,8 +267,9 @@ private:
             mg::batches::BeginRenderpass(cmd,passHub.renderPass,passHub.swapChainFramebuffers[imageIndex],clears.data(), 2, passHub.extent);
             mg::batches::SetViewport(cmd, passHub.extent);
             /* 场景信息+ShadowMap */
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo_tex, dstSet, 1, &frame->scene_ubo_shadow, 0, nullptr);
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow_h, dstSet, 1, &frame->scene_shadow_h, 0, nullptr);
             drawScene(cmd, frame);
+            drawUI(cmd, frame);
             vkCmdEndRenderPass(cmd);
         }
 
@@ -279,67 +280,56 @@ private:
     {
         uint32_t batchIdx =-1;
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_shadow);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo, 0, 1, &frame->shadow_ubo, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow, 0, 1, &frame->shadow_ubo, 0, nullptr);
         for (uint32_t i = 0; i < 4; i++) 
         {
             batchIdx = i;
-            scene.draw(cmd, piHub.piLayout_ubo, batchIdx);
+            scene.draw(cmd, piHub.piLayout_shadow, batchIdx);
         }
+    }
+    /* ui */
+    void drawUI(VkCommandBuffer cmd, Frame* frame)
+    {
+        uint32_t dstSet = 0;
+        uint32_t batchIdx = 0;
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_ui);
+        dstSet = 0;
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ui, dstSet, 1, &frame->ui, 0, nullptr);
+        batchIdx = 5;
+        scene.draw(cmd, piHub.piLayout_ui, batchIdx);
+        batchIdx = 6;
+        scene.draw(cmd, piHub.piLayout_ui, batchIdx);
     }
     /* 场景信息+ShadowMap  画一遍场景 */
     void drawScene(VkCommandBuffer cmd, Frame* frame) 
     {
-        uint32_t dstSet = 0;
+        uint32_t dstSet = 1;
         uint32_t batchIdx = 0;
         /* 模型 方柱 */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_TexArray);
-        dstSet = 1;             //texture
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo_tex_tex, dstSet, 1, &frame->tex_array, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_array, 0, nullptr);
         batchIdx = 0;
-        scene.draw(cmd, piHub.piLayout_ubo_tex_tex, batchIdx);
-
+        scene.draw(cmd, piHub.piLayout_solid, batchIdx);
         /* 一队 立方体 */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex3D);
-        dstSet = 1;
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo_tex_tex, dstSet, 1, &frame->tex_3d, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_3d, 0, nullptr);
         batchIdx = 1;
-        scene.draw(cmd, piHub.piLayout_ubo_tex_tex, batchIdx);
-
+        scene.draw(cmd, piHub.piLayout_solid, batchIdx);
         /* Cube 环阵 */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
-        dstSet = 1;
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo_tex_tex, dstSet, 1, &frame->tex_mips, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_mips, 0, nullptr);
         batchIdx = 2;
-        scene.draw(cmd, piHub.piLayout_ubo_tex_tex, batchIdx);
-
+        scene.draw(cmd, piHub.piLayout_solid, batchIdx);
         /* 球体 */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_TexCube);
-        dstSet = 1;    
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo_tex_tex, dstSet, 1, &frame->cube_map, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->cube_map, 0, nullptr);
         batchIdx = 3;
-        scene.draw(cmd, piHub.piLayout_ubo_tex_tex, batchIdx);
-
+        scene.draw(cmd, piHub.piLayout_solid, batchIdx);
         /* 地板的贴图 */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
-        dstSet = 1;    
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo_tex_tex, dstSet, 1, &frame->ground_tex, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_ground, 0, nullptr);
         batchIdx = 4;
-        scene.draw(cmd, piHub.piLayout_ubo_tex_tex, batchIdx);
-
-        /* ui */
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_ui);
-        dstSet = 0;
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo_tex_tex, dstSet, 1, &frame->ui_ubo_tex, 0, nullptr);
-        dstSet = 1;//<等位>遗传，如果<等位>上的资源不匹配，就会报错，(API无法判定shader中的if条件，即使实际上没有使用这个等位上的资源)
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo_tex_tex, dstSet, 1, &frame->ui_shadow, 0, nullptr);
-        batchIdx = 5;
-        scene.draw(cmd, piHub.piLayout_ubo_tex_tex, batchIdx);
-
-        dstSet = 1;//额外绑定 shadow-map: view_type_2d-array
-        //vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ubo_tex_tex, dstSet, 1, &frame->ui_shadow, 0, nullptr);
-        batchIdx = 6;
-        scene.draw(cmd, piHub.piLayout_ubo_tex_tex, batchIdx);
-
+        scene.draw(cmd, piHub.piLayout_solid, batchIdx);
     }
     void createSyncObjects() {
         imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);

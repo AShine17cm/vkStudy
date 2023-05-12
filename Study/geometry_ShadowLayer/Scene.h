@@ -274,17 +274,13 @@ struct  Scene
 			case 5:
 				//画 UI
 				firstPt = 0;
-				pod.texIndex = { 0,0,0,0 };
-				vkCmdPushConstants(cmd, piLayout, stageVGF, 0, size, &pod);
 				vkCmdDraw(cmd, 6, 1, firstPt, 0);
 				break;
 			case 6:
 				//展示 阴影的Map
 				if (input->displayShadowmap)
 				{
-					pod.texIndex = { 1,0,0,0 };
 					firstPt = 6;
-					vkCmdPushConstants(cmd, piLayout, stageVGF, 0, size, &pod);
 					vkCmdDraw(cmd, 6, 1, firstPt, 0);
 				}
 				break;

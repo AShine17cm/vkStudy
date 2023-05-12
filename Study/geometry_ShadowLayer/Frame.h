@@ -15,17 +15,17 @@ using namespace mg;
 	*/
 struct Frame
 {
-	VkDescriptorSet shadow_ubo;
 
-	VkDescriptorSet ui_ubo_tex;				//ui
-	VkDescriptorSet ui_shadow;				//阴影Map的展示
-	VkDescriptorSet scene_ubo_shadow;		//场景数据+ShadowMap
+	VkDescriptorSet ui;					//ui
+	VkDescriptorSet shadow_ubo;			//阴影渲染
 
-	VkDescriptorSet ground_tex;				//tex	地板
-	VkDescriptorSet tex_mips;				//tex	mips
-	VkDescriptorSet tex_array;				//tex	模型
-	VkDescriptorSet cube_map;				//tex   球体
-	VkDescriptorSet tex_3d;					//tex   3D 纹理
+	VkDescriptorSet scene_shadow_h;		//阴影合成  管线上的资源继承
+
+	VkDescriptorSet tex_ground;			//tex	地板
+	VkDescriptorSet tex_mips;			//tex	mips
+	VkDescriptorSet tex_array;			//tex	模型
+	VkDescriptorSet cube_map;			//tex   球体
+	VkDescriptorSet tex_3d;				//tex   3D 纹理
 
 	mg::Buffer ubo_ui;
 	mg::Buffer ubo_scene;				//相机 灯光
@@ -42,19 +42,15 @@ struct Frame
 	void prepare(VulkanDevice* vulkanDevice, VkDescriptorPool descriptorPool, PipelineHub* pipes, VkDeviceSize* bufferSizes)
 	{
 		VkDevice device = vulkanDevice->logicalDevice;
-		/* 此方式:生成2个 内存上连续的Set,而不是2个Set组合成的一个Set */
-		//VkDescriptorSetLayout set_scr[] = { pipes->setLayout_ubo,pipes->setLayout_tex };
-		//descriptors::allocateDescriptorSet(set_scr, 2, descriptorPool, device, &set_ui);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_ubo, 1, descriptorPool, device, &shadow_ubo);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_ui, 1, descriptorPool, device, &ui);			//ui
+		descriptors::allocateDescriptorSet(&pipes->setLayout_shadow, 1, descriptorPool, device, &shadow_ubo);	//阴影阶段
 
-		descriptors::allocateDescriptorSet(&pipes->setLayout_ubo_tex, 1, descriptorPool, device, &ui_ubo_tex);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_ubo_tex, 1, descriptorPool, device, &scene_ubo_shadow);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &ui_shadow);//UI 展示 使用单独的一个 set
-		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &ground_tex);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &tex_mips);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &tex_array);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &cube_map);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_tex, 1, descriptorPool, device, &tex_3d);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_shadow_h, 1, descriptorPool, device, &scene_shadow_h);//阴影合成
+		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &tex_ground);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &tex_mips);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &tex_array);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &cube_map);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &tex_3d);
 
 		vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -76,6 +72,16 @@ struct Frame
 		std::vector<VkDescriptorType> types;
 		std::vector<uint32_t> counts;
 		std::vector<void*> infos;
+
+		//UI: 顶点+UI图片
+		types = {
+			VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER };
+		counts = { 1,1,1 };
+		infos = { &ubo_ui.descriptor,&res->tex_ui->descriptor,&res->tex_shadow->descriptor };
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), ui, device);
+
 		/* 渲染ShadowMap的 灯光矩阵 */
 		types = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER };
 		counts = { 1 };
@@ -86,16 +92,12 @@ struct Frame
 		types = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER };
 		counts = { 1,1 };
 		infos = { &ubo_scene.descriptor,&res->tex_shadow->descriptor };
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), scene_ubo_shadow, device);
-		//UI: 顶点+UI图片
-		infos = { &ubo_ui.descriptor,&res->tex_ui->descriptor };
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), ui_ubo_tex, device);
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), scene_shadow_h, device);
+
 
 		/* shadow-array, tex-mips,tex-array,cube-map,3D-tex */
 		counts = { 1 };
 		types = { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER };
-		infos = { &res->tex_shadow->descriptor };
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), ui_shadow, device);
 
 		infos = {&res->tex_mips->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), tex_mips, device);
@@ -106,7 +108,7 @@ struct Frame
 		infos = { &res->tex_3D->texture->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), tex_3d, device);
 		infos = { &res->tex_floor->descriptor };
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), ground_tex, device);
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), tex_ground, device);
 
 	}
 	/* 切换贴图格式 */
@@ -137,9 +139,7 @@ struct Frame
 	}
 	void cleanup(VkDevice device)
 	{
-
 		ubo_ui.destroy();
 		ubo_scene.destroy();
-		//ubo_shadow.destroy();
 	}
 };
