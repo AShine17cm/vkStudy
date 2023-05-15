@@ -10,6 +10,7 @@ namespace geos
 		vec3 dirA = { 1,0,0 };
 		vec3 dirB = { 0,1,0 };
 		vec3 normal = { 0,0,1 };
+		vec3 tangent = { 0,1,0 };
 		vec4 color = { 1,1,1,1 };
 		vec3 zero = -dirA * size * 0.5f - dirB * size * 0.5f;
 		float stepUv = 1.0f/(colums - 1);
@@ -20,7 +21,7 @@ namespace geos
 			{
 				vec3 pos = zero + dirA * (step * a) + dirB * (step * b);
 				vec2 uv = {1.0f- stepUv * a,stepUv * b };
-				vertices.push_back({ pos,normal,{0,0,0},uv,color });
+				vertices.push_back({ pos,normal,tangent,uv,color });
 
 				if (a >= 1 && b >= 1) 
 				{

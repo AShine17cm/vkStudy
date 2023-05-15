@@ -288,7 +288,7 @@ private:
         uint32_t batchIdx = -1;
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_geo_debug);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_geo_ubo, 0, 1, &frame->geo_ubo, 0, nullptr);
-        for (uint32_t i = 0; i < 4; i++)
+        for (uint32_t i = 0; i <= 4; i++)
         {
             if (i == 2)continue;
             batchIdx = i;

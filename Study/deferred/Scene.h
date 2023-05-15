@@ -187,7 +187,7 @@ struct  Scene
 		/* µ÷ÊÔÑÓ³ÙäÖÈ¾ */
 		if (input->flip_Deferred) {
 			input->flip_Deferred = false;
-			deferFliper = (deferFliper + 1) % 4;
+			deferFliper = (deferFliper + 1) %  6;
 			ivec4 debugDeferred = { 0,0,0,0 };
 			switch (deferFliper)
 			{
@@ -202,6 +202,12 @@ struct  Scene
 				break;
 			case 3:
 				debugDeferred = { 0,0,0,1 };
+				break;
+			case 4:
+				debugDeferred = { 0,0,0,0 };
+				break;
+			case 5:
+				debugDeferred = { 1,1,1,1 };
 				break;
 			}
 			view->data.debugDeferred = debugDeferred;

@@ -23,7 +23,7 @@ struct  View
 		glm::mat4 view;
 		glm::vec4 camera;
 		glm::ivec4 debugShadow = { 1,1,1,0 };//全部3个阴影
-		glm::ivec4 debugDeferred = { 0,0,0,1 };
+		glm::ivec4 debugDeferred = { 0,0,0,0 };
 		Light lights[LIGHT_COUNT];
 	}data;
 

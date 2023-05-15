@@ -19,7 +19,7 @@ LAYOUT_COLOR_ATTACHMENT_OPTIMAL	LAYOUT_COLOR_ATTACHMENT_OPTIMAL
 3. UI 的位置 通过顶点索引计算  gl_VertexIndex/6 , glsl中 in/out 整型向量，变量必须使用flat修饰
 
 操作: 
-数字键 1： 切换 G-Buffer中的 pos-normal-albedo  以及最终的compose
+数字键 1： 切换 G-Buffer中的 pos-normal-albedo 黑白光照  以及最终的compose
 数字键 2:   切换 3个阴影
 数字键 3：打开/关闭 阴影面板
 数字键 4:  切换 mips 范围
@@ -35,4 +35,6 @@ Bug:
    延迟渲染  Compose阶段 
    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL  不能使用创建时的这个Layout
    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL   需要使用这个
-5. UI的render-pass 和 compose 阶段一样, 和 G-Buffer 阶段不一样
+5. 在shader中 layout 重复定义, shader编译不会报错，vulkan 运行时也不会报错
+6. UI的render-pass 和 compose 阶段一样, 和 G-Buffer 阶段不一样
+

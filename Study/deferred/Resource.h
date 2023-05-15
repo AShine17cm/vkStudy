@@ -41,14 +41,15 @@ struct Resource
             VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
         };
         /* 阴影贴图 */
-        imgInfo.extent3D = { SHADOWMAP_DIM,SHADOWMAP_DIM,1 };
+        imgInfo.extent3D = { SHADOWMAP_DIM_W,SHADOWMAP_DIM_W,1 };
         imgInfo.layers = LIGHT_COUNT;
         tex_shadow = new textures::Texture(vulkanDevice, imgInfo);
         tex_shadow->viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
         tex_shadow->extends = { textures::MgTextureEx::Sampler_ShadowMap };
         tex_shadow->load(nullptr);
 
-        imgInfo.extent3D = { GEOMETRY_DIM,GEOMETRY_DIM,1 };
+        imgInfo.extent3D = { GEOMETRY_DIM_W,GEOMETRY_DIM_H,1 };
+        
         imgInfo.layers = 1;
         /* 场景深度测试 */
         geo_depth = new textures::Texture(vulkanDevice, imgInfo);
