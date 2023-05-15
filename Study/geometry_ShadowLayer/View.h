@@ -99,15 +99,15 @@ struct  View
 			{
 			case 0:
 				lightPos = { 6,-4,8 };
-				color = { 1.0f,1.0f,1.0f,0.6f };
+				color = { 1.0f,0.0f,0.0f,1.2f };
 				break;
 			case 1:
-				lightPos = { -5,-4,8 };
-				color = { 0.2f,0.8f,0.0f,0.4f };
+				lightPos = { 8,2,12 };
+				color = { 0.0f,1.0f,0.0f,1.0f };
 				break;
 			case 2:
-				lightPos = { -3,4,8 };
-				color = { 0.0f,0.2f,1.0f,0.2f };
+				lightPos = { 2,5,8 };
+				color = { 0.0f,0.0f,1.0f,1.0f };
 				break;
 			}
 			shadowView = glm::lookAt(lightPos, targetPos, upDir);

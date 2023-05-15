@@ -4,7 +4,7 @@
 */
 #define LIGHT_COUNT 3
 #define PI 3.1415926
-#define AMBIENT 0.1
+#define AMBIENT 0.2
 #define SHADOW_FACTOR 0.25
 #define SHADOW_PCF
 
