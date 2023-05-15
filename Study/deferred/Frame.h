@@ -84,13 +84,13 @@ struct Frame
 		/* geo_mrt ·¨Ïß+ÑÕÉ« */
 		counts = { 1,1 };
 		types = { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ,VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER };
-		infos = {&res->norm_01->descriptor, &res->tex_mips->descriptor };
+		infos = {&res->norm_02->descriptor, &res->tex_mips->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), geo_mrt_mips, device);
-		infos = {&res->norm_01->descriptor, &res->tex_array->descriptor };
+		infos = {&res->norm_02->descriptor, &res->tex_array->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), geo_mrt_texArray, device);
-		infos = {&res->norm_01->descriptor, &res->tex_cube->descriptor };
+		infos = {&res->norm_02->descriptor, &res->tex_cube->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), geo_mrt_cubeMap, device);
-		infos = {&res->norm_01->descriptor, &res->tex_floor->descriptor };
+		infos = {&res->norm_02->descriptor, &res->tex_floor->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), geo_mrt_ground, device);
 
 		/* Compose ½×¶Î */
