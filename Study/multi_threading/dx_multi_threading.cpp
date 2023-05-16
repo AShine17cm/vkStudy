@@ -119,7 +119,10 @@ private:
     }
 
     void cleanup() {
-        delete[](threads);
+        for (auto& thread : threads) 
+        {
+            delete(thread);
+        }
         passHub.clean();
         piHub.cleanup(device);
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 

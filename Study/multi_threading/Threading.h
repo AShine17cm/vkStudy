@@ -67,6 +67,7 @@ struct Threading
 		for (int i = 0; i < threadDatas.size(); i++) 
 		{
 			ThreadData td = threadDatas[i];
+			vkFreeCommandBuffers(device, td.cmdPool, td.cmds.size(), td.cmds.data());
 			vkDestroyCommandPool(device, td.cmdPool, nullptr);
 		}
 	}
