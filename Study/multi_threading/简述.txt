@@ -1,0 +1,27 @@
+主cmd正常 begin
+		主cmd开始 render-pass  ( VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS )   而不是通常的 VK_SUBPASS_CONTENTS_INLINE
+
+			次级cmd开始 begin
+			次级 cmd  的beginInfo 必须有VkCommandBufferInheritanceInfo, 用于继承 主cmd 的render-pass 和 frame-buffer
+				次级 cmd记录渲染指令
+			次级 cmd必须end
+		主cmd 执行次级cmd
+		主cmd 结束end render-pass
+主cmd 结束
+
+重点: 
+次级cmd 必须在主cmd 的一个  render-pass<begin / end>之间
+次级cmd 在一个begin/end 之间，只能被主cmd使用一次
+主cmd执行次级cmd 必须在 主cmd的<begin / end>之间
+
+
+在工作线程上 
+1. 不需要  BeginRenderPass  不需要绑定 FrameBuffer
+2. Command Buffer Begin Info的flags 需要设定为 Render_Pass_Continue
+3. Command Buffer 的 Level 是 Secondary
+4. 创建 M 个 工作线程, 每个工作线程创建 N 个 CommandBuffer, 每个 CommandBuffer 渲染 Q 个物体
+5. 其它方面和主线程操作一致
+
+
+BUG:
+swapchain中的image count 比 MAX_FRAMES_IN_FLIGHT 多一个

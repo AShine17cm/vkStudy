@@ -203,6 +203,7 @@
     <ClInclude Include="surfaces.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="textures.h" />
+    <ClInclude Include="threadpool.hpp" />
     <ClInclude Include="vertices.h" />
     <ClInclude Include="VulkanDevice.h" />
     <ClInclude Include="VulkanFrameBuffer.hpp" />

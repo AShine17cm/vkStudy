@@ -164,5 +164,8 @@
     <ClInclude Include="mipmaps.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="threadpool.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

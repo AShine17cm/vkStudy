@@ -1,2 +1,4 @@
-﻿  GeoPlane.cpp
+﻿  batches.cpp
+E:\VulkanProj\vkStudy\Study\base\batches.cpp(44,25): warning C4244: “=”: 从“uint32_t”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\batches.cpp(45,26): warning C4244: “=”: 从“uint32_t”转换到“float”，可能丢失数据
   base.vcxproj -> E:\VulkanProj\vkStudy\Study\x64\Debug\base.lib

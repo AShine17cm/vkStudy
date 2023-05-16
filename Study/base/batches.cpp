@@ -13,7 +13,8 @@ namespace batches
 		VkFramebuffer framebuffer,
 		VkClearValue* clearValues,
 		uint32_t clearCount,
-		VkExtent2D extent
+		VkExtent2D extent,
+		bool multiThreading
 	)
 	{
 		VkRenderPassBeginInfo renderPassBI{};
@@ -25,7 +26,12 @@ namespace batches
 		renderPassBI.pClearValues = clearValues;
 		renderPassBI.clearValueCount = clearCount;
 
-		vkCmdBeginRenderPass(cmd, &renderPassBI, VK_SUBPASS_CONTENTS_INLINE);
+		if (multiThreading) {
+			vkCmdBeginRenderPass(cmd, &renderPassBI, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
+		}
+		else {
+			vkCmdBeginRenderPass(cmd, &renderPassBI, VK_SUBPASS_CONTENTS_INLINE);
+		}
 
 	}
 

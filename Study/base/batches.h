@@ -14,7 +14,8 @@ namespace batches
 		VkFramebuffer framebuffer,
 		VkClearValue* clearValues,
 		uint32_t clearCount,
-		VkExtent2D extent
+		VkExtent2D extent,
+		bool multiThreading=false
 	);
 	void SetViewport(
 		VkCommandBuffer cmd,
