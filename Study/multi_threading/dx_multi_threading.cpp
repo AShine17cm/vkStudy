@@ -10,6 +10,9 @@
 #include "threadpool.hpp"
 #include "Threading.h"
 
+/*  多线程渲染
+    如果Fence使用 in-Flights 数组, 因为线程中的次级 cmd的关系,线程池对象也需要使用等位的数组
+*/
 class GeneralApp {
 public:
     void run() {
@@ -44,7 +47,7 @@ private:
     Resource resource;
     Input* input;
 
-    Threading* thread;
+    Threading* threads[MAX_FRAMES_IN_FLIGHT];
     std::vector<VkCommandBuffer> commandBuffers;        //primary
     std::vector<VkCommandBuffer> cmdShadowSecondary;    //阴影
     std::vector<VkCommandBuffer> cmdSolidSecondary;     //合成
@@ -90,8 +93,13 @@ private:
 
         createCommandBuffers();
         /* Threading */
-        thread = new Threading(device, commandPool, &piHub);
-        thread->prepare_MultiThread_Renderer(vulkanDevice, nullptr);
+        for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+
+        Threading* thread = new Threading(device, &piHub);
+        thread->prepare_MultiThread_Renderer(vulkanDevice);
+        threads[i] = thread;
+        }
+
         createSyncObjects();
     }
 
@@ -111,7 +119,7 @@ private:
     }
 
     void cleanup() {
-
+        delete[](threads);
         passHub.clean();
         piHub.cleanup(device);
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
@@ -292,6 +300,17 @@ private:
             vkCmdExecuteCommands(cmd, 1, &cmdShadow_s);//执行 次级cmd
             vkCmdEndRenderPass(cmd);
         }
+        if (false)//render-pass 只能 begin/end 一次，不然内容会被clear ?
+        {
+            clears[0].color = { {1.0f, 0.0f, 0.0f, 1.0f} };
+            clears[1].depthStencil = { 1.0f,0 };
+            mg::batches::BeginRenderpass(cmd, passHub.renderPass, passHub.swapChainFramebuffers[imageIndex], clears.data(), 2, passHub.extent, multiThreading);
+            inherit.renderPass = passHub.renderPass;
+            inherit.framebuffer = passHub.swapChainFramebuffers[imageIndex];
+            /* 多线程 提交 */
+            threads[currentFrame]->thread_Render(cmd, inherit,frame);
+            vkCmdEndRenderPass(cmd);
+        }
         if (true) 
         {
             clears[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
@@ -299,9 +318,15 @@ private:
             /* 正常渲染 */
             mg::batches::BeginRenderpass(cmd,passHub.renderPass,passHub.swapChainFramebuffers[imageIndex],clears.data(), 2, passHub.extent,multiThreading);
             
-            /* 次级 command buffer 渲染阴影 */
+            /* 次级 command buffer 渲染主场景 */
             inherit.renderPass = passHub.renderPass;
             inherit.framebuffer = passHub.swapChainFramebuffers[imageIndex];
+
+            /*  多线程渲染 
+                如果Fence使用 in-Flights 数组, 因为线程中的次级 cmd的关系,线程池对象也需要使用等位的数组
+            */
+            threads[0]->thread_Render(cmd, inherit, frame);
+
             VkCommandBufferBeginInfo cmdBI{};
             cmdBI.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
             cmdBI.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
@@ -400,7 +425,12 @@ private:
 
 
     void drawFrame( ) {
-        vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+        VkResult fenceRes;
+        do 
+        {
+            fenceRes= vkWaitForFences(device, 1, &inFlightFences[0], VK_TRUE, UINT64_MAX);
+        } while (VK_TIMEOUT == fenceRes);
+        vkResetFences(device, 1, &inFlightFences[0]);
 
         uint32_t imageIndex;
         VkResult result = vkAcquireNextImageKHR(device, passHub.swapchain->swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
@@ -416,11 +446,10 @@ private:
 
         updateScene(currentFrame);
 
-        vkResetFences(device, 1, &inFlightFences[currentFrame]);
-
         vkResetCommandBuffer(commandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
         vkResetCommandBuffer(cmdShadowSecondary[currentFrame], 0);/////////////////////////
         vkResetCommandBuffer(cmdSolidSecondary[currentFrame], 0);////////////////////////
+
 
         recordCommandBuffer(commandBuffers[currentFrame],currentFrame, imageIndex);
 
@@ -439,7 +468,7 @@ private:
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
+        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[0]) != VK_SUCCESS) {
             throw std::runtime_error("failed to submit draw command buffer!");
         }
 
@@ -455,8 +484,6 @@ private:
 
         currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
-
-
 };
 
 int main() {

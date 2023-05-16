@@ -38,6 +38,21 @@ void shade(out vec4 diff)
     vec3 V=scene.camera.xyz-inPos;
     V=normalize(V);
 
+    /* 采样阴影-多层 */
+    float shadow[LIGHT_COUNT];
+    for(int i=0;i<LIGHT_COUNT;i+=1)
+    {
+        vec4 coord=scene.lights[i].mvp* vec4(inPos,1.0);
+        float layerVal=1.0;
+        #ifdef SHADOW_PCF
+            layerVal= filterPCF(coord,i);
+        #else
+            layerVal= textureProj(coord,i,vec2(0));
+        #endif
+        if(scene.debug[i]==0) layerVal=1.0;/* 3个光源的阴影,逐次展示，共同展示 */
+        shadow[i]=layerVal;
+    }
+
     vec3 color=vec3(0);
     float spec=0;
     for(int i=0;i<LIGHT_COUNT;i+=1)
@@ -52,31 +67,15 @@ void shade(out vec4 diff)
             L=normalize(L);
         }
         float NdotL=max(0.0,dot(N,L));  //光照
-        color+=scene.lights[i].color.rgb*vec3(NdotL*scene.lights[i].color.a);
+        vec3 tmp=scene.lights[i].color.rgb*vec3(NdotL*scene.lights[i].color.a);
+
+        color=color+ tmp*shadow[i];
 
         vec3 R=reflect(-L,N);           //高光
         float NdotR=max(0.0,dot(R,V));
-        spec+=pow(NdotR,16.0);
-    }
-    /* 采样阴影-多层 */
-    float shadow=1.0;
-    for(int i=0;i<LIGHT_COUNT;i+=1)
-    {
-        vec4 coord=scene.lights[i].mvp* vec4(inPos,1.0);
-        float layerVal=1.0;
-        #ifdef SHADOW_PCF
-            layerVal= filterPCF(coord,i);
-        #else
-            layerVal= textureProj(coord,i,vec2(0));
-        #endif
-
-        /* 3个光源的阴影,逐次展示，共同展示 */
-        if(scene.debug[i]==0) layerVal=1.0;
-
-        shadow=shadow*layerVal;
+        spec+=pow(NdotR,16.0)*shadow[i];
     }
 
     diff.rgb=color+spec;
-    diff*=shadow;
     diff.a=1.0;
 }

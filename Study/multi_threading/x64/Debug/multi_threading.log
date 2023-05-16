@@ -13,20 +13,24 @@ E:\VulkanProj\vkStudy\Study\multi_threading\PipelineHub.h(53,1): warning C4267: 
 E:\VulkanProj\vkStudy\Study\multi_threading\PipelineHub.h(58,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\multi_threading\PipelineHub.h(63,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\multi_threading\PipelineHub.h(178,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(83,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(89,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(95,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(103,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(105,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(107,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(109,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(111,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(129,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(134,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(88,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(94,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(100,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(108,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(110,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(112,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(114,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(116,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(119,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(121,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(139,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Frame.h(144,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\multi_threading\Scene.h(99,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\multi_threading\Scene.h(195,1): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\multi_threading\Scene.h(197,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\Threading.h(103,14): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\dx_multi_threading.cpp(164,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\multi_threading\dx_multi_threading.cpp(209,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\Threading.h(176,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\dx_multi_threading.cpp(122,1): warning C4154: 删除数组表达式；转换到提供的指针
+E:\VulkanProj\vkStudy\Study\multi_threading\dx_multi_threading.cpp(172,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\multi_threading\dx_multi_threading.cpp(217,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+LINK : warning LNK4098: 默认库“MSVCRT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
   multi_threading.vcxproj -> E:\VulkanProj\vkStudy\Study\multi_threading\multi_threading.exe

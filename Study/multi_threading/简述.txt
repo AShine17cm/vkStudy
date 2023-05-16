@@ -13,6 +13,10 @@
 次级cmd 必须在主cmd 的一个  render-pass<begin / end>之间
 次级cmd 在一个begin/end 之间，只能被主cmd使用一次
 主cmd执行次级cmd 必须在 主cmd的<begin / end>之间
+主cmd 可以执行(Execute)多次 多个次级cmd
+render-pass 只能 begin/end 一次，不然内容会被clear ?
+ 
+如果Fence使用 in-Flights 数组, 因为线程中的次级cmd 的关系,线程池对象也需要使用等位的数组
 
 
 在工作线程上 
@@ -25,3 +29,6 @@
 
 BUG:
 swapchain中的image count 比 MAX_FRAMES_IN_FLIGHT 多一个
+
+
+

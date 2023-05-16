@@ -39,7 +39,8 @@ namespace mg
 			jobQueue.push(std::move(function));
 			condition.notify_one();
 		}
-		// Wait until all work items have been finished
+		//等待/获取 queueMutex
+		//也就是 所有job都释放这个 queueMutex
 		void wait()
 		{
 			std::unique_lock<std::mutex> lock(queueMutex);
@@ -53,6 +54,7 @@ namespace mg
 		std::mutex queueMutex;
 		std::condition_variable condition;
 
+		/* 在构造函数中 使用  */
 		void queueLoop()
 		{
 			while (true)

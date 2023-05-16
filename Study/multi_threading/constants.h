@@ -9,6 +9,6 @@
 #define MAX_FRAMES_IN_FLIGHT 2
 
 #define NUM_THREADS 16
-#define NUM_PER_CMD 16					//
-#define NUM_CMD_PER_THREAD 32			//
+#define NUM_CMD_PER_THREAD 16		//
+#define NUM_OBJECT_PER_CMD 8		//
 

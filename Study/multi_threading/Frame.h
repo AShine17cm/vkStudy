@@ -27,6 +27,9 @@ struct Frame
 	VkDescriptorSet cube_map;			//tex   球体
 	VkDescriptorSet tex_3d;				//tex   3D 纹理
 
+	VkDescriptorSet tex_1;
+	VkDescriptorSet tex_2;
+
 	mg::Buffer ubo_ui;
 	mg::Buffer ubo_scene;				//相机 灯光
 
@@ -51,6 +54,8 @@ struct Frame
 		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &tex_array);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &cube_map);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &tex_3d);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &tex_1);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &tex_2);
 
 		vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -109,6 +114,11 @@ struct Frame
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), tex_3d, device);
 		infos = { &res->tex_floor->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), tex_ground, device);
+
+		infos = { &res->tex_1->descriptor };
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), tex_1, device);
+		infos = { &res->tex_2->descriptor };
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), tex_2, device);
 
 	}
 	/* 切换贴图格式 */
