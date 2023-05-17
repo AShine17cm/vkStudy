@@ -18,5 +18,4 @@ E:\VulkanProj\vkStudy\Study\descriptors\Frame.h(106,1): warning C4267: “参数
 E:\VulkanProj\vkStudy\Study\descriptors\Frame.h(114,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\descriptors\dx_descriptors.cpp(159,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\descriptors\dx_descriptors.cpp(206,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-LINK : warning LNK4098: 默认库“MSVCRT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
   descriptors.vcxproj -> E:\VulkanProj\vkStudy\Study\descriptors\descriptors.exe

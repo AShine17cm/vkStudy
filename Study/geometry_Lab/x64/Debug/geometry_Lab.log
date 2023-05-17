@@ -33,4 +33,5 @@ E:\VulkanProj\vkStudy\Study\geometry_Lab\Scene.h(103,17): warning C4244: “初�
 E:\VulkanProj\vkStudy\Study\geometry_Lab\Scene.h(179,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\geometry_Lab\dx_GeometryShader.cpp(156,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\geometry_Lab\dx_GeometryShader.cpp(202,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+LINK : warning LNK4098: 默认库“MSVCRT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
   geometry_Lab.vcxproj -> E:\VulkanProj\vkStudy\Study\geometry_Lab\geometry_Lab.exe

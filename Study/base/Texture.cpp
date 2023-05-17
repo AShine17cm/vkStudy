@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include "mipmaps.h"
 //#include "textures.h"
 
 //第三方库
@@ -25,8 +26,19 @@ namespace textures
 			data=stbi_load(filename, &width, &height, &channels, STBI_rgb_alpha);
 			info.extent3D.width = width;
 			info.extent3D.height = height;
+			//需要生成 mipmaps
+			if (info.gen_Mips) 
+			{
+				int maxBorder = std::max(width, height);
+				int numLevels = 1 + floor(log(maxBorder));
+				info.mipLevels = numLevels;
+			}
 		}
 		if (VK_FORMAT_R8G8B8A8_SRGB == info.formats.format)channels = 4;//简单处理
+		if (info.gen_Mips)
+		{
+			info.formats.usageFlags |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT; //最后再去掉 ?
+		}
 
 		VkDeviceSize imageSize = info.extent3D.width * info.extent3D.height *info.extent3D.depth* channels;
 		textures::MgImgViewInfo viewInfo{};
@@ -38,7 +50,6 @@ namespace textures
 		textures::createTexture(info,imageSize,vulkanDevice,&image, &memory,data,nullptr,0);
 		textures::createImageView(vulkanDevice->logicalDevice,image, &view,viewInfo);
 		textures::createSampler(vulkanDevice,info.mipLevels,&sampler,extends.data(), extends.size(),VK_SAMPLER_ADDRESS_MODE_REPEAT);
-
 		updateDescriptor();
 	}
 	/* 后续操作，必须比创建时的 <width,height>区域 =/小 */
@@ -51,6 +62,17 @@ namespace textures
 		VkDeviceSize imageSize = width * height * info.extent3D.depth * 4;
 		MgInsertPiece piece = { info,target_Layer,target_mipLevel,imageSize};
 		textures::InsertPiece(vulkanDevice, &image,data, piece);
+	}
+	void Texture::genMips()
+	{
+		if (info.gen_Mips)
+		{
+			mipmaps::generateMipmaps(
+				info,
+				image,
+				vulkanDevice,
+				vulkanDevice->graphicsQueue);
+		}
 	}
 	void Texture::updateDescriptor()
 	{

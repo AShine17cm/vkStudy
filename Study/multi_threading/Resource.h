@@ -49,6 +49,7 @@ struct Resource
 
         /* Textures */
         imgInfo.layers = 1;
+        imgInfo.gen_Mips = true;
         imgInfo.formats = {
             VK_IMAGE_TYPE_2D,
             VK_FORMAT_R8G8B8A8_SRGB ,
@@ -57,16 +58,20 @@ struct Resource
 
         tex_ui = new textures::Texture(vulkanDevice, imgInfo);
         tex_ui->load("../textures/ui.psd");
+        tex_ui->genMips();
         tex_floor = new textures::Texture(vulkanDevice, imgInfo);
         tex_floor->load("../textures/ground 01.jpg");
+        tex_floor->genMips();
         tex_1 = new textures::Texture(vulkanDevice, imgInfo);
         tex_1->load("../textures/stone_01.jpg");
+        tex_1->genMips();
         tex_2 = new textures::Texture(vulkanDevice, imgInfo);
         tex_2->load("../textures/stone_02.jpg");
-
+        tex_2->genMips();
 
         /* 带mip-maps的贴图 */
         imgInfo.mipLevels = 8;
+        imgInfo.gen_Mips = false; //不要自动生成mips,手动生成
         tex_mips = new textures::Texture(vulkanDevice, imgInfo);
         tex_mips->load("../textures/rock 03.jpg");
         tex_mips->Insert("../textures/mip 256.jpg", 0, 1);
@@ -77,12 +82,13 @@ struct Resource
         tex_mips->Insert("../textures/mip 8.jpg", 0, 6);
         tex_mips->Insert("../textures/mip 4.jpg", 0, 7);
         /* 多层贴图 - View要使用 2D-Array格式 */
-        imgInfo.mipLevels = 1;
         imgInfo.layers = 2;
+        imgInfo.gen_Mips = true;
         tex_array = new textures::Texture(vulkanDevice, imgInfo);
         tex_array->viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
         tex_array->load("../textures/rock 01.jpg");
         tex_array->Insert("../textures/rock 02.jpg", 1, 0);
+        tex_array->genMips();
         /* 只包含部分 <layer,mip-level>的视图 */
         textures::MgImgViewInfo viewInfo{};
         viewInfo.imgFormat = tex_mips->info.formats.format;
@@ -91,7 +97,7 @@ struct Resource
         viewInfo.mipLevCount = 3;
         subView = new SubImageView(tex_mips, viewInfo);
         /* Cube-Map */
-        imgInfo.mipLevels = 1;
+        imgInfo.gen_Mips = true;
         imgInfo.layers = 6;
         imgInfo.formats.createFalgs = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
         tex_cube = new textures::Texture(vulkanDevice, imgInfo);
@@ -102,6 +108,7 @@ struct Resource
         tex_cube->Insert("../textures/cube 3.jpg", 3, 0);
         tex_cube->Insert("../textures/cube 4.jpg", 4, 0);
         tex_cube->Insert("../textures/cube 5.jpg", 5, 0);
+        tex_cube->genMips();
         /* Texture 3D */
         tex_3D = new Tex3D(vulkanDevice, 128, 128, 128);
         tex_3D->generate();

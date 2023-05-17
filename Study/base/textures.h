@@ -29,7 +29,8 @@ namespace textures
 		{
 			VkExtent3D extent3D = { 0,0,1 };
 			uint32_t layers = 1;
-			uint32_t mipLevels = 1;
+			uint32_t mipLevels = 1;		
+			bool gen_Mips = false;
 			struct Formats
 			{
 				VkImageType type = VK_IMAGE_TYPE_2D;
