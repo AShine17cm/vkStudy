@@ -1,8 +1,1 @@
-﻿  mipmaps.cpp
-  Texture.cpp
-E:\VulkanProj\vkStudy\Study\base\Texture.cpp(33,19): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\base\Texture.cpp(50,32): warning C4244: “参数”: 从“VkDeviceSize”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\base\Texture.cpp(52,125): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-  textures.cpp
-  正在生成代码...
-  base.vcxproj -> E:\VulkanProj\vkStudy\Study\x64\Debug\base.lib
+﻿  base.vcxproj -> E:\VulkanProj\vkStudy\Study\x64\Debug\base.lib

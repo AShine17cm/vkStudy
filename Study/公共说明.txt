@@ -1,0 +1,1 @@
+Vertex 的 hash模板 需要放到 std 命名空间

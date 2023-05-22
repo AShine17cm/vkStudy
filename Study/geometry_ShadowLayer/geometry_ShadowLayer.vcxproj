@@ -185,6 +185,7 @@
     <None Include="shaders\ui.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="commonData.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="Frame.h" />
     <ClInclude Include="Input.h" />

@@ -6,7 +6,7 @@
 #include "Frame.h"
 #include "View.h"
 #include "Input.h"
-
+#include "commonData.h"
 using namespace mg;
 
 /*
@@ -17,12 +17,7 @@ struct  Scene
 	static const int countInstance = 16;
 	static const int countTextureArray = 8;
 	static const int countUI = 2;
-	/* 走 PushConstant的数据 */
-	struct PerObjectData
-	{
-		glm::mat4 model;
-		glm::vec4 texIndex;
-	};
+
 	/* 渲染数据 */
 	struct InstanceData
 	{
@@ -48,7 +43,6 @@ struct  Scene
 	geos::Geo* ground;
 	geos::GeoCube* cube;
 	geos::GeoSphere* sphere;
-
 	float deltaTime;
 	//创建 模型
 	void prepare(VulkanDevice* vulkanDevice, VkExtent2D extent,Input* input)

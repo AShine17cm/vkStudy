@@ -19,6 +19,7 @@ struct Resource
     textures::Texture* tex_mips;    //mip-maps 立方体-旋转环阵
     textures::Texture* tex_floor;   //地板
     textures::Texture* tex_cube;    //球体的反射
+
     SubImageView* subView;          //Image的部分 <layer,mip-level>, 键盘<1,2>切换<tex_mips,subView>
     Tex3D* tex_3D;
 
@@ -59,7 +60,6 @@ struct Resource
         tex_floor = new textures::Texture(vulkanDevice, imgInfo);
         tex_floor->load("../textures/ground 01.jpg");
         tex_floor->genMips();
-
         /* 带mip-maps的贴图 */
         imgInfo.mipLevels = 8;
         imgInfo.gen_Mips = false;
@@ -117,5 +117,6 @@ struct Resource
         tex_floor->destroy();
         tex_depth->destroy();
         tex_cube->destroy();
+
     }
 };

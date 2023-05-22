@@ -14,20 +14,19 @@ E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\PipelineHub.h(53,1): warning C4
 E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\PipelineHub.h(58,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\PipelineHub.h(63,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\PipelineHub.h(178,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(83,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(89,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(95,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(103,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(105,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(107,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(109,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(111,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(84,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(90,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(96,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(104,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(106,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(108,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(110,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(112,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(129,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Frame.h(134,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Scene.h(99,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Scene.h(195,1): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Scene.h(197,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Scene.h(92,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Scene.h(188,1): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\Scene.h(190,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\dx_geometryShadowLayer.cpp(156,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\dx_geometryShadowLayer.cpp(201,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-LINK : warning LNK4098: 默认库“MSVCRT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
   geometry_ShadowLayer.vcxproj -> E:\VulkanProj\vkStudy\Study\geometry_ShadowLayer\geometry_ShadowLayer.exe

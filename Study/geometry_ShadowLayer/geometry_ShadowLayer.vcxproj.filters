@@ -106,5 +106,8 @@
     <ClInclude Include="constants.h">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="commonData.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

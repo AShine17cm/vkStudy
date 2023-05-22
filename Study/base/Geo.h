@@ -1,8 +1,9 @@
 #pragma once
 #include <vector>
 #include "glm.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
+#include "gtx/hash.hpp"
 #include "vulkan/vulkan.h"
-
 #include "VulkanDevice.h"
 #include "Buffer.h"
 using namespace glm;
@@ -19,6 +20,16 @@ namespace geos
 		vec3 tangent;
 		vec2 uv;
 		vec4 color;
+
+		bool operator==(const Vertex& other)const
+		{
+			return
+				pos == other.pos &&
+				normal == other.normal &&
+				tangent == other.tangent &&
+				uv == other.uv &&
+				color == other.color;
+		}
 	};
 
 	class Geo
@@ -227,4 +238,14 @@ namespace geos
 
 	};
 
+}
+/* hash 函数需要放到 std 空间 */
+namespace std {
+	template<> struct hash<geos::Vertex> 
+	{
+		size_t operator()(geos::Vertex const& vertex) const 
+		{
+			return ((hash<glm::vec3>()(vertex.pos) ^ (hash<glm::vec3>()(vertex.normal) << 1)) >> 1) ^ (hash<glm::vec2>()(vertex.uv) << 1);
+		}
+	};
 }

@@ -124,5 +124,8 @@
     <ClInclude Include="RenderPassHub.h">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="constants.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

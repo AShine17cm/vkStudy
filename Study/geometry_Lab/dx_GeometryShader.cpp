@@ -184,7 +184,7 @@ private:
 
     void createGraphicsPipeline() {
 
-        piHub.prepare(device,&passHub,sizeof(Scene::PerObjectData));
+        piHub.prepare(device,&passHub,sizeof(PerObjectData));
     }
 
     void createResources() 

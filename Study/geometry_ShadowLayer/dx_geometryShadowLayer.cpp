@@ -183,7 +183,7 @@ private:
 
     void createGraphicsPipeline() {
 
-        piHub.prepare(device,&passHub,sizeof(Scene::PerObjectData));
+        piHub.prepare(device,&passHub,sizeof(PerObjectData));
     }
 
     void createResources() 
@@ -320,7 +320,7 @@ private:
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_mips, 0, nullptr);
         batchIdx = 2;
         scene.draw(cmd, piHub.piLayout_solid, batchIdx);
-        /* ÇòÌå */
+        /* ½ÇÉ« */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_TexCube);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->cube_map, 0, nullptr);
         batchIdx = 3;

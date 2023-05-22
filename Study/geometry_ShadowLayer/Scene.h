@@ -1,5 +1,6 @@
 #pragma once
 #include "constants.h"
+#include "commonData.h"
 #include <vector>
 #include "glm.hpp"
 #include "Geo.h"
@@ -16,14 +17,6 @@ using namespace mg;
 struct  Scene
 {
 	static const int countTextureArray = 8;
-
-	/* 走 PushConstant的数据 */
-	struct PerObjectData
-	{
-		glm::mat4 model;
-		glm::vec4 texIndex;
-	};
-
 
 	View* view;
 	Input* input;
