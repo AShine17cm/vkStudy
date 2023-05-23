@@ -141,7 +141,7 @@ struct Resource
         norm_01->load("../textures/normal_01.png");
         norm_01->genMips();
         norm_02 = new textures::Texture(vulkanDevice, imgInfo);
-        norm_02->load("../textures/normal_02.png");
+        norm_02->load("../textures/normal_03.png");
         norm_02->genMips();
     }
     void cleanup() 

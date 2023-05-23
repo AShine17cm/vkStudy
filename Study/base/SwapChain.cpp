@@ -59,7 +59,7 @@ namespace mg
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
         createInfo.oldSwapchain = VK_NULL_HANDLE;
-
+        
         MG_CHECK_RESULT(vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain));
 
         vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);

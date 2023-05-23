@@ -19,6 +19,8 @@ namespace textures
 			Image_Mipmap=104,
 			Image_Depth=105,
 
+			MULTI_SAMPLE=200,
+
 			//Sampler
 			Sampler_None = 300,
 			Sampler_AnisotropyDisable = 301,
@@ -38,6 +40,7 @@ namespace textures
 				VkImageUsageFlags usageFlags = VK_IMAGE_USAGE_SAMPLED_BIT;
 				VkImageLayout imagelayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				VkImageCreateFlags createFalgs = 0;// VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+				VkSampleCountFlagBits sampleCount = VK_SAMPLE_COUNT_1_BIT;
 			}formats;
 
 			VkExtent2D getExtend2D() 

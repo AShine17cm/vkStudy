@@ -1,1 +1,7 @@
 Vertex 的 hash模板 需要放到 std 命名空间
+
+E:\VulkanProj\vkStudy\VkLibraries\glm
+E:\VulkanProj\vkStudy\VkLibraries\glm\glm
+这两个路径都加了，反正一堆烦，解决了再说 (base要加，当前项目也要加)
+
+使用了未定义类型  hpp文件被包含了两次	使用#ifndef #endif 解决

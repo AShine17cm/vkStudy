@@ -16,7 +16,6 @@
 #include "framebuffers.h"
 
 #include "shaders.h"
-#include "materials.h"
 #include "renderpasses.h"
 #include "surfaces.h"
 

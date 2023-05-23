@@ -10,12 +10,13 @@ namespace mg
 			VkFormat format,
 			VkFormat depthFormat,
 			VkDevice device,
-			VkRenderPass* renderPass
+			VkRenderPass* renderPass,
+			VkSampleCountFlagBits SAMPLE_COUNT
 		)
 		{
 			VkAttachmentDescription colorAttachment{};
 			colorAttachment.format = format;
-			colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+			colorAttachment.samples = SAMPLE_COUNT;
 			colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 			colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -30,7 +31,7 @@ namespace mg
 			/* Depth */
 			VkAttachmentDescription depthAttachment{};
 			depthAttachment.format = depthFormat;
-			depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+			depthAttachment.samples = SAMPLE_COUNT;
 			depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 			depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -74,12 +75,13 @@ namespace mg
 		void create_PostProcess(
 			VkFormat format,
 			VkDevice device,
-			VkRenderPass* renderPass
+			VkRenderPass* renderPass,
+			VkSampleCountFlagBits SAMPLE_COUNT
 		)
 		{
 			VkAttachmentDescription colorAttachment{};
 			colorAttachment.format = format;
-			colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+			colorAttachment.samples = SAMPLE_COUNT;
 			colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 			colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -122,14 +124,15 @@ namespace mg
 		void create_MRT(
 			VkFormat* formats,
 			VkDevice device,
-			VkRenderPass* renderPass
+			VkRenderPass* renderPass,
+			VkSampleCountFlagBits SAMPLE_COUNT
 		)
 		{
 			std::array<VkAttachmentDescription, 4> attachments = {};
 			for (int i = 0; i < 4; i++)
 			{
 				attachments[i].format = formats[i];
-				attachments[i].samples = VK_SAMPLE_COUNT_1_BIT;
+				attachments[i].samples = SAMPLE_COUNT;
 				attachments[i].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 				attachments[i].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 				attachments[i].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -192,12 +195,13 @@ namespace mg
 		void createDepthRenderPass(
 			VkFormat format,
 			VkDevice device,
-			VkRenderPass* renderPass
+			VkRenderPass* renderPass,
+			VkSampleCountFlagBits SAMPLE_COUNT
 		)
 		{
 			VkAttachmentDescription attachmentDesc{};
 			attachmentDesc.format = format;
-			attachmentDesc.samples = VK_SAMPLE_COUNT_1_BIT;
+			attachmentDesc.samples = SAMPLE_COUNT;
 			attachmentDesc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			attachmentDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 			attachmentDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;

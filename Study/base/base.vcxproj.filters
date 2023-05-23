@@ -78,9 +78,6 @@
     <ClCompile Include="batches.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="materials.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -153,9 +150,6 @@
       <Filter>geo</Filter>
     </ClInclude>
     <ClInclude Include="batches.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="materials.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">

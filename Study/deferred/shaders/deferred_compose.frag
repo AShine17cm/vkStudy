@@ -27,6 +27,21 @@ layout(set=0,binding=4) uniform UniformObjectData
 /* 光照 */
 vec3 shade(vec3 pos,vec3 normal)
 {
+        /* 采样阴影-多层 */
+    float shadow[LIGHT_COUNT];
+    for(int i=0;i<LIGHT_COUNT;i+=1)
+    {
+        vec4 coord=scene.lights[i].mvp* vec4(pos,1.0);
+        float layerVal=1.0;
+        #ifdef SHADOW_PCF
+            layerVal= filterPCF(coord,i);
+        #else
+            layerVal= textureProj(coord,i,vec2(0));
+        #endif
+        if(scene.debugShadow[i]==0) layerVal=1.0;/* 3个光源的阴影,逐次展示，共同展示 */
+        shadow[i]=layerVal;
+    }
+
     vec3 diff=vec3(0);
     for(int i=0;i<LIGHT_COUNT;i++)
     {
@@ -40,23 +55,9 @@ vec3 shade(vec3 pos,vec3 normal)
             dist=length(L);
             L=normalize(L);
         }
-       diff=diff+lit.color.rgb*lit.color.a* max(0,dot(L,normal));
+       diff=diff+lit.color.rgb*lit.color.a* max(0,dot(L,normal))*shadow[i];
     }
     return diff;
-}
-/* 采样阴影 */
-float texShadow(vec3 pos)
-{
-    vec4 shadowCoord=scene.lights[0].mvp*vec4(pos,1.0);
-    float shadow=1.0;
-    for(int i=0;i<LIGHT_COUNT;i++)
-    {
-        vec4 shadowCoord=scene.lights[i].mvp*vec4(pos,1.0);
-        float shadow_i=filterPCF(shadowCoord,i);
-        if(scene.debugShadow[i]==1)
-            shadow=shadow*shadow_i;
-    }
-    return shadow;
 }
 /* API无法判定shader中的if条件，即使实际上没有使用这个等位上的资源 */
 void main() 
@@ -66,17 +67,15 @@ void main()
     vec4 albedo=texture(samplerAlbedo,uv);
 
     vec3 diff=shade(pos,normal);
-    float shadow=texShadow(pos);
-
     ivec4 mask=scene.debugDeferred;
 
     if(mask.x+mask.y+mask.z+mask.w==0)
     {
-        outColor=albedo*vec4(diff,1)*shadow;//最终合成
+        outColor=albedo*vec4(diff,1);//最终合成
     }
     else if(mask.x*mask.y*mask.z*mask.w==1)
     {
-        outColor=vec4(diff,1)*shadow;       //阴影
+        outColor=vec4(diff,1);       //阴影
     }
     else if(mask.x==1)
         outColor=vec4(pos,1.0);

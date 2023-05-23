@@ -83,7 +83,7 @@ struct  View
 		vec3 targetPos = { 0,0,0 };
 		vec3 upDir = { 0,0,1 };
 
-		float lightFOV = 45;
+		float lightFOV = 60;
 		float lightNear = 1.0f;
 		float lightFar = 100.0f;
 
@@ -100,15 +100,15 @@ struct  View
 			{
 			case 0:
 				lightPos = { 6,-4,8 };
-				color = { 1.0f,0.0f,0.0f,1.2f };
+				color = { 1.0f,0.33f,0.33f,0.6f };
 				break;
 			case 1:
 				lightPos = { 8,2,12 };
-				color = { 0.0f,1.0f,0.0f,1.0f };
+				color = { 0.33f,1.0f,0.33f,0.6f };
 				break;
 			case 2:
 				lightPos = { 2,5,8 };
-				color = { 0.0f,0.0f,1.0f,1.0f };
+				color = { 0.33f,0.33f,1.0f,0.6f };
 				break;
 			}
 			shadowView = glm::lookAt(lightPos, targetPos, upDir);

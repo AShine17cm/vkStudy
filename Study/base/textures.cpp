@@ -34,6 +34,7 @@ namespace textures
 			imageCI.format			= info.formats.format;
 			imageCI.usage			= info.formats.usageFlags | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 			imageCI.flags			= info.formats.createFalgs;
+			imageCI.samples			= info.formats.sampleCount;
 			imageCI.initialLayout	= VK_IMAGE_LAYOUT_UNDEFINED;//VK_IMAGE_LAYOUT_PREINITIALIZED
 			imageCI.samples			= VK_SAMPLE_COUNT_1_BIT;
 			imageCI.sharingMode		= VK_SHARING_MODE_EXCLUSIVE;
@@ -49,6 +50,7 @@ namespace textures
 					break;
 				}
 			}
+			
 			/* 创建image,分配内存 */
 			MG_CHECK_RESULT(vkCreateImage(logicalDevice, &imageCI, nullptr, image));
 			vkGetImageMemoryRequirements(logicalDevice, *image, &memReqs);

@@ -9,23 +9,27 @@ namespace renderpasses
 		VkFormat format,
 		VkFormat depthFromat,
 		VkDevice device,
-		VkRenderPass* renderPass
+		VkRenderPass* renderPass,
+		VkSampleCountFlagBits SAMPLE_COUNT=VK_SAMPLE_COUNT_1_BIT
 	);
 	void create_PostProcess(
 		VkFormat format,
 		VkDevice device,
-		VkRenderPass* renderPass
+		VkRenderPass* renderPass,
+		VkSampleCountFlagBits SAMPLE_COUNT = VK_SAMPLE_COUNT_1_BIT
 	);
 	void create_MRT(
 		VkFormat* formats,
 		VkDevice device,
-		VkRenderPass* renderPass
+		VkRenderPass* renderPass,
+		VkSampleCountFlagBits SAMPLE_COUNT = VK_SAMPLE_COUNT_1_BIT
 	);
 	//创建 只有一个depth attachment的深度 render-pass
 	void createDepthRenderPass(
 		VkFormat format,
 		VkDevice vulkanDevice,
-		VkRenderPass* renderPass
+		VkRenderPass* renderPass,
+		VkSampleCountFlagBits SAMPLE_COUNT = VK_SAMPLE_COUNT_1_BIT
 	);
 }
 }

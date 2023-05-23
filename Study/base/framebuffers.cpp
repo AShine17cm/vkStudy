@@ -163,7 +163,7 @@ namespace mg
 			framebufferCI.attachmentCount = attachmentCount;
 			framebufferCI.pAttachments = attachments;
 			framebufferCI.layers = layers; //用 geometry shader生成多光源的阴影
-
+			
 			MG_CHECK_RESULT(vkCreateFramebuffer(device, &framebufferCI, nullptr, framebuffer));
 		}
 

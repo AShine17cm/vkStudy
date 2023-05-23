@@ -92,7 +92,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\VulkanProj\vkStudy\VkLibraries\stb-master;E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\include;E:\VulkanProj\vkStudy\VkLibraries\glm\glm;C:\VulkanSDK\1.3.216.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\VulkanProj\vkStudy\VkLibraries\tinygltf;E:\VulkanProj\gli-master;E:\VulkanProj\gli-master\gli;E:\VulkanProj\vkStudy\VkLibraries\stb-master;E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\include;E:\VulkanProj\vkStudy\VkLibraries\glm;E:\VulkanProj\vkStudy\VkLibraries\glm\glm;C:\VulkanSDK\1.3.216.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -110,7 +110,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\VulkanProj\vkStudy\VkLibraries\stb-master;E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\include;E:\VulkanProj\vkStudy\VkLibraries\glm\glm;C:\VulkanSDK\1.3.216.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\VulkanProj\vkStudy\VkLibraries\tinygltf;E:\VulkanProj\gli-master;E:\VulkanProj\gli-master\gli;E:\VulkanProj\vkStudy\VkLibraries\stb-master;E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\include;E:\VulkanProj\vkStudy\VkLibraries\glm;E:\VulkanProj\vkStudy\VkLibraries\glm\glm;C:\VulkanSDK\1.3.216.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -128,7 +128,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\VulkanProj\vkStudy\VkLibraries\stb-master;E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\include;E:\VulkanProj\vkStudy\VkLibraries\glm\glm;C:\VulkanSDK\1.3.216.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\VulkanProj\vkStudy\VkLibraries\tinygltf;E:\VulkanProj\gli-master;E:\VulkanProj\gli-master\gli;E:\VulkanProj\vkStudy\VkLibraries\stb-master;E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\include;E:\VulkanProj\vkStudy\VkLibraries\glm;E:\VulkanProj\vkStudy\VkLibraries\glm\glm;C:\VulkanSDK\1.3.216.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -146,7 +146,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\VulkanProj\vkStudy\VkLibraries\stb-master;E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\include;E:\VulkanProj\vkStudy\VkLibraries\glm\glm;C:\VulkanSDK\1.3.216.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\VulkanProj\vkStudy\VkLibraries\tinygltf;E:\VulkanProj\gli-master;E:\VulkanProj\gli-master\gli;E:\VulkanProj\vkStudy\VkLibraries\stb-master;E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\include;E:\VulkanProj\vkStudy\VkLibraries\glm;E:\VulkanProj\vkStudy\VkLibraries\glm\glm;C:\VulkanSDK\1.3.216.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -170,7 +170,6 @@
     <ClCompile Include="GeoPlane.cpp" />
     <ClCompile Include="GeoSphere.cpp" />
     <ClCompile Include="GeoSquarePillar.cpp" />
-    <ClCompile Include="materials.cpp" />
     <ClCompile Include="mipmaps.cpp" />
     <ClCompile Include="pipelines.cpp" />
     <ClCompile Include="renderpasses.cpp" />
@@ -193,7 +192,6 @@
     <ClInclude Include="descriptors.h" />
     <ClInclude Include="framebuffers.h" />
     <ClInclude Include="Geo.h" />
-    <ClInclude Include="materials.h" />
     <ClInclude Include="mg.h" />
     <ClInclude Include="mipmaps.h" />
     <ClInclude Include="pipelines.h" />
