@@ -1,6 +1,6 @@
 #pragma once
-
 #include<vulkan/vulkan.h>
+//#include "VulkanDevice.h"  头文件不能相互包含,此头文件有包含 Buffer.h
 
 namespace mg
 {

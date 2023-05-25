@@ -1,0 +1,94 @@
+
+<-----  1.  gltf 的加载比较耗时	  ------>
+ ( 均为 gltf中的概念，包含更多的数据，对应vulkan中的概念 )
+采样器	被顺序加载到采样器集合中，方便纹理后续索引
+纹理	被顺序加载到纹理集合中，方便后续索引 (采样器 id=-1 就默认创建一个)
+材质	根据基础名称  对应到 纹理集合中纹理（还有一个UV坐标）
+		baseColorTetxure
+		metallicRoughnessTexture
+		normalTexture
+		emissiveTexture
+		occlusionTexture
+材质	根据基础名称 对应到 数值
+		baseColorFactor
+		metallicFactor
+		emissionFactor
+		alphaCutoff
+网格	计算每一个节点上	顶点/三角面  计数
+	生成，加载  顶点/三角面  到 VkBuffer
+节点	顶点+法线+UV0+UV1+颜色+ 骨骼节点+骨骼权重	三角面
+		POSITION
+		NORMAL
+		TEXCOORD_0 / TEXCOORD_1
+		COLOR_0
+		JOINTS_0
+		WEIGHTS_0
+其它	计算  aabb
+
+加载完毕	纹理, Mesh 存放于 vkglTF::Model 中
+	VkBuffer	vertices / indices
+	VkImage  textures
+	材质 / Material 是 VkImage + 材质参数 + VkDescriptorSet
+
+<----      2. PBR  资源    ----->
+1. 三张环境贴图 	irradiance(辐照度) + 环境 + lut brdf   可由一个初始 环境贴图生成 
+2. 五张材质贴图	颜色 + 金属度 + 法线 + AO + 自发光   (gltf 默认 金属度工作流 )
+3.  empy贴图	用于做 材质贴图的默认值
+
+<----   3. gltfModel_pbr 描述符布局  ----->
+描述符布局	descriptorSetLayouts.scene		UBO + UBO + SAMPLER + SAMPLER + SAMPLER
+描述符		descriptorSets.scene
+-----------
+描述符数据	uniformBuffers.scene 		UBOMatrices		shaderValuesScene 	 主要是MVP矩阵, 场景根节点的缩放，平移
+描述符数据	uniformBuffers.params		shaderValuesParams		shaderValuesParams	 灯光，exposure,gamma, debug
+描述符数据	textures.irradianceCube		环境贴图 irradiance   cube
+描述符数据	textures.prefilteredCube		环境贴图 prefilterred cube
+描述符数据	textures.lutBrdf			环境贴图 lut brdf       2D
+以上描述符 	在 setupDescriptors 中建立关联 (Allocate, Write, Update )
+数据 更新/拷贝 	在 updateUniformBuffers 中进行
+(背景天空盒 类似)
+----------------------------------------------------------------
+描述符布局	descriptorSetLayouts.material		SAMPLER + SAMPELR + SAMPLER + SAMPLER + SAMPLER
+描述符		material.descriptorSet		存在于 Material 结构中的 VkDescriptorSet
+-----------
+描述符数据					Color + Metallic + Normal + OC + Emissive
+以上描述符	在 setupDescriptors 中建立关联 (Allocate, Write, Update )
+无需更新
+----------------------------------------------------------------
+描述符数据	descriptorSetLayouts.node		UBO
+描述符		node->mesh->uniformBuffer.descriptorSet	存在于节点中的 VkDescriptorSet ( VkBuffer,VkDeviceMemory)
+-----------
+描述符数据	node->mesh->uniformBlock		到根节点的矩阵数据（在vert.shader中与model相结合）	
+以上描述符	在 setupDescriptors/setupNodeDescriptorSet 建立关联
+数据 更新/拷贝	在 Mesh 构造函数中
+
+<------    4. gltfModel_pbr 渲染   ------>
+图形管线		根据节点选择 pbr/pbrDoubleSided/pbrAlphaBlend
+管线布局		上面3个描述符布局的组合	场景环境<MVP，调试参数，环境贴图> + 材质数据<PBR贴图> + 节点数据 <一个矩阵 (蒙皮还有骨骼矩阵 )>
+材质数据		PushConstants推送		颜色,自发光,金属度，Alpha  等数值参数
+正常渲染		VkCmdDrawIndexed
+
+<-------   5. 存放于 vkglTF::Model 中的数据   ------->
+几何数据	顶点+三角面 + 对应的 UBO 	在 vkglTF::Model 中
+纹理数据	材质贴图 			在 vkglTF::Model 中
+节点数据	到根节点的矩阵+对应的UBO	在 vkglTF::Mesh 中  Mesh是Node的成员
+Model	是 Node，纹理，材质的集合
+
+<-------  6.存放于 gltfModel_pbr 中的数据   ------->
+纹理数据	环境贴图，生成的光照图 irradiance+lut+prefilterred
+环境数据	场景环境<MVP,调试参数>
+材质数据	材质中PushConstants 数据	颜色,自发光,金属度，Alpha  等数值参数
+模型数据	Model
+图形管线	pbr 渲染管线
+
+
+其它
+1. 创建 VkDevice时，需要打开 samplerAnisotropy,  vkglTF:Model 创建的 sampler有用到
+
+#define STB_IMAGE_IMPLEMENTATION
+这个定义 在Texture.cpp 和 VulkanglTFModel.cpp 都有定义  删掉一个
+
+hpp文件 如果发生重复定义  分离为 h头文件和 cpp 实现文件
+如果发生找不到定义 就把方法定义到 结构/类 中
+
+无法解析的外部符号  分离 h头文件和cpp文件时  函数的默认值 留在了 cpp 中

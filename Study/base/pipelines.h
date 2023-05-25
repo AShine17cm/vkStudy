@@ -20,6 +20,8 @@ namespace mg
 			ShadowMap = 201, //ÐèÒª¿ªÆô depth-bias
 			Geo_MRT=301,
 			Deferred_Compose=401,
+
+			Counter_Clock_Wise=501,
 			//DynamicState_A=61,
 			//ColorBlend=30,
 		};

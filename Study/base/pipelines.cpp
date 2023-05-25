@@ -137,6 +137,9 @@ namespace mg
 					dynamicSCI.dynamicStateCount = dynamicStates.size();
 					dynamicSCI.pDynamicStates = dynamicStates.data();
 					break;
+				case MgPipelineEx::Counter_Clock_Wise://ÃæµÄÊ±ÕëË³Ðò
+					rasterStateCI.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+					break;
 				default:
 					break;
 				}

@@ -369,7 +369,12 @@ namespace mg
 		}
 		return cmd;
 	}
-
+	void VulkanDevice::beginCommandBuffer(VkCommandBuffer commandBuffer)
+	{
+		VkCommandBufferBeginInfo commandBufferBI{};
+		commandBufferBI.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		MG_CHECK_RESULT(vkBeginCommandBuffer(commandBuffer, &commandBufferBI));
+	}
 	void VulkanDevice::flushCommandBuffer(VkCommandBuffer cmd, VkQueue queue, bool free) {
 		if (VK_NULL_HANDLE == cmd)
 		{

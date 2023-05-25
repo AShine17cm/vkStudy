@@ -1,3 +1,5 @@
+Vulkan 的坐标系  XZ 水平面  Y轴向下
+
 Vertex 的 hash模板 需要放到 std 命名空间
 
 E:\VulkanProj\vkStudy\VkLibraries\glm

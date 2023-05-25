@@ -93,6 +93,12 @@
     <ClCompile Include="GeoSphere.cpp">
       <Filter>geo</Filter>
     </ClCompile>
+    <ClCompile Include="VulkanglTFModel.cpp">
+      <Filter>geo</Filter>
+    </ClCompile>
+    <ClCompile Include="gltfModel_pbr.cpp">
+      <Filter>geo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h">
@@ -160,6 +166,24 @@
     </ClInclude>
     <ClInclude Include="threadpool.hpp">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanglTFModel.h">
+      <Filter>geo</Filter>
+    </ClInclude>
+    <ClInclude Include="gltfModel_pbr.h">
+      <Filter>geo</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanTexture.hpp">
+      <Filter>geo</Filter>
+    </ClInclude>
+    <ClInclude Include="macros.h">
+      <Filter>geo</Filter>
+    </ClInclude>
+    <ClInclude Include="saBuffer.cpp">
+      <Filter>geo</Filter>
+    </ClInclude>
+    <ClInclude Include="saBuffer.h">
+      <Filter>geo</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

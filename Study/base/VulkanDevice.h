@@ -59,6 +59,7 @@ namespace mg
 						VkCommandPoolCreateFlags createFlags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 		void			createCommandBuffers(VkCommandBufferLevel level,VkCommandBuffer* cmdBuffers, uint32_t count);
 		VkCommandBuffer	createCommandBuffer(VkCommandBufferLevel level,bool begin=false);
+		void			beginCommandBuffer(VkCommandBuffer commandBuffer);
 		void			flushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue, bool free = true);
 		//
 		bool			extensionSupported(std::string extension);
