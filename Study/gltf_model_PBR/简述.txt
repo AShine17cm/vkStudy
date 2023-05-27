@@ -84,6 +84,7 @@ Model	是 Node，纹理，材质的集合
 
 其它
 1. 创建 VkDevice时，需要打开 samplerAnisotropy,  vkglTF:Model 创建的 sampler有用到
+2. 将 gltf场景 渲染为阴影时，会有奇怪的锯齿，不解之谜？
 
 #define STB_IMAGE_IMPLEMENTATION
 这个定义 在Texture.cpp 和 VulkanglTFModel.cpp 都有定义  删掉一个

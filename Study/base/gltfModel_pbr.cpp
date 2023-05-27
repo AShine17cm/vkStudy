@@ -1,20 +1,23 @@
 #include <chrono>
 #include "gltfModel_pbr.h"
 #include "macros.h"
+#include "PerObjectData.h"
 
 namespace vks 
 {
 	/*	imageCount 做初始化
 		后续的 buffer索引需要走 imageIndex
 	*/
-	gltfModel_pbr::gltfModel_pbr(mg::VulkanDevice* vulkanDevice,uint32_t swapchainImgCount)
+	gltfModel_pbr::gltfModel_pbr(mg::VulkanDevice* vulkanDevice,uint32_t swapchainImgCount,gltfModel_pbr::ModelInfo modelInfo)
 	{
 		this->vulkanDevice = vulkanDevice;
 		this->device = vulkanDevice->logicalDevice;
+		this->modelInfo = modelInfo;
+
 		uniformBuffers.resize(swapchainImgCount);
 		descriptorSets.resize(swapchainImgCount);
 
-		textures.empty.loadFromFile(assetpath + "textures/empty.ktx", VK_FORMAT_R8G8B8A8_UNORM, vulkanDevice, vulkanDevice->graphicsQueue);
+		textures.empty.loadFromFile(modelInfo.emptyFile, VK_FORMAT_R8G8B8A8_UNORM, vulkanDevice, vulkanDevice->graphicsQueue);
 		load_gltf();
 		loadEnvironment();
 		prepareUniformBuffers();
@@ -145,15 +148,43 @@ namespace vks
 			renderNode(cmd,child, cbIndex, alphaMode);
 		}
 	}
+	//用提前绑定的管线 渲染(阴影)
+	void gltfModel_pbr::renderNode_ByXPipe(VkCommandBuffer cmd, vkglTF::Node* node,VkPipelineLayout pipeLayout,VkPipelineStageFlags stageFlags, vkglTF::Material::AlphaMode alphaMode)
+	{
+		if (node->mesh) {
+			for (vkglTF::Primitive* primitive : node->mesh->primitives)
+			{
+				if (primitive->material.alphaMode == alphaMode)
+				{
+					//matrix of node,the only data i wanted(or goes wrong)
+					geos::PerObjectData pod = {shaderValuesScene.model* node->mesh->uniformBlock.matrix,{0,0,0,0} };
+					vkCmdPushConstants(cmd, pipeLayout, stageFlags, 0, sizeof(geos::PerObjectData), &pod);
+					if (primitive->hasIndices) 
+					{
+						vkCmdDrawIndexed(cmd, primitive->indexCount, 1, primitive->firstIndex, 0, 0);
+					}
+					else 
+					{
+						vkCmdDraw(cmd, primitive->vertexCount, 1, 0, 0);
+					}
+				}
+			}
+		};
+		//递归 节点
+		for (auto child : node->children)
+		{
+			renderNode_ByXPipe(cmd, child, pipeLayout, stageFlags, alphaMode);
+		}
+	}
 	void gltfModel_pbr::load_gltf( )
 	{
-		std::cout << "Scene::加载场景: " << sceneFile.c_str() << std::endl;
+		std::cout << "Scene::加载场景: " <<modelInfo.sceneFile.c_str() << std::endl;
 		auto tStart = std::chrono::high_resolution_clock::now();
-		models.scene.loadFromFile(sceneFile.c_str(), vulkanDevice, vulkanDevice->graphicsQueue);
+		models.scene.loadFromFile(modelInfo.sceneFile.c_str(), vulkanDevice, vulkanDevice->graphicsQueue);
 		auto tFileLoad = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - tStart).count();
 		std::cout << "Scene::加载到: " << tFileLoad << " ms" << std::endl;
 
-		models.skybox.loadFromFile(skyFile, vulkanDevice, vulkanDevice->graphicsQueue);
+		models.skybox.loadFromFile(modelInfo.skyFile, vulkanDevice, vulkanDevice->graphicsQueue);
 	}
 	//加载环节贴图
 	void gltfModel_pbr::loadEnvironment()
@@ -164,7 +195,7 @@ namespace vks
 			textures.irradianceCube.destroy();
 			textures.prefilteredCube.destroy();
 		}
-		textures.environmentCube.loadFromFile(envMapFile, VK_FORMAT_R16G16B16A16_SFLOAT, vulkanDevice, vulkanDevice->graphicsQueue);
+		textures.environmentCube.loadFromFile(modelInfo.envMapFile, VK_FORMAT_R16G16B16A16_SFLOAT, vulkanDevice, vulkanDevice->graphicsQueue);
 		generateBRDFLUT();
 		generateCubemaps();
 	}
@@ -1001,14 +1032,24 @@ namespace vks
 		// Scene
 		shaderValuesScene.projection = proj;
 		shaderValuesScene.view =view;
-
+		float modelScale = modelInfo.modelScale;
+		glm::vec3 modelTranslate = modelInfo.modelTranslate;
 		//场景根节点 的缩放，平移
 		shaderValuesScene.model = glm::mat4(1.0f);
 		shaderValuesScene.model[0][0] = modelScale;
 		shaderValuesScene.model[1][1] = modelScale;
 		shaderValuesScene.model[2][2] = modelScale;
 		shaderValuesScene.model = glm::translate(shaderValuesScene.model, modelTranslate);
-
+		//
+		//float scale = (1.0f / std::max(models.scene.aabb[0][0], std::max(models.scene.aabb[1][1], models.scene.aabb[2][2]))) * 0.5f;
+		//glm::vec3 translate = -glm::vec3(models.scene.aabb[3][0], models.scene.aabb[3][1], models.scene.aabb[3][2]);
+		//translate += -0.5f * glm::vec3(models.scene.aabb[0][0], models.scene.aabb[1][1], models.scene.aabb[2][2]);
+		//shaderValuesScene.model = glm::mat4(1.0f);
+		//shaderValuesScene.model[0][0] = scale;
+		//shaderValuesScene.model[1][1] = scale;
+		//shaderValuesScene.model[2][2] = scale;
+		//shaderValuesScene.model = glm::translate(shaderValuesScene.model, translate);
+		//
 		shaderValuesScene.camPos = camPos;
 		// Skybox
 		shaderValuesSkybox.projection = proj;
@@ -1246,7 +1287,7 @@ namespace vks
 		VkPipelineRasterizationStateCreateInfo rasterizationStateCI{};
 		rasterizationStateCI.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 		rasterizationStateCI.polygonMode = VK_POLYGON_MODE_FILL;
-		rasterizationStateCI.cullMode = VK_CULL_MODE_BACK_BIT;
+		rasterizationStateCI.cullMode =  VK_CULL_MODE_BACK_BIT;
 		rasterizationStateCI.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 		rasterizationStateCI.lineWidth = 1.0f;
 

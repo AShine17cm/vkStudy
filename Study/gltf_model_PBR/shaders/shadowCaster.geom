@@ -26,6 +26,7 @@ void main()
     {
         gl_Layer=gl_InvocationID;
         vec4 posWS=gl_in[i].gl_Position;  //World Space
+
         gl_Position=scene.lights[gl_InvocationID].mvp*posWS;
         EmitVertex();
     }

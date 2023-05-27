@@ -1,6 +1,3 @@
-//#ifndef GLTF_MODEL_PBR_STUDY
-//#define GLTF_MODEL_PBR_STUDY
-
 #pragma once
 #include "VulkanglTFModel.h"
 #include "VulkanTexture.hpp"
@@ -11,17 +8,19 @@ namespace vks
 {
 	struct gltfModel_pbr
 	{
-		const std::string assetpath = "./../data/";
-		std::string envMapFile = assetpath + "environments/papermill.ktx";
-		//std::string sceneFile = "../models/Unicorn.glb";
-		std::string sceneFile = "../data/models/DamagedHelmet/glTF-Embedded/DamagedHelmet.gltf";
-		std::string skyFile = "../data/models/Box/glTF-Embedded/Box.gltf";
-		float modelScale = 1.2f;
-		glm::vec3 modelTranslate = { 0,0,0 };
-
 		mg::VulkanDevice* vulkanDevice;
 		VkDevice device;
 		VkPipelineCache pipelineCache = VK_NULL_HANDLE;
+
+		struct ModelInfo
+		{
+			std::string sceneFile;	//模型文件
+			std::string skyFile;
+			std::string emptyFile;
+			std::string envMapFile;
+			float modelScale = 1.0f;
+			glm::vec3 modelTranslate = { 0,0,0 };
+		}modelInfo;
 
 		struct Textures {
 			vks::TextureCubeMap environmentCube;
@@ -81,8 +80,6 @@ namespace vks
 			VkDescriptorSet skybox;
 		};
 		std::vector<DescriptorSets> descriptorSets;
-
-		//std::vector<VkCommandBuffer> commandBuffers;
 		std::vector<UniformBufferSet> uniformBuffers;
 
 		enum PBRWorkflows { PBR_WORKFLOW_METALLIC_ROUGHNESS = 0, PBR_WORKFLOW_SPECULAR_GLOSINESS = 1 };
@@ -104,10 +101,12 @@ namespace vks
 			float alphaMaskCutoff;
 		} pushConstBlockMaterial;
 
-		gltfModel_pbr(mg::VulkanDevice* vulkanDevice,uint32_t swapchainImgCount);
+		gltfModel_pbr(mg::VulkanDevice* vulkanDevice,uint32_t swapchainImgCount,ModelInfo modelInfo);
 		void setup(VkDescriptorPool pool);
 		void clean();
 		void renderNode(VkCommandBuffer cmd, vkglTF::Node* node, uint32_t cbIndex, vkglTF::Material::AlphaMode alphaMode);
+		//管线提前绑定
+		void renderNode_ByXPipe(VkCommandBuffer cmd,vkglTF::Node* node, VkPipelineLayout pipeLayout, VkPipelineStageFlags stageFlags,vkglTF::Material::AlphaMode alphaMode);
 		void load_gltf();
 		void loadEnvironment();
 		void generateBRDFLUT();
@@ -125,4 +124,3 @@ namespace vks
 };
 
 }
-//#endif // !GLTF_MODEL_PBR_STUDY

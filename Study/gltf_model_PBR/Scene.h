@@ -1,6 +1,6 @@
 #pragma once
 #include "constants.h"
-#include "commonData.h"
+#include "PerObjectData.h"
 #include <vector>
 #include "glm.hpp"
 #include "Geo.h"
@@ -37,7 +37,8 @@ struct  Scene
 	geos::Geo* ground;
 	geos::GeoCube* cube;
 
-	vks::gltfModel_pbr* gltf;
+	vks::gltfModel_pbr* helmet;
+	vks::gltfModel_pbr* armor;
 
 	float rotateRadius = 2.2f;
 
@@ -138,14 +139,49 @@ struct  Scene
 			cubes_ring.push_back(cube);
 			spds.push_back(rnd.generate());
 		}
-		gltf = new vks::gltfModel_pbr(vulkanDevice,swapchainImgCount);
+		//gltf 模型信息
+		vks::gltfModel_pbr::ModelInfo helmetInfo = {
+			//"../models/Unicorn.glb",
+			"../data/models/DamagedHelmet/glTF-Embedded/DamagedHelmet.gltf",
+			"../data/models/Box/glTF-Embedded/Box.gltf",
+			"../data/textures/empty.ktx",
+			"../data/environments/papermill.ktx",
+			1.2f,
+			{0,0,0}
+		};
+		vks::gltfModel_pbr::ModelInfo armorInfo = {
+			"../models/armor/armor.gltf",
+			"../models/deferred_box.gltf",
+			"../data/textures/empty.ktx",
+			"../data/environments/papermill.ktx",
+			0.75f,
+			{0,0.4f,0}
+		};
+		helmet = new vks::gltfModel_pbr(vulkanDevice,swapchainImgCount,helmetInfo);
+		armor = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, armorInfo);
 	}
-
-	/* 画一个 gltf 模型 */
-	void draw_gltf(VkCommandBuffer cmd,uint32_t cmd_idx)
+	void prepareStep2(VkDescriptorPool descriptorPool,VkRenderPass renderPass)
 	{
-		VkDeviceSize offsets[1] = { 0 };
+		helmet->setup(descriptorPool);                 
+		helmet->preparePipelines(renderPass);
+		armor->setup(descriptorPool);
+		armor->preparePipelines(renderPass);
+	}
+	/* 画一个 gltf 模型 */
+	void draw_gltf(VkCommandBuffer cmd,uint32_t cmd_idx,int modelIdx)
+	{
+		vks::gltfModel_pbr* gltf = nullptr;
+		switch (modelIdx)
+		{
+		case 0:
+			gltf = helmet;
+			break;
+		case 1:
+			gltf = armor;
+			break;
+		}
 		vkglTF::Model& model = gltf->models.scene;
+		VkDeviceSize offsets[1] = { 0 };
 		/* 顶点，三角面数据 */
 		vkCmdBindVertexBuffers(cmd, 0, 1, &model.vertices.buffer, offsets);
 		if (model.indices.buffer != VK_NULL_HANDLE) 
@@ -166,6 +202,31 @@ struct  Scene
 		for (auto node : model.nodes)
 		{
 			gltf->renderNode(cmd,node, cmd_idx, vkglTF::Material::ALPHAMODE_BLEND);
+		}
+	}
+	//阴影 有奇怪的锯齿
+	void draw_gltf_ByXPipe(VkCommandBuffer cmd, VkPipelineLayout pipeLayout,int modelIdx)
+	{
+		vks::gltfModel_pbr* gltf = nullptr;
+		switch (modelIdx)
+		{
+		case 0:
+			gltf = helmet;
+			break;
+		case 1:
+			gltf = armor;
+			break;
+		}
+
+		vkglTF::Model& model = gltf->models.scene;
+		VkDeviceSize offsets[1] = { 0 };
+		vkCmdBindVertexBuffers(cmd, 0, 1, &model.vertices.buffer, offsets);
+		vkCmdBindIndexBuffer(cmd, model.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+		VkShaderStageFlags stageVGF = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_GEOMETRY_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+		gltf->boundPipeline = VK_NULL_HANDLE;
+		for (auto node : model.nodes)
+		{
+			gltf->renderNode_ByXPipe(cmd, node, pipeLayout,stageVGF,vkglTF::Material::ALPHAMODE_OPAQUE);
 		}
 	}
 	/* 更新-UBO 资源 */
@@ -197,7 +258,8 @@ struct  Scene
 		view->update(deltaTime, input->opKey);
 		float ang = time * glm::radians(30.0f);//time是相对时间
 		updateInstance(ang);
-		gltf->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
+		helmet->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
+		armor->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
 		//拷贝数据
 		memcpy(pFrame->ubo_ui.mapped, &ui, sizeof(UIData));
 		memcpy(pFrame->ubo_scene.mapped, &view->data, sizeof(View::UniformBufferObject));
@@ -237,8 +299,8 @@ struct  Scene
 	void draw(VkCommandBuffer cmd, VkPipelineLayout piLayout, int batchIdx)
 	{
 		VkShaderStageFlags stageVGF = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_GEOMETRY_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-		PerObjectData pod = { glm::mat4(1),{0,0,0,0} };
-		uint32_t size = sizeof(PerObjectData);
+		geos::PerObjectData pod = {glm::mat4(1),{0,0,0,0}};
+		uint32_t size = sizeof(geos::PerObjectData);
 		VkDeviceSize offsets[] = { 0 };
 		uint32_t firstPt = 0;
 		switch (batchIdx)
@@ -298,7 +360,8 @@ struct  Scene
 
 	void cleanup()
 	{
-		gltf->clean();
+		helmet->clean();
+		armor->clean();
 
 		ground->clean();
 		cube->clean();

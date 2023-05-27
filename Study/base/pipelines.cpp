@@ -133,6 +133,7 @@ namespace mg
 					break;
 				case MgPipelineEx::ShadowMap: //阴影贴图，开启偏移
 					rasterStateCI.depthBiasEnable = VK_TRUE;
+					//rasterStateCI.cullMode = VK_CULL_MODE_NONE;	//有些gltf 模型的时针顺序 和自建geo 不一样
 					dynamicStates.push_back(VK_DYNAMIC_STATE_DEPTH_BIAS);
 					dynamicSCI.dynamicStateCount = dynamicStates.size();
 					dynamicSCI.pDynamicStates = dynamicStates.data();

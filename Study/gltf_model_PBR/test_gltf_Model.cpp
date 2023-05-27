@@ -6,6 +6,7 @@
 #include "Frame.h"
 #include "Scene.h"
 #include "Input.h"
+#include "PerObjectData.h"
 
 //#include "VulkanglTFModel.h"
 
@@ -83,9 +84,8 @@ private:
 
         createResources();
 
-        scene.gltf->setup(descriptorPool);                  //gltf
-        scene.gltf->preparePipelines(passHub.renderPass);
-
+        scene.prepareStep2(descriptorPool, passHub.renderPass);
+ 
         passHub.createFrameBuffers(&resource);//为了 共享一个 depth-tex
 
         createCommandBuffers();
@@ -191,7 +191,7 @@ private:
 
     void createGraphicsPipeline() {
 
-        piHub.prepare(device,&passHub,sizeof(PerObjectData));
+        piHub.prepare(device,&passHub,sizeof(geos::PerObjectData));
     }
 
     void createResources() 
@@ -277,7 +277,12 @@ private:
             /* 场景信息+ShadowMap */
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow_h, dstSet, 1, &frame->scene_shadow_h, 0, nullptr);
             drawScene(cmd, frame);
-            scene.draw_gltf(cmd,imageIndex);
+            //scene.draw_gltf(cmd,imageIndex,0);
+            dstSet = 1;
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_ground, 0, nullptr);
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_solid,0);
+
             drawUI(cmd, frame);
             vkCmdEndRenderPass(cmd);
         }
@@ -295,6 +300,7 @@ private:
             batchIdx = i;
             scene.draw(cmd, piHub.piLayout_shadow, batchIdx);
         }
+        //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow,1);
     }
     /* ui */
     void drawUI(VkCommandBuffer cmd, Frame* frame)

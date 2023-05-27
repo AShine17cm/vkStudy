@@ -185,5 +185,8 @@
     <ClInclude Include="saBuffer.h">
       <Filter>geo</Filter>
     </ClInclude>
+    <ClInclude Include="PerObjectData.h">
+      <Filter>geo</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

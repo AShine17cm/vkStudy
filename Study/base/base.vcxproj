@@ -198,6 +198,7 @@
     <ClInclude Include="macros.h" />
     <ClInclude Include="mg.h" />
     <ClInclude Include="mipmaps.h" />
+    <ClInclude Include="PerObjectData.h" />
     <ClInclude Include="pipelines.h" />
     <ClInclude Include="renderpasses.h" />
     <ClInclude Include="SwapChain.h" />
