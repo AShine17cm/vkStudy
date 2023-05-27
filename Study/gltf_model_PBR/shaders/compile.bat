@@ -8,6 +8,7 @@ set c2=texCube.frag
 
 set caster1=shadowCaster.vert
 set caster2=shadowCaster.geom
+set caster3=shadowCaster_gltf.vert
 
 %glslc% %u1% -o %u1%.spv
 %glslc% %u2% -o %u2%.spv
@@ -18,5 +19,6 @@ set caster2=shadowCaster.geom
 
 %glslc% %caster1% -o %caster1%.spv
 %glslc% %caster2% -o %caster2%.spv
+%glslc% %caster3% -o %caster3%.spv
 
 pause

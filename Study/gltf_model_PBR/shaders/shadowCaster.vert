@@ -26,7 +26,5 @@ layout(push_constant) uniform PushConstants
 void main() 
 {
     vec4 pos=pushs.model*vec4(inPos,1);
-//    pos.y=-pos.y;
-//    pos=pos/pos.w;
     gl_Position=pos;
 }

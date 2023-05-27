@@ -277,11 +277,11 @@ private:
             /* 场景信息+ShadowMap */
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow_h, dstSet, 1, &frame->scene_shadow_h, 0, nullptr);
             drawScene(cmd, frame);
-            //scene.draw_gltf(cmd,imageIndex,0);
-            dstSet = 1;
-            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_ground, 0, nullptr);
-            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_solid,0);
+            scene.draw_gltf(cmd,imageIndex,0);
+            //dstSet = 1;
+            //vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
+            //vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_ground, 0, nullptr);
+            //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_solid,0);
 
             drawUI(cmd, frame);
             vkCmdEndRenderPass(cmd);
@@ -300,7 +300,10 @@ private:
             batchIdx = i;
             scene.draw(cmd, piHub.piLayout_shadow, batchIdx);
         }
-        //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow,1);
+        //gltf 有自己的 vertexInputAttribute,需要自己的管线
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_shadow_gltf);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow, 0, 1, &frame->shadow_ubo, 0, nullptr);
+        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow,0);
     }
     /* ui */
     void drawUI(VkCommandBuffer cmd, Frame* frame)

@@ -131,7 +131,8 @@ namespace mg
 				case MgPipelineEx::DynamicState:
 					pipelineCI.pDynamicState = (VkPipelineDynamicStateCreateInfo*)extends[i];
 					break;
-				case MgPipelineEx::ShadowMap: //阴影贴图，开启偏移
+				case MgPipelineEx::ShadowMap:		//阴影贴图，开启偏移
+				case MgPipelineEx::ShadowMap_GLTF:	
 					rasterStateCI.depthBiasEnable = VK_TRUE;
 					//rasterStateCI.cullMode = VK_CULL_MODE_NONE;	//有些gltf 模型的时针顺序 和自建geo 不一样
 					dynamicStates.push_back(VK_DYNAMIC_STATE_DEPTH_BIAS);

@@ -18,6 +18,7 @@ namespace mg
 
 			UI = 101, //不同的Vertex-Layout
 			ShadowMap = 201, //需要开启 depth-bias
+			ShadowMap_GLTF=202,	//gltf 有自己的顶点属性布局
 			Geo_MRT=301,
 			Deferred_Compose=401,
 
