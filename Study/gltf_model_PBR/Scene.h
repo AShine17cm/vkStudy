@@ -30,7 +30,6 @@ struct  Scene
 		glm::ivec4 debug;
 	}ui;
 
-	std::vector<geos::GeoSquarePillar*> pillars;		//方柱，非实例化
 	std::vector<geos::GeoCube*> cubes_ring;				//mip-maps
 	std::vector<float> spds;
 
@@ -39,8 +38,9 @@ struct  Scene
 
 	vks::gltfModel_pbr* helmet;
 	vks::gltfModel_pbr* armor;
+	vks::gltfModel_pbr* dinosaur;
 
-	float rotateRadius = 2.2f;
+	float rotateRadius = 4.2f;
 
 	float deltaTime, timer = 0;
 	bool displayShadowMap = true;
@@ -67,7 +67,7 @@ struct  Scene
 		ui.debug = { 1,1,1,1 };
 		/* 相机控制 */
 		view = new View({ 0,0,0 }, 9.0f, { -6.0f,6.0f }, extent);
-		ground = new geos::GeoPlane(8, { 0,-2,0 });
+		ground = new geos::GeoPlane(16, { 0,-2,0 });
 		ground->prepareBuffer(vulkanDevice);
 		/* 立方体  将被Instancing的物体 */
 		float size = 0.3f;
@@ -92,34 +92,11 @@ struct  Scene
 		vec2 uvPlane = { 1.0f,1.0f };
 		Random rnd(0, { 0,1.0f });
 
-		int countPillar = 15;
 		float radius = 3.0f;
-		float stepAng = PI * 2.0 / countPillar;
+		float stepAng;
 		float ang;
-		float h = 1.6f;
-		/* 环形柱阵 */
-		for (int i = 0; i < countPillar; i++)
-		{
-			ang = stepAng * i;
-			/* 做一些随机 形状-半径-角度 */
-			vec2 base = baseSize + glm::vec2{ rnd.generate() * 0.2f, rnd.generate() * 0.2f };
-			vec2 top = topSize + glm::vec2{ rnd.generate() * 0.2f, rnd.generate() * 0.2f };
-			vec2 height = heights + glm::vec2{ rnd.generate() * 0.2f, rnd.generate() * 0.2f };
-			float r = radius + rnd.generate() * 0.5f;
-			ang = ang * (1.0f + (rnd.generate() - 0.5f) * 0.04f);
-			float sin = r * glm::sin(ang);
-			float cos = r * glm::cos(ang);
-
-			auto  pillar = new geos::GeoSquarePillar(base, top, topCenter, height, uvPlane);
-			pillar->prepareBuffer(vulkanDevice);
-			pillar->pos = { cos,h,sin };
-			pillar->modelMatrix = glm::translate(pillar->modelMatrix, pillar->pos);
-			pillar->modelMatrix= glm::rotate(pillar->modelMatrix, PI*0.5f, { 1.0f,0.0f,0.0f });//旋转90 与xz平面对其
-			pillar->modelMatrix = glm::rotate(pillar->modelMatrix, ang, { 0,0,1.0f });
-			pillars.push_back(pillar);
-		}
 		/* 环阵 初始化 */
-		int countRing = 16;
+		int countRing = 32;
 		glm::mat4 idenity = glm::mat4(1.0f);
 		stepAng = PI * 2.0f / countRing;
 		for (int i = 0; i < countRing; i++)
@@ -141,7 +118,6 @@ struct  Scene
 		}
 		//gltf 模型信息
 		vks::gltfModel_pbr::ModelInfo helmetInfo = {
-			//"../models/Unicorn.glb",
 			"../data/models/DamagedHelmet/glTF-Embedded/DamagedHelmet.gltf",
 			"../data/models/Box/glTF-Embedded/Box.gltf",
 			"../data/textures/empty.ktx",
@@ -150,15 +126,25 @@ struct  Scene
 			{0,0,0}
 		};
 		vks::gltfModel_pbr::ModelInfo armorInfo = {
-			"../models/armor/armor.gltf",
+			"../models/Unicorn.glb",
+			//"../models/armor/armor.gltf",
 			"../models/deferred_box.gltf",
 			"../data/textures/empty.ktx",
 			"../data/environments/papermill.ktx",
-			0.75f,
-			{0,0.4f,0}
+			1.0f,
+			{-3,-1.7f,1}
+		};
+		vks::gltfModel_pbr::ModelInfo dinosaurInfo = {
+			"../models/Rampaging T-Rex.glb",
+			"../models/deferred_box.gltf",
+			"../data/textures/empty.ktx",
+			"../data/environments/papermill.ktx",
+			0.5f,
+			{5,-3.1f,0}
 		};
 		helmet = new vks::gltfModel_pbr(vulkanDevice,swapchainImgCount,helmetInfo);
 		armor = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, armorInfo);
+		dinosaur = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, dinosaurInfo);
 	}
 	void prepareStep2(VkDescriptorPool descriptorPool,VkRenderPass renderPass)
 	{
@@ -166,6 +152,8 @@ struct  Scene
 		helmet->preparePipelines(renderPass);
 		armor->setup(descriptorPool);
 		armor->preparePipelines(renderPass);
+		dinosaur->setup(descriptorPool);
+		dinosaur->preparePipelines(renderPass);
 	}
 	/* 画一个 gltf 模型 */
 	void draw_gltf(VkCommandBuffer cmd,uint32_t cmd_idx,int modelIdx)
@@ -178,6 +166,9 @@ struct  Scene
 			break;
 		case 1:
 			gltf = armor;
+			break;
+		case 2:
+			gltf = dinosaur;
 			break;
 		}
 		vkglTF::Model& model = gltf->models.scene;
@@ -215,6 +206,9 @@ struct  Scene
 			break;
 		case 1:
 			gltf = armor;
+			break;
+		case 2:
+			gltf = dinosaur;
 			break;
 		}
 
@@ -260,6 +254,7 @@ struct  Scene
 		updateInstance(ang);
 		helmet->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
 		armor->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
+		dinosaur->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
 		//拷贝数据
 		memcpy(pFrame->ubo_ui.mapped, &ui, sizeof(UIData));
 		memcpy(pFrame->ubo_scene.mapped, &view->data, sizeof(View::UniformBufferObject));
@@ -306,21 +301,8 @@ struct  Scene
 		switch (batchIdx)
 		{
 		case 0:
-		{
-			/* texture-array */
-			for (uint32_t i = 0; i < pillars.size(); i++)
-			{
-				pod.model = pillars[i]->modelMatrix;
-				/* 切换到Array的不同Layer */
-				pod.texIndex = { i % 2,0,0,0 };
-				vkCmdPushConstants(cmd, piLayout, stageVGF, 0, size, &pod);
-				pillars[i]->drawGeo(cmd);
-			}
-		}
-		break;
+			break;
 		case 1:
-			/* Cube队列 3d-texture */
-			//draw_gltf(cmd);
 			break;
 		case 2:
 			/* 运动的Cube环阵 */
@@ -333,8 +315,6 @@ struct  Scene
 			}
 			break;
 		case 3:
-			/* 球体 */
-			//draw_gltf(cmd);
 			break;
 		case 4:
 			/* texture */
@@ -362,13 +342,10 @@ struct  Scene
 	{
 		helmet->clean();
 		armor->clean();
+		dinosaur->clean();
 
 		ground->clean();
 		cube->clean();
-		for (uint32_t i = 0; i < pillars.size(); i++)
-		{
-			pillars[i]->clean();
-		}
 		for (uint32_t i = 0; i < cubes_ring.size(); i++)
 		{
 			cubes_ring[i]->clean();

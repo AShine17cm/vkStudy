@@ -156,8 +156,8 @@ namespace vks
 			{
 				if (primitive->material.alphaMode == alphaMode)
 				{
-					//matrix of node,the only data i wanted(or goes wrong)
-					geos::PerObjectData pod = {shaderValuesScene.model* node->mesh->uniformBlock.matrix,{0,0,0,0} };
+					//节点矩阵
+					geos::PerObjectData pod = { shaderValuesScene.model * node->getMatrix(), {0,0,0,0} };
 					vkCmdPushConstants(cmd, pipeLayout, stageFlags, 0, sizeof(geos::PerObjectData), &pod);
 					if (primitive->hasIndices) 
 					{
@@ -1034,21 +1034,15 @@ namespace vks
 		shaderValuesScene.view =view;
 		float modelScale = modelInfo.modelScale;
 		glm::vec3 modelTranslate = modelInfo.modelTranslate;
+		float rotate = modelInfo.roate;
+		glm::vec3 rotateAxis = modelInfo.rotateAxis;
 		//场景根节点 的缩放，平移
 		shaderValuesScene.model = glm::mat4(1.0f);
 		shaderValuesScene.model[0][0] = modelScale;
 		shaderValuesScene.model[1][1] = modelScale;
 		shaderValuesScene.model[2][2] = modelScale;
 		shaderValuesScene.model = glm::translate(shaderValuesScene.model, modelTranslate);
-		//
-		//float scale = (1.0f / std::max(models.scene.aabb[0][0], std::max(models.scene.aabb[1][1], models.scene.aabb[2][2]))) * 0.5f;
-		//glm::vec3 translate = -glm::vec3(models.scene.aabb[3][0], models.scene.aabb[3][1], models.scene.aabb[3][2]);
-		//translate += -0.5f * glm::vec3(models.scene.aabb[0][0], models.scene.aabb[1][1], models.scene.aabb[2][2]);
-		//shaderValuesScene.model = glm::mat4(1.0f);
-		//shaderValuesScene.model[0][0] = scale;
-		//shaderValuesScene.model[1][1] = scale;
-		//shaderValuesScene.model[2][2] = scale;
-		//shaderValuesScene.model = glm::translate(shaderValuesScene.model, translate);
+		shaderValuesScene.model = glm::rotate(shaderValuesScene.model, glm::radians(rotate), rotateAxis);
 		//
 		shaderValuesScene.camPos = camPos;
 		// Skybox

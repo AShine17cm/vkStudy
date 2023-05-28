@@ -18,7 +18,6 @@ struct PipelineHub
 	/* set-layout 组合的 pipe-layout */
 	VkPipelineLayout piLayout_ui;
 	VkPipelineLayout piLayout_shadow;		//阴影渲染
-	//VkPipelineLayout piLayout_shadow_gltf;	//gltf 文件有自己的顶点属性布局
 	VkPipelineLayout piLayout_shadow_h;		//阴影合成: h表示占位，用于后续渲染的继承
 	VkPipelineLayout piLayout_solid;		//场景数据+ShadowMap + Object贴图  /+/  ui顶点+ui贴图+shadow:2d-array
 
@@ -27,9 +26,7 @@ struct PipelineHub
 	VkPipeline pi_shadow_gltf;				//gltf 文件有自己的顶点属性布局
 	/* 使用同一个 pipeline-layout */
 	VkPipeline pi_Tex;						//shader::<tex.shader>
-	VkPipeline pi_TexArray;					//shader::<texArray.shader>
-	VkPipeline pi_TexCube;					//shader::<texCube.shader>
-
+	VkPipeline pi_Pbr;						//shader::<pbr.shader>	用gltf 模型 做PBR 测试
 
 	void prepare(VkDevice device, RenderPassHub* passHub, uint32_t constantSize)
 	{
@@ -101,30 +98,57 @@ struct PipelineHub
 		/* Pipeline-s */
 		std::vector<VkShaderStageFlagBits> shaderStages; 
 		std::vector<const char*> shaderFiles;
+		/* 顶点布局 */
+		std::vector<VkVertexInputAttributeDescription> attributes;
+		std::vector<VkVertexInputBindingDescription> bindings;
+		VkPipelineVertexInputStateCreateInfo vertexInputSCI{};
+		vertexInputSCI.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		vertexInputSCI = geos::Geo::getVertexInput(&attributes, &bindings);
+		/* 顶点布局 UI的数据 在Descriptor-Set中，不走vertex */
+		VkPipelineVertexInputStateCreateInfo vertexInputSCI_ui{};
+		vertexInputSCI_ui.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		/* 顶点布局 gltf */
+		VkVertexInputBindingDescription vertexInputBinding = { 0, sizeof(vkglTF::Model::Vertex), VK_VERTEX_INPUT_RATE_VERTEX };
+		std::vector<VkVertexInputAttributeDescription> vertexInputAttributes = {
+			{ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0 },						//位置
+			{ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 3 },		//法线
+			{ 2, 0, VK_FORMAT_R32G32_SFLOAT, sizeof(float) * 6 },			//uv 0
+			{ 3, 0, VK_FORMAT_R32G32_SFLOAT, sizeof(float) * 8 },			//uv 1
+			{ 4, 0, VK_FORMAT_R32G32B32A32_SFLOAT, sizeof(float) * 10 },	//joint 0
+			{ 5, 0, VK_FORMAT_R32G32B32A32_SFLOAT, sizeof(float) * 14 },	//weight 0
+			{ 6, 0, VK_FORMAT_R32G32B32A32_SFLOAT, sizeof(float) * 18 }		//颜色
+		};
+		VkPipelineVertexInputStateCreateInfo vertexInputSCI_gltf{};
+		vertexInputSCI_gltf.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		vertexInputSCI_gltf.vertexBindingDescriptionCount = 1;
+		vertexInputSCI_gltf.pVertexBindingDescriptions = &vertexInputBinding;
+		vertexInputSCI_gltf.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexInputAttributes.size());
+		vertexInputSCI_gltf.pVertexAttributeDescriptions = vertexInputAttributes.data();
+		vertexInputSCI_gltf.flags = 0;
 		//ui
 		shaderStages= { VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_FRAGMENT_BIT };
 		shaderFiles = { "shaders/ui.vert.spv","shaders/ui.frag.spv" };
-		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_ui, &pi_ui, pipelines::MgPipelineEx::UI);
+		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_ui, &pi_ui, &vertexInputSCI_ui);
 		/* 阴影阶段 使用定制的RenderPass */
 		shaderStages = { VK_SHADER_STAGE_VERTEX_BIT,VK_SHADER_STAGE_GEOMETRY_BIT };
 		shaderFiles = { "shaders/shadowCaster.vert.spv","shaders/shadowCaster.geom.spv" };
-		createPipeline(device, passHub->shadowPass, &shaderFiles, shaderStages, &piLayout_shadow, &pi_shadow, pipelines::MgPipelineEx::ShadowMap);
+		createPipeline(device, passHub->shadowPass, &shaderFiles, shaderStages, &piLayout_shadow, &pi_shadow,&vertexInputSCI, pipelines::MgPipelineEx::ShadowMap);
 		shaderFiles = { "shaders/shadowCaster_gltf.vert.spv","shaders/shadowCaster.geom.spv" };
-		createPipeline(device, passHub->shadowPass, &shaderFiles, shaderStages, &piLayout_shadow, &pi_shadow_gltf, pipelines::MgPipelineEx::ShadowMap_GLTF);
+		createPipeline(device, passHub->shadowPass, &shaderFiles, shaderStages, &piLayout_shadow, &pi_shadow_gltf,&vertexInputSCI_gltf, pipelines::MgPipelineEx::ShadowMap);
 		/* 渲染场景阶段 */
 		shaderStages = { VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_FRAGMENT_BIT };
 		shaderFiles = { "shaders/tex.vert.spv", "shaders/tex.frag.spv" };
-		createPipeline(device, passHub->renderPass, &shaderFiles,shaderStages, &piLayout_solid, &pi_Tex);
-		shaderFiles = { "shaders/tex.vert.spv", "shaders/texArray.frag.spv" };
-		createPipeline(device, passHub->renderPass, &shaderFiles,shaderStages, &piLayout_solid, &pi_TexArray);
-		shaderFiles = { "shaders/tex.vert.spv", "shaders/texCube.frag.spv" };
-		createPipeline(device, passHub->renderPass, &shaderFiles,shaderStages, &piLayout_solid, &pi_TexCube);
+		createPipeline(device, passHub->renderPass, &shaderFiles,shaderStages, &piLayout_solid, &pi_Tex,&vertexInputSCI);
+		/* pbr */
+		shaderFiles = { "shaders/pbr.vert.spv", "shaders/pbr.frag.spv" };
+		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_solid, &pi_Pbr,&vertexInputSCI_gltf);
 	}
 	/* 根据 shader 创建 pipeline */
 	void createPipeline(VkDevice device, VkRenderPass renderPass, 
 		std::vector<const char*>* shaderFiles,
 		std::vector<VkShaderStageFlagBits> shaderStageFlags,
 		VkPipelineLayout* piLayout, VkPipeline* pi,
+		VkPipelineVertexInputStateCreateInfo* vertexInputSCI,
 		pipelines::MgPipelineEx kind = pipelines::MgPipelineEx::None)
 	{
 		std::vector<VkShaderModule> shaderModules;
@@ -143,35 +167,6 @@ struct PipelineHub
 			shaderModules.push_back(module); //存储到 类中
 			shaderStages.push_back(shaderStage);
 		}
-		/* Vertex */
-		std::vector<VkVertexInputAttributeDescription> attributes;
-		std::vector<VkVertexInputBindingDescription> bindings;
-		VkPipelineVertexInputStateCreateInfo vertexInputSCI{};
-		vertexInputSCI.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputSCI = geos::Geo::getVertexInput(&attributes, &bindings);
-
-		//GLTF 有自己的 vertexInputAttribute 属性
-		//要放到 if{}外面，不然会被释放掉
-		VkVertexInputBindingDescription vertexInputBinding = { 0, sizeof(vkglTF::Model::Vertex), VK_VERTEX_INPUT_RATE_VERTEX };
-		std::vector<VkVertexInputAttributeDescription> vertexInputAttributes = {
-			{ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0 },						//位置
-			{ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 3 },		//法线
-			{ 2, 0, VK_FORMAT_R32G32_SFLOAT, sizeof(float) * 6 },			//uv 0
-			{ 3, 0, VK_FORMAT_R32G32_SFLOAT, sizeof(float) * 8 },			//uv 1
-			{ 4, 0, VK_FORMAT_R32G32B32A32_SFLOAT, sizeof(float) * 10 },	//joint 0
-			{ 5, 0, VK_FORMAT_R32G32B32A32_SFLOAT, sizeof(float) * 14 },	//weight 0
-			{ 6, 0, VK_FORMAT_R32G32B32A32_SFLOAT, sizeof(float) * 18 }		//颜色
-		};
-		if (kind == pipelines::MgPipelineEx::ShadowMap_GLTF)
-		{
-			vertexInputSCI.vertexBindingDescriptionCount = 1;
-			vertexInputSCI.pVertexBindingDescriptions = &vertexInputBinding;
-			vertexInputSCI.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexInputAttributes.size());
-			vertexInputSCI.pVertexAttributeDescriptions = vertexInputAttributes.data();
-			vertexInputSCI.flags = 0;
-		}
-
-
 		/* Color Blend*/
 		VkPipelineColorBlendAttachmentState colorBlendAttachment{};
 		colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -182,13 +177,7 @@ struct PipelineHub
 		/* 一些特殊处理逻辑 */
 		switch (kind)
 		{
-			/* UI的数据 在Descriptor-Set中，不走vertex */
-		case pipelines::MgPipelineEx::UI:
-			vertexInputSCI = {};
-			vertexInputSCI.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-			break;
 		case pipelines::MgPipelineEx::ShadowMap:
-		case pipelines::MgPipelineEx::ShadowMap_GLTF:
 			extends.push_back(kind);
 			break;
 		}
@@ -196,7 +185,7 @@ struct PipelineHub
 		mg::pipelines::createPipeline(
 			shaderStages.data(), shaderStages.size(),
 			&colorBlendAttachment, 1,
-			&vertexInputSCI,
+			vertexInputSCI,
 			*piLayout,
 			renderPass,
 			device,
@@ -219,8 +208,7 @@ struct PipelineHub
 		vkDestroyPipeline(device, pi_shadow_gltf, nullptr);
 
 		vkDestroyPipeline(device, pi_Tex, nullptr);
-		vkDestroyPipeline(device, pi_TexArray, nullptr);
-		vkDestroyPipeline(device, pi_TexCube, nullptr);
+		vkDestroyPipeline(device, pi_Pbr, nullptr);
 
 		vkDestroyPipelineLayout(device, piLayout_ui, nullptr);
 		vkDestroyPipelineLayout(device, piLayout_shadow_h, nullptr);

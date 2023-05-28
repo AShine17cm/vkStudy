@@ -197,15 +197,15 @@ private:
     void createResources() 
     {
         /* 没统计 */
-        uint32_t countUBO = MAX_FRAMES_IN_FLIGHT * (128);
-        uint32_t countSampler = MAX_FRAMES_IN_FLIGHT * (128);
+        uint32_t countUBO = MAX_FRAMES_IN_FLIGHT * (256);
+        uint32_t countSampler = MAX_FRAMES_IN_FLIGHT * (256);
         /* Pool */
         std::vector<VkDescriptorPoolSize> poolSizes =
         {
             {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,countUBO},
             {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,countSampler}
         };
-        uint32_t maxSets = MAX_FRAMES_IN_FLIGHT * (16);
+        uint32_t maxSets = MAX_FRAMES_IN_FLIGHT * (32);
         mg::descriptors::createDescriptorPool(poolSizes.data(), poolSizes.size(), device, &descriptorPool, nullptr, maxSets);
         /* Tex 和 depth-Tex */
         resource.prepare(vulkanDevice,passHub.extent);
@@ -277,11 +277,15 @@ private:
             /* 场景信息+ShadowMap */
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow_h, dstSet, 1, &frame->scene_shadow_h, 0, nullptr);
             drawScene(cmd, frame);
+            /* pbr 渲染 */
+            dstSet = 1;
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Pbr);
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_ground, 0, nullptr);
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_solid, 1);
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_solid, 2);
+
             scene.draw_gltf(cmd,imageIndex,0);
-            //dstSet = 1;
-            //vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
-            //vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_ground, 0, nullptr);
-            //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_solid,0);
+            //scene.draw_gltf(cmd, imageIndex, 1);
 
             drawUI(cmd, frame);
             vkCmdEndRenderPass(cmd);
@@ -302,8 +306,9 @@ private:
         }
         //gltf 有自己的 vertexInputAttribute,需要自己的管线
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_shadow_gltf);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow, 0, 1, &frame->shadow_ubo, 0, nullptr);
-        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow,0);
+        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 0);
+        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 1);
+        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 2);
     }
     /* ui */
     void drawUI(VkCommandBuffer cmd, Frame* frame)
@@ -323,25 +328,10 @@ private:
     {
         uint32_t dstSet = 1;
         uint32_t batchIdx = 0;
-        /* 模型 方柱 */
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_TexArray);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_array, 0, nullptr);
-        batchIdx = 0;
-        scene.draw(cmd, piHub.piLayout_solid, batchIdx);
-        /* 一队 立方体 */
-        //vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex3D);
-        //vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_3d, 0, nullptr);
-        batchIdx = 1;
-        scene.draw(cmd, piHub.piLayout_solid, batchIdx);
         /* Cube 环阵 */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_ground, 0, nullptr);
         batchIdx = 2;
-        scene.draw(cmd, piHub.piLayout_solid, batchIdx);
-        /* 角色 */
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_TexCube);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->cube_map, 0, nullptr);
-        batchIdx = 3;
         scene.draw(cmd, piHub.piLayout_solid, batchIdx);
         /* 地板的贴图 */
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);

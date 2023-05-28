@@ -53,6 +53,7 @@ struct  View
 		vAngle = -25;
 		hAngle = 0;
 		radius = baseRadius + (range.x + range.y) / 2;
+		radius = 11.2f;
 		setLight();
 	}
 	void setPose(float radius, float hAngle, float vAngle)

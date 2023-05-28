@@ -38,12 +38,6 @@
     <None Include="shaders\tex.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\texArray.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shaders\texCube.frag">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="shaders\shadowCaster.vert">
       <Filter>shaders</Filter>
     </None>
@@ -99,6 +93,18 @@
       <Filter>pbr</Filter>
     </None>
     <None Include="shaders\shadowCaster_gltf.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\part.pbr.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\pbr.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\part.pbr.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\pbr.frag">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

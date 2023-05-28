@@ -84,7 +84,8 @@ Model	是 Node，纹理，材质的集合
 
 其它
 1. 创建 VkDevice时，需要打开 samplerAnisotropy,  vkglTF:Model 创建的 sampler有用到
-2. 将 gltf场景 渲染为阴影时，会有奇怪的锯齿，不解之谜？
+2. 使用自定义的管线渲染时  一定注意 vertexInputAttribute的布局， 要和gltf 文件的顶点属性保持一致
+3. 每个Node都有一个矩阵，这个矩阵在 VulkanglTFModel::Node::update 时直接拷贝到 mesh->uniformBuffer.mapped 不写入 UniformBlock.matrix中
 
 #define STB_IMAGE_IMPLEMENTATION
 这个定义 在Texture.cpp 和 VulkanglTFModel.cpp 都有定义  删掉一个

@@ -22,8 +22,6 @@ struct Frame
 	VkDescriptorSet scene_shadow_h;		//阴影合成  管线上的资源继承
 
 	VkDescriptorSet tex_ground;			//tex	地板
-	VkDescriptorSet tex_array;			//tex	模型
-	VkDescriptorSet cube_map;			//tex   球体
 
 	mg::Buffer ubo_ui;
 	mg::Buffer ubo_scene;				//相机 灯光
@@ -45,9 +43,6 @@ struct Frame
 
 		descriptors::allocateDescriptorSet(&pipes->setLayout_shadow_h, 1, descriptorPool, device, &scene_shadow_h);//阴影合成
 		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &tex_ground);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &tex_array);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_solidTex, 1, descriptorPool, device, &cube_map);
-
 
 		vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -95,11 +90,6 @@ struct Frame
 		/* shadow-array, tex-mips,tex-array,cube-map,3D-tex */
 		counts = { 1 };
 		types = { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER };
-
-		infos = { &res->tex_array->descriptor };
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), tex_array, device);
-		infos = { &res->tex_cube->descriptor };
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), cube_map, device);
 		infos = { &res->tex_floor->descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), tex_ground, device);
 	}

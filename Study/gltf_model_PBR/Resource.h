@@ -13,9 +13,8 @@ struct Resource
 
     textures::Texture* tex_depth;   //场景的深度测试
     textures::Texture* tex_ui;      //一个操作说明
-    textures::Texture* tex_array;   //两层贴图 立柱-环阵
     textures::Texture* tex_floor;   //地板
-    textures::Texture* tex_cube;    //球体的反射
+
 
     void prepare(VulkanDevice* vulkanDevice,VkExtent2D swapchainExtent) 
     {
@@ -54,27 +53,6 @@ struct Resource
         tex_floor = new textures::Texture(vulkanDevice, imgInfo);
         tex_floor->load("../textures/ground 01.jpg");
         tex_floor->genMips();
-        /* 多层贴图 - View要使用 2D-Array格式 */
-        imgInfo.layers = 2;
-        imgInfo.gen_Mips = true;
-        tex_array = new textures::Texture(vulkanDevice, imgInfo);
-        tex_array->viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
-        tex_array->load("../textures/rock 01.jpg");
-        tex_array->Insert("../textures/rock 02.jpg", 1, 0);
-        tex_array->genMips();
-        /* Cube-Map */
-        imgInfo.layers = 6;
-        imgInfo.gen_Mips = true;
-        imgInfo.formats.createFalgs = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
-        tex_cube = new textures::Texture(vulkanDevice, imgInfo);
-        tex_cube->viewType = VK_IMAGE_VIEW_TYPE_CUBE;
-        tex_cube->load("../textures/cube 0.jpg");
-        tex_cube->Insert("../textures/cube 1.jpg", 1, 0);
-        tex_cube->Insert("../textures/cube 2.jpg", 2, 0);
-        tex_cube->Insert("../textures/cube 3.jpg", 3, 0);
-        tex_cube->Insert("../textures/cube 4.jpg", 4, 0);
-        tex_cube->Insert("../textures/cube 5.jpg", 5, 0);
-        tex_cube->genMips();
     }
     void cleanup() 
     {
@@ -82,10 +60,8 @@ struct Resource
         tex_shadow->destroy();
 
         tex_ui->destroy();
-        tex_array->destroy();
         tex_floor->destroy();
         tex_depth->destroy();
-        tex_cube->destroy();
 
     }
 };

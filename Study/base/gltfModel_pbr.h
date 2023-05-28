@@ -20,6 +20,9 @@ namespace vks
 			std::string envMapFile;
 			float modelScale = 1.0f;
 			glm::vec3 modelTranslate = { 0,0,0 };
+			float roate = 0;
+			glm::vec3 rotateAxis = { 0,1,0 };
+
 		}modelInfo;
 
 		struct Textures {
