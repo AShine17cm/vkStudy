@@ -49,7 +49,7 @@ struct Resource
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
         imgInfo.formats.samplerMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         tex_ui = new textures::Texture(vulkanDevice, imgInfo);
-        tex_ui->load("../textures/ui.psd");
+        tex_ui->load("../textures/ui_pbr.psd");
         tex_ui->genMips();
 
         tex_sand = new textures::Texture(vulkanDevice, imgInfo);

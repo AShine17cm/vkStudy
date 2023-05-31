@@ -85,7 +85,7 @@ private:
 
         createResources();
 
-        scene.prepareStep2(descriptorPool, passHub.renderPass);
+        scene.prepareStep2(descriptorPool, passHub.renderPass,&frames);
  
         passHub.createFrameBuffers(&resource);//为了 共享一个 depth-tex
 
@@ -97,10 +97,10 @@ private:
         while (!glfwWindowShouldClose(window)) {
             input->Process(window);
             /* 防止cmd对descriptor的占用，使用cache */
-            for (int i = 0; i < frames.size(); i++) 
-            {
-                frames[i].CacheKey(input->frame_op);
-            }
+            //for (int i = 0; i < frames.size(); i++) 
+            //{
+            //    frames[i].CacheKey(input->frame_op);
+            //}
             drawFrame( );
             glfwPollEvents();
         }
@@ -281,13 +281,12 @@ private:
             /* 场景信息+ShadowMap */
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow_h, dstSet, 1, &frame->scene_shadow_h, 0, nullptr);
             dstSet = 1;
-            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Pbr);
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbr_bg, 0, nullptr);
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_pbr_basic);
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbrBasic_bg, 0, nullptr);
             scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 3);
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbr, 0, nullptr);
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbrBasic, 0, nullptr);
             scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 2);
             scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 1);
-
 
             scene.draw_gltf(cmd,imageIndex,0);
             //scene.draw_gltf(cmd, imageIndex,2);

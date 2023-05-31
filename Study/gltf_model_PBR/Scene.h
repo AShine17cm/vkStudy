@@ -37,7 +37,7 @@ struct  Scene
 	geos::PbrBasic pbrBasic_bg = { {0.7f,0.6f,0.5f,1},0.7f,0.15f };	//roughtness,metallic
 
 	vks::gltfModel_pbr* helmet;
-	vks::gltfModel_pbr* armor;
+	vks::gltfModel_pbr* ship;
 	vks::gltfModel_pbr* dinosaur;
 	vks::gltfModel_pbr* landscape;
 
@@ -47,7 +47,9 @@ struct  Scene
 
 	float deltaTime, timer = 0;
 	bool displayShadowMap = true;
-	int flipCounter = 3;// 用于阴影的调试
+	int flipCounter_shadow = 3;		// 用于阴影的调试
+	int flipCounter_equation = 6;	//保证第一次 切换到 1
+	int flipCounter_viewInputs =7;	//保证第一次 切换到 1
 	//创建 模型
 	void prepare(VulkanDevice* vulkanDevice, VkExtent2D extent, Input* input, uint32_t swapchainImgCount)
 	{
@@ -80,7 +82,7 @@ struct  Scene
 			1.6f,
 			{0,3.5f,6}
 		};
-		vks::gltfModel_pbr::ModelInfo armorInfo = {
+		vks::gltfModel_pbr::ModelInfo shipInfo = {
 			"../models/ship.glb",
 			"../models/deferred_box.gltf",
 			"../data/textures/empty.ktx",
@@ -107,7 +109,7 @@ struct  Scene
 			{0,0.0f,0}
 		};
 		helmet = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, helmetInfo);
-		armor = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, armorInfo);
+		ship = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, shipInfo);
 		dinosaur = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, dinosaurInfo);
 		landscape = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, landscapeInfo);
 
@@ -119,18 +121,24 @@ struct  Scene
 		pt = { glm::mat4(1.0),view->lightPoses[2],{0,0,1,18} };
 		dxPoint.addPoint(pt);
 	}
-	void prepareStep2(VkDescriptorPool descriptorPool, VkRenderPass renderPass)
+	void prepareStep2(VkDescriptorPool descriptorPool, VkRenderPass renderPass,std::vector<Frame>* frames)
 	{
 		helmet->setup(descriptorPool);
 		helmet->preparePipelines(renderPass);
-		armor->setup(descriptorPool);
-		armor->preparePipelines(renderPass);
+		ship->setup(descriptorPool);
+		ship->preparePipelines(renderPass);
 		dinosaur->setup(descriptorPool);
 		dinosaur->preparePipelines(renderPass);
 		landscape->setup(descriptorPool);
 		landscape->preparePipelines(renderPass);
 
 		dxPoint.prepare(vulkanDevice, renderPass);
+		//添加 一个albedo 用于着色//恐龙
+		for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			VkDescriptorImageInfo descriptor= dinosaur->models.scene.textures[0].descriptor;
+			(*frames)[i].add_pbrAlbedo(vulkanDevice->logicalDevice, descriptor);
+		}
 	}
 	/* 画一个 gltf 模型 */
 	void draw_gltf(VkCommandBuffer cmd, uint32_t cmd_idx, int modelIdx)
@@ -142,7 +150,7 @@ struct  Scene
 			gltf = helmet;
 			break;
 		case 1:
-			gltf = armor;
+			gltf = ship;
 			break;
 		case 2:
 			gltf = dinosaur;
@@ -184,7 +192,7 @@ struct  Scene
 			gltf = helmet;
 			break;
 		case 1:
-			gltf = armor;
+			gltf = ship;
 			break;
 		case 2:
 			gltf = dinosaur;
@@ -213,11 +221,24 @@ struct  Scene
 	/* 更新-UBO 资源 */
 	void update(Frame* pFrame, uint32_t imageIndex, float time, float deltaTime)
 	{
+		if (input->flipEquation)
+		{
+			input->flipEquation = false;
+			flipCounter_equation =(flipCounter_equation + 1) % 6;		//0::从 1 到 5
+			pbrBasic.debugViewEquation = flipCounter_equation;
+		}
+		if (input->flipViewInputs)
+		{
+			input->flipViewInputs = false;
+			flipCounter_viewInputs =  (flipCounter_viewInputs + 1) % 7;	//0::从 1 到 6
+			pbrBasic.debugViewInputs = flipCounter_viewInputs;
+		}
+
 		if (input->flipShadows) //3个光源的阴影,逐次展示，共同展示
 		{
 			input->flipShadows = false;
-			flipCounter = (flipCounter + 1) % 4;
-			switch (flipCounter)
+			flipCounter_shadow = (flipCounter_shadow + 1) % 4;
+			switch (flipCounter_shadow)
 			{
 			case 0:
 				ui.debug = { 1,0,0,0 };
@@ -238,7 +259,7 @@ struct  Scene
 		this->timer += deltaTime;
 		view->update(input, deltaTime);
 		helmet->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
-		armor->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
+		ship->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
 		dinosaur->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
 		landscape->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
 		//拷贝数据
@@ -271,12 +292,6 @@ struct  Scene
 			vkCmdDraw(cmd, 6, 1, firstPt, 0);
 			break;
 		case 6:
-			//展示 阴影的Map
-			//if (input->displayShadowmap)
-			//{
-			//	firstPt = 6;
-			//	vkCmdDraw(cmd, 6, 1, firstPt, 0);
-			//}
 			break;
 		}
 	}
@@ -286,7 +301,7 @@ struct  Scene
 		dxPoint.clean();
 
 		helmet->clean();
-		armor->clean();
+		ship->clean();
 		dinosaur->clean();
 		landscape->clean();
 	}

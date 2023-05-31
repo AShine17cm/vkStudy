@@ -13,5 +13,13 @@ namespace geos
 		glm::vec4 rgba;
 		float roughness;
 		float metallic;
+
+		//高级参数
+		float exposure;
+		float gamma;
+		float prefilteredCubeMipLevels;
+		float scaleIBLAmbient;
+		float debugViewInputs = 0;
+		float debugViewEquation = 0;
 	};
 }

@@ -23,14 +23,15 @@ struct Frame
 
 	VkDescriptorSet scene_shadow_h;		//阴影合成  管线上的资源继承
 
-	//VkDescriptorSet tex_ground;			//tex	地板
-	VkDescriptorSet pbr_bg;
-	VkDescriptorSet pbr;				//metallic + tex
+	VkDescriptorSet pbrBasic_bg;
+	VkDescriptorSet pbrBasic;				//metallic + tex
+	VkDescriptorSet pbr_albedo;
 
 	mg::Buffer ubo_ui;
 	mg::Buffer ubo_scene;				//相机 灯光
 	mg::Buffer ubo_pbr;
 	mg::Buffer ubo_pbr_bg;
+	mg::Buffer ubo_pbr_albedo;
 
 	bool mips_subView = false;
 	int opKey_cached;					//只能操作属于当前 Command-Buffer 的 DescriptorSet
@@ -48,8 +49,9 @@ struct Frame
 		descriptors::allocateDescriptorSet(&pipes->setLayout_shadow, 1, descriptorPool, device, &shadow_ubo);	//阴影阶段
 
 		descriptors::allocateDescriptorSet(&pipes->setLayout_shadow_h, 1, descriptorPool, device, &scene_shadow_h);//阴影合成
-		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrBasic, 1, descriptorPool, device, &pbr);
-		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrBasic, 1, descriptorPool, device, &pbr_bg);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrBasic, 1, descriptorPool, device, &pbrBasic);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrBasic, 1, descriptorPool, device, &pbrBasic_bg);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrAlbedo, 1, descriptorPool, device, &pbr_albedo);
 
 		vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -69,12 +71,18 @@ struct Frame
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 			sizeof(geos::PbrBasic), &ubo_pbr_bg);
+		vulkanDevice->createBuffer(
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			sizeof(geos::PbrBasic), &ubo_pbr_albedo);
 
 		ubo_scene.map();//给出mapped地址
 		ubo_ui.map();
 		ubo_pbr.map();
 		ubo_pbr_bg.map();
+		ubo_pbr_albedo.map();
 	}
+
 	/* 绑定set和资源(ubo,tex) */
 	void updateDescritors(VkDevice device, Resource* res)
 	{
@@ -107,9 +115,21 @@ struct Frame
 		types = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER };
 		counts = { 1 };
 		infos = { &ubo_pbr.descriptor };
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), pbr, device);
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), pbrBasic, device);
 		infos = { &ubo_pbr_bg.descriptor };
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), pbr_bg, device);
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), pbrBasic_bg, device);
+	}
+	//基础色 使用贴图
+	void add_pbrAlbedo(VkDevice device,VkDescriptorImageInfo imgDescriptor)
+	{
+		std::vector<VkDescriptorType> types;
+		std::vector<uint32_t> counts;
+		std::vector<void*> infos;
+
+		types = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER };
+		counts = { 1,1 };
+		infos = { &ubo_pbr_albedo.descriptor,&imgDescriptor };
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), pbr_albedo, device);
 	}
 	/* 切换贴图格式 */
 	void update(VkDevice device, Resource* res)
@@ -134,5 +154,6 @@ struct Frame
 		ubo_scene.destroy();
 		ubo_pbr.destroy();
 		ubo_pbr_bg.destroy();
+		ubo_pbr_albedo.destroy();
 	}
 };

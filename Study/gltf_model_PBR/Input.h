@@ -4,8 +4,8 @@
 struct Input
 {
     bool flipShadows = false;
-    bool displayShadowmap = true;
-    int frame_op = -1;
+    bool flipEquation = false;
+    bool flipViewInputs = false;
     /* 鼠标数据 */
     int mb_key = -1;
     glm::vec2 mouseStart;
@@ -70,7 +70,6 @@ struct Input
 
         /* 检查按键 */
         opKey = -1;
-        frame_op = -1;
         for (int i = 0; i < 26; i++) {
             if (glfwGetKey(window, GLFW_KEY_A + i) == GLFW_PRESS)
             {
@@ -103,16 +102,19 @@ struct Input
         switch (funcKey)
         {
         case GLFW_KEY_1:
-            flipShadows = true;
+            flipEquation = true;
             funcKey = -1;
             break;
         case GLFW_KEY_2:
-            displayShadowmap = !displayShadowmap;
+            flipViewInputs = true;
             funcKey = -1;
             break;
         case GLFW_KEY_3:
-            frame_op = funcKey - GLFW_KEY_0;
+            flipShadows = true;
             funcKey = -1;
+
+            break;
+        case GLFW_KEY_4:
             break;
         }
 	}

@@ -35,15 +35,6 @@
     <None Include="shaders\shadowCaster.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\part.solid.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shaders\part.solid.vert">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shaders\shadowCaster.geom">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="shaders\part.constants.shader">
       <Filter>shaders</Filter>
     </None>
@@ -86,16 +77,22 @@
     <None Include="shaders\shadowCaster_gltf.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\pbr.vert">
+    <None Include="shaders\pbr_basic.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\pbr.frag">
+    <None Include="shaders\pbr_basic.frag">
       <Filter>shaders</Filter>
     </None>
     <None Include="shaders\point.frag">
       <Filter>shaders</Filter>
     </None>
     <None Include="shaders\point.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\pbr_albedo.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\shadowCaster.geom">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
