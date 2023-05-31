@@ -11,7 +11,8 @@ float textureProj(vec4 shadowCoord,int layer, vec2 offset)//offset ÓÃÓÚSoft-Shad
     if(coord.z>-1.0&&coord.z<1.0)
     {
 		float dist=texture(shadowMap,vec3(coord.xy+offset,layer)).r;
-        if(coord.w>0.0&&dist<coord.z)
+        //if(coord.w>0.0&&dist>coord.z)
+		if(coord.w>0.0&&dist<coord.z)
         {
             shadow=SHADOW_FACTOR;
         }

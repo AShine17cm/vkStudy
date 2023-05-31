@@ -8,4 +8,10 @@ namespace geos
 		glm::mat4 model;
 		glm::vec4 texIndex;
 	};
+	struct PbrBasic
+	{
+		glm::vec4 rgba;
+		float roughness;
+		float metallic;
+	};
 }

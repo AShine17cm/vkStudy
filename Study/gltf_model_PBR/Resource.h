@@ -12,8 +12,8 @@ struct Resource
     textures::Texture* tex_shadow;
 
     textures::Texture* tex_depth;   //场景的深度测试
+    textures::Texture* tex_sand;   
     textures::Texture* tex_ui;      //一个操作说明
-    textures::Texture* tex_floor;   //地板
 
 
     void prepare(VulkanDevice* vulkanDevice,VkExtent2D swapchainExtent) 
@@ -33,6 +33,7 @@ struct Resource
         /* 阴影贴图 */
         imgInfo.extent3D = { SHADOWMAP_DIM,SHADOWMAP_DIM,1 };
         imgInfo.layers = LIGHT_COUNT;
+        imgInfo.formats.samplerMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
         tex_shadow = new textures::Texture(vulkanDevice, imgInfo);
         tex_shadow->viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
         tex_shadow->extends = { textures::MgTextureEx::Sampler_ShadowMap };
@@ -45,23 +46,22 @@ struct Resource
             VK_IMAGE_TYPE_2D,
             VK_FORMAT_R8G8B8A8_SRGB ,
             VK_IMAGE_USAGE_SAMPLED_BIT ,
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL };
-
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+        imgInfo.formats.samplerMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         tex_ui = new textures::Texture(vulkanDevice, imgInfo);
         tex_ui->load("../textures/ui.psd");
         tex_ui->genMips();
-        tex_floor = new textures::Texture(vulkanDevice, imgInfo);
-        tex_floor->load("../textures/ground 01.jpg");
-        tex_floor->genMips();
+
+        tex_sand = new textures::Texture(vulkanDevice, imgInfo);
+        tex_sand->load("../textures/sand.psd");
+        tex_sand->genMips();
     }
     void cleanup() 
     {
         /* 阴影贴图 */
         tex_shadow->destroy();
-
+        tex_sand->destroy();
         tex_ui->destroy();
-        tex_floor->destroy();
         tex_depth->destroy();
-
     }
 };

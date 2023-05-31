@@ -163,6 +163,7 @@
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="buffers.cpp" />
     <ClCompile Include="commands.cpp" />
+    <ClCompile Include="DebugPoints.cpp" />
     <ClCompile Include="descriptors.cpp" />
     <ClCompile Include="framebuffers.cpp" />
     <ClCompile Include="Geo.cpp" />
@@ -190,7 +191,9 @@
     <ClInclude Include="batches.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="buffers.h" />
+    <ClInclude Include="camera.hpp" />
     <ClInclude Include="commands.h" />
+    <ClInclude Include="DebugPoints.h" />
     <ClInclude Include="descriptors.h" />
     <ClInclude Include="framebuffers.h" />
     <ClInclude Include="Geo.h" />

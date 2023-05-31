@@ -1,7 +1,7 @@
 #include "Geo.h"
 namespace geos 
 {
-	GeoPlane::GeoPlane(float size, vec3 pos) 
+	GeoPlane::GeoPlane(float size, vec3 pos,vec3 normal) 
 	{
 		this->size = size;
 		this->pos = pos;
@@ -9,7 +9,7 @@ namespace geos
 		uint colums = 3;
 		vec3 dirA = { 1,0,0 };
 		vec3 dirB = { 0,1,0 };
-		vec3 normal = { 0,0,1 };
+		//vec3 normal = { 0,0,1 }; 5-30
 		vec3 tangent = { 0,1,0 };
 		vec4 color = { 1,1,1,1 };
 		vec3 zero = -dirA * size * 0.5f - dirB * size * 0.5f;

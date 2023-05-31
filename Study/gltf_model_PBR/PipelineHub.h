@@ -14,18 +14,17 @@ struct PipelineHub
 	VkDescriptorSetLayout setLayout_ui;
 	VkDescriptorSetLayout setLayout_shadow;		//阴影渲染 
 	VkDescriptorSetLayout setLayout_shadow_h;	//阴影合成 h:holder  管线上的资源继承
-	VkDescriptorSetLayout setLayout_solidTex;	//物体的 albedo
+	VkDescriptorSetLayout setLayout_pbrBasic;
 	/* set-layout 组合的 pipe-layout */
 	VkPipelineLayout piLayout_ui;
 	VkPipelineLayout piLayout_shadow;		//阴影渲染
 	VkPipelineLayout piLayout_shadow_h;		//阴影合成: h表示占位，用于后续渲染的继承
-	VkPipelineLayout piLayout_solid;		//场景数据+ShadowMap + Object贴图  /+/  ui顶点+ui贴图+shadow:2d-array
+	VkPipelineLayout piLayout_pbrBasic;		//场景数据+ShadowMap+ PBR + Object 贴图
 
 	VkPipeline pi_ui;						//shader::<ui.shader>
 	VkPipeline pi_shadow;					//shader::<shadowCaster.shader>
 	VkPipeline pi_shadow_gltf;				//gltf 文件有自己的顶点属性布局
 	/* 使用同一个 pipeline-layout */
-	VkPipeline pi_Tex;						//shader::<tex.shader>
 	VkPipeline pi_Pbr;						//shader::<pbr.shader>	用gltf 模型 做PBR 测试
 
 	void prepare(VkDevice device, RenderPassHub* passHub, uint32_t constantSize)
@@ -51,17 +50,16 @@ struct PipelineHub
 		stages = { stageVGF };
 		desCounts = { 1 };
 		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_shadow);
-		// <texture>
-		types = { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER };
-		stages = { VK_SHADER_STAGE_FRAGMENT_BIT };
-		desCounts = { 1 };
-		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_solidTex);
 		//阴影合成
 		types = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER };
 		stages = { stageVGF , VK_SHADER_STAGE_FRAGMENT_BIT };
 		desCounts = { 1,1 };
 		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_shadow_h);
-
+		//pbr
+		types = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER };
+		stages = { VK_SHADER_STAGE_FRAGMENT_BIT  };
+		desCounts = { 1};
+		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_pbrBasic);
 		/* Pipeline-Layout */
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -87,13 +85,13 @@ struct PipelineHub
 		pipelineLayoutInfo.pPushConstantRanges = &pushRange;		//不设置，无法将 layout-scene 复用
 		MG_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &piLayout_shadow_h));
 
-		//渲染阶段::  场景信息+Shadow  /+/  Object贴图
-		VkDescriptorSetLayout setL_solidTex[] = { setLayout_shadow_h,setLayout_solidTex };
+		//渲染阶段::  场景信息+Shadow  /+/  PBR  Object贴图
+		VkDescriptorSetLayout setL_pbrTex[] = { setLayout_shadow_h,setLayout_pbrBasic };
 		pipelineLayoutInfo.setLayoutCount = 2;
-		pipelineLayoutInfo.pSetLayouts = setL_solidTex;
+		pipelineLayoutInfo.pSetLayouts = setL_pbrTex;
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 		pipelineLayoutInfo.pPushConstantRanges = &pushRange;
-		MG_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &piLayout_solid));
+		MG_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &piLayout_pbrBasic));
 
 		/* Pipeline-s */
 		std::vector<VkShaderStageFlagBits> shaderStages; 
@@ -135,13 +133,10 @@ struct PipelineHub
 		createPipeline(device, passHub->shadowPass, &shaderFiles, shaderStages, &piLayout_shadow, &pi_shadow,&vertexInputSCI, pipelines::MgPipelineEx::ShadowMap);
 		shaderFiles = { "shaders/shadowCaster_gltf.vert.spv","shaders/shadowCaster.geom.spv" };
 		createPipeline(device, passHub->shadowPass, &shaderFiles, shaderStages, &piLayout_shadow, &pi_shadow_gltf,&vertexInputSCI_gltf, pipelines::MgPipelineEx::ShadowMap);
-		/* 渲染场景阶段 */
-		shaderStages = { VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_FRAGMENT_BIT };
-		shaderFiles = { "shaders/tex.vert.spv", "shaders/tex.frag.spv" };
-		createPipeline(device, passHub->renderPass, &shaderFiles,shaderStages, &piLayout_solid, &pi_Tex,&vertexInputSCI);
 		/* pbr */
+		shaderStages = { VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_FRAGMENT_BIT };
 		shaderFiles = { "shaders/pbr.vert.spv", "shaders/pbr.frag.spv" };
-		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_solid, &pi_Pbr,&vertexInputSCI_gltf);
+		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_pbrBasic, &pi_Pbr,&vertexInputSCI_gltf);
 	}
 	/* 根据 shader 创建 pipeline */
 	void createPipeline(VkDevice device, VkRenderPass renderPass, 
@@ -207,17 +202,16 @@ struct PipelineHub
 		vkDestroyPipeline(device, pi_shadow, nullptr);					//图形管线 shadow
 		vkDestroyPipeline(device, pi_shadow_gltf, nullptr);
 
-		vkDestroyPipeline(device, pi_Tex, nullptr);
 		vkDestroyPipeline(device, pi_Pbr, nullptr);
 
 		vkDestroyPipelineLayout(device, piLayout_ui, nullptr);
 		vkDestroyPipelineLayout(device, piLayout_shadow_h, nullptr);
 		vkDestroyPipelineLayout(device, piLayout_shadow, nullptr);			//阴影渲染 灯光矩阵
-		vkDestroyPipelineLayout(device, piLayout_solid, nullptr);
+		vkDestroyPipelineLayout(device, piLayout_pbrBasic, nullptr);
 
 		vkDestroyDescriptorSetLayout(device, setLayout_ui, nullptr);
 		vkDestroyDescriptorSetLayout(device, setLayout_shadow, nullptr);
 		vkDestroyDescriptorSetLayout(device, setLayout_shadow_h, nullptr);
-		vkDestroyDescriptorSetLayout(device, setLayout_solidTex, nullptr);
+		vkDestroyDescriptorSetLayout(device, setLayout_pbrBasic, nullptr);
 	}
 };

@@ -12,10 +12,14 @@
 #include "VulkanglTFModel.h"
 #include "gltfModel_pbr.h"
 
+#include "DebugPoints.h"
+
 using namespace mg;
 
 /*
 将Geo 以不同的材质 渲染
+	camera 做transition 时 z轴取反
+	shader 里 y 轴取反
 */
 struct  Scene
 {
@@ -29,16 +33,15 @@ struct  Scene
 		std::array<vec4, 6 * countUI> pts;				//用于在 近剪切平面上画 UI
 		glm::ivec4 debug;
 	}ui;
-
-	std::vector<geos::GeoCube*> cubes_ring;				//mip-maps
-	std::vector<float> spds;
-
-	geos::Geo* ground;
-	geos::GeoCube* cube;
+	geos::PbrBasic pbrBasic = { {1,1,1,1},0.6f,0.3f };					//roughtness,metallic
+	geos::PbrBasic pbrBasic_bg = { {0.6f,0.4f,0.2f,0},0.95f,0.05f };	//roughtness,metallic
 
 	vks::gltfModel_pbr* helmet;
 	vks::gltfModel_pbr* armor;
 	vks::gltfModel_pbr* dinosaur;
+	vks::gltfModel_pbr* landscape;
+
+	geos::DebugPoints dxPoint;
 
 	float rotateRadius = 4.2f;
 
@@ -46,7 +49,7 @@ struct  Scene
 	bool displayShadowMap = true;
 	int flipCounter = 3;// 用于阴影的调试
 	//创建 模型
-	void prepare(VulkanDevice* vulkanDevice, VkExtent2D extent, Input* input,uint32_t swapchainImgCount)
+	void prepare(VulkanDevice* vulkanDevice, VkExtent2D extent, Input* input, uint32_t swapchainImgCount)
 	{
 		this->vulkanDevice = vulkanDevice;
 		this->input = input;
@@ -64,99 +67,73 @@ struct  Scene
 		ui.pts[6 + 3] = { 1.0f,-0.2f,1,1 };
 		ui.pts[6 + 4] = ui.pts[6 + 1];
 		ui.pts[6 + 5] = ui.pts[6 + 0];
-		ui.debug = { 1,1,1,1 };
+
+		ui.debug = { 0,1,0,1 };
 		/* 相机控制 */
-		view = new View({ 0,0,0 }, 9.0f, { -6.0f,6.0f }, extent);
-		ground = new geos::GeoPlane(16, { 0,-2,0 });
-		ground->prepareBuffer(vulkanDevice);
-		/* 立方体  将被Instancing的物体 */
-		float size = 0.3f;
-		vec3 clipA = { 0.5f,0.3f,0.2f };
-		vec3 clipB = { 0.4f,0.2f,0.45f };
-		cube = new geos::GeoCube(size, clipA, clipB);
-		cube->prepareBuffer(vulkanDevice);
-
-		float PI = glm::pi<float>();
-		/* 设置物体的初始 位置-姿势 */
-		ground->pos = { 0,1.6f,0 };
-		cube->pos = { 0,0,2 };
-		ground->modelMatrix = glm::translate(ground->modelMatrix, ground->pos);
-		ground->modelMatrix = glm::rotate(ground->modelMatrix, PI * 0.5f, { 1.0f,0.0f,0.0f });
-		cube->modelMatrix = glm::translate(cube->modelMatrix, cube->pos);
-
-		/* 方柱 */
-		vec2 baseSize = { 0.3f,0.4f };
-		vec2 topSize = { 0.2f,0.25f };
-		vec2 heights = { 0.8f,0.8f };   //x 是绝对值，y是比例
-		vec2 topCenter = { 0.0f,0.05f };
-		vec2 uvPlane = { 1.0f,1.0f };
-		Random rnd(0, { 0,1.0f });
-
-		float radius = 3.0f;
-		float stepAng;
-		float ang;
-		/* 环阵 初始化 */
-		int countRing = 32;
-		glm::mat4 idenity = glm::mat4(1.0f);
-		stepAng = PI * 2.0f / countRing;
-		for (int i = 0; i < countRing; i++)
-		{
-			float r = rotateRadius;// +rnd.generate() * 0.5f;
-			ang = stepAng * i;
-			float sin = r * glm::sin(ang);
-			float cos = r * glm::cos(ang);
-
-			glm::mat4 model = glm::translate(idenity, { cos,sin,instanceH });
-			ang = ang * (1.0f + (rnd.generate() - 0.5f) * 0.2f);
-			model = glm::rotate(model, ang, { 0,0,1.0f });
-			auto cube = new geos::GeoCube(size, clipA, clipB);
-			cube->prepareBuffer(vulkanDevice);
-			cube->pos = { cos,instanceH,sin };
-			cube->modelMatrix = model;
-			cubes_ring.push_back(cube);
-			spds.push_back(rnd.generate());
-		}
+		view = new View(extent);
 		//gltf 模型信息
 		vks::gltfModel_pbr::ModelInfo helmetInfo = {
 			"../data/models/DamagedHelmet/glTF-Embedded/DamagedHelmet.gltf",
 			"../data/models/Box/glTF-Embedded/Box.gltf",
 			"../data/textures/empty.ktx",
 			"../data/environments/papermill.ktx",
-			1.2f,
-			{0,0,0}
+			1.6f,
+			{0,3.5f,6}
 		};
 		vks::gltfModel_pbr::ModelInfo armorInfo = {
-			"../models/Unicorn.glb",
-			//"../models/armor/armor.gltf",
+			"../models/ship.glb",
 			"../models/deferred_box.gltf",
 			"../data/textures/empty.ktx",
 			"../data/environments/papermill.ktx",
-			1.0f,
-			{-3,-1.7f,1}
+			3.0f,
+			{0,3,0},
+			60,
+			{0,1,0}
 		};
 		vks::gltfModel_pbr::ModelInfo dinosaurInfo = {
 			"../models/Rampaging T-Rex.glb",
 			"../models/deferred_box.gltf",
 			"../data/textures/empty.ktx",
 			"../data/environments/papermill.ktx",
-			0.5f,
-			{5,-3.1f,0}
+			1.0f,
+			{9,3.2f,0}
 		};
-		helmet = new vks::gltfModel_pbr(vulkanDevice,swapchainImgCount,helmetInfo);
+		vks::gltfModel_pbr::ModelInfo landscapeInfo = {
+			"../models/island.glb",
+			"../models/deferred_box.gltf",
+			"../data/textures/empty.ktx",
+			"../data/environments/papermill.ktx",
+			1.0f,
+			{0,0.0f,0}
+		};
+		helmet = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, helmetInfo);
 		armor = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, armorInfo);
 		dinosaur = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, dinosaurInfo);
+		landscape = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, landscapeInfo);
+
+		geos::DebugPoints::Point pt;
+		pt = { glm::mat4(1.0),view->lightPoses[0],{1,0,0,18} };
+		dxPoint.addPoint(pt);
+		pt = { glm::mat4(1.0),view->lightPoses[1],{0,1,0,18} };
+		dxPoint.addPoint(pt);
+		pt = { glm::mat4(1.0),view->lightPoses[2],{0,0,1,18} };
+		dxPoint.addPoint(pt);
 	}
-	void prepareStep2(VkDescriptorPool descriptorPool,VkRenderPass renderPass)
+	void prepareStep2(VkDescriptorPool descriptorPool, VkRenderPass renderPass)
 	{
-		helmet->setup(descriptorPool);                 
+		helmet->setup(descriptorPool);
 		helmet->preparePipelines(renderPass);
 		armor->setup(descriptorPool);
 		armor->preparePipelines(renderPass);
 		dinosaur->setup(descriptorPool);
 		dinosaur->preparePipelines(renderPass);
+		landscape->setup(descriptorPool);
+		landscape->preparePipelines(renderPass);
+
+		dxPoint.prepare(vulkanDevice, renderPass);
 	}
 	/* 画一个 gltf 模型 */
-	void draw_gltf(VkCommandBuffer cmd,uint32_t cmd_idx,int modelIdx)
+	void draw_gltf(VkCommandBuffer cmd, uint32_t cmd_idx, int modelIdx)
 	{
 		vks::gltfModel_pbr* gltf = nullptr;
 		switch (modelIdx)
@@ -170,12 +147,15 @@ struct  Scene
 		case 2:
 			gltf = dinosaur;
 			break;
+		case 3:
+			gltf = landscape;
+			break;
 		}
 		vkglTF::Model& model = gltf->models.scene;
 		VkDeviceSize offsets[1] = { 0 };
 		/* 顶点，三角面数据 */
 		vkCmdBindVertexBuffers(cmd, 0, 1, &model.vertices.buffer, offsets);
-		if (model.indices.buffer != VK_NULL_HANDLE) 
+		if (model.indices.buffer != VK_NULL_HANDLE)
 		{
 			vkCmdBindIndexBuffer(cmd, model.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 		}
@@ -188,15 +168,14 @@ struct  Scene
 		}
 		for (auto node : model.nodes)
 		{
-			gltf->renderNode(cmd,node, cmd_idx, vkglTF::Material::ALPHAMODE_MASK);
+			gltf->renderNode(cmd, node, cmd_idx, vkglTF::Material::ALPHAMODE_MASK);
 		}
 		for (auto node : model.nodes)
 		{
-			gltf->renderNode(cmd,node, cmd_idx, vkglTF::Material::ALPHAMODE_BLEND);
+			gltf->renderNode(cmd, node, cmd_idx, vkglTF::Material::ALPHAMODE_BLEND);
 		}
 	}
-	//阴影 有奇怪的锯齿
-	void draw_gltf_ByXPipe(VkCommandBuffer cmd, VkPipelineLayout pipeLayout,int modelIdx)
+	void draw_gltf_ByXPipe(VkCommandBuffer cmd, VkPipelineLayout pipeLayout, int modelIdx)
 	{
 		vks::gltfModel_pbr* gltf = nullptr;
 		switch (modelIdx)
@@ -210,6 +189,9 @@ struct  Scene
 		case 2:
 			gltf = dinosaur;
 			break;
+		case 3:
+			gltf = landscape;
+			break;
 		}
 
 		vkglTF::Model& model = gltf->models.scene;
@@ -220,13 +202,18 @@ struct  Scene
 		gltf->boundPipeline = VK_NULL_HANDLE;
 		for (auto node : model.nodes)
 		{
-			gltf->renderNode_ByXPipe(cmd, node, pipeLayout,stageVGF,vkglTF::Material::ALPHAMODE_OPAQUE);
+			gltf->renderNode_ByXPipe(cmd, node, pipeLayout, stageVGF, vkglTF::Material::ALPHAMODE_OPAQUE);
 		}
 	}
-	/* 更新-UBO 资源 */
-	void update(Frame* pFrame,uint32_t imageIndex, float time, float deltaTime)
+	void draw_points(VkCommandBuffer cmd)
 	{
-		if (input->flipShadows) //3个光源的阴影,逐次展示，共同展示
+		glm::mat4  mvp = view->data.proj * view->data.view;
+		dxPoint.draw(cmd, mvp);
+	}
+	/* 更新-UBO 资源 */
+	void update(Frame* pFrame, uint32_t imageIndex, float time, float deltaTime)
+	{
+		if (input->flipShadows&&false) //3个光源的阴影,逐次展示，共同展示
 		{
 			input->flipShadows = false;
 			flipCounter = (flipCounter + 1) % 4;
@@ -249,52 +236,26 @@ struct  Scene
 		}
 		this->deltaTime = deltaTime;
 		this->timer += deltaTime;
-		view->update(deltaTime, input->opKey);
-		float ang = time * glm::radians(30.0f);//time是相对时间
-		updateInstance(ang);
+		view->update(input, deltaTime);
 		helmet->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
 		armor->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
 		dinosaur->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
+		landscape->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
 		//拷贝数据
 		memcpy(pFrame->ubo_ui.mapped, &ui, sizeof(UIData));
 		memcpy(pFrame->ubo_scene.mapped, &view->data, sizeof(View::UniformBufferObject));
-	}
-	void updateInstance(float offsetAng)
-	{
-		int countRing = cubes_ring.size();
-		float PI = glm::pi<float>();
-		float stepAng = PI * 2.0 / countRing;
-		//一个平滑的运动半径缩放
-		float band = 0.8f;
-		float k = timer - (static_cast<int> (timer / 4.0f)) * 4.0f;
-		k =glm::abs( k / 4.0f-0.5f)*2.0f;
-		k = 3.0f * k * k - 2.0f * k * k * k;//(0,1)
-		k = k - 0.5f;
-
-		float radius = rotateRadius + k * band;
-		float ang;
-		glm::mat4 idenity = glm::mat4(1.0f);
-		for (int i = 0; i < countRing; i++)
-		{
-			ang = offsetAng + stepAng * i;
-
-			float sin = radius * glm::sin(ang);
-			float cos = radius * glm::cos(ang);
-			auto cube = cubes_ring[i];
-			glm::mat4 rt = glm::rotate(idenity, spds[i], { 1,0,0 });//自旋
-			vec3 pos = {cos,instanceH ,sin };
-			glm::mat4 model = glm::translate(idenity, pos);
-			model = glm::rotate(model, ang, { 0,0,1 });
-			cube->modelMatrix = model * rt;
-		}
+		memcpy(pFrame->ubo_pbr.mapped, &pbrBasic, sizeof(geos::PbrBasic));
+		memcpy(pFrame->ubo_pbr_bg.mapped, &pbrBasic_bg, sizeof(geos::PbrBasic));
 	}
 	/*
 	用idx 将 geo 以不同的方式渲染
 	*/
 	void draw(VkCommandBuffer cmd, VkPipelineLayout piLayout, int batchIdx)
 	{
+		if (batchIdx == -1) draw_points(cmd);
+
 		VkShaderStageFlags stageVGF = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_GEOMETRY_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-		geos::PerObjectData pod = {glm::mat4(1),{0,0,0,0}};
+		geos::PerObjectData pod = { glm::mat4(1),{0,0,0,0} };
 		uint32_t size = sizeof(geos::PerObjectData);
 		VkDeviceSize offsets[] = { 0 };
 		uint32_t firstPt = 0;
@@ -304,24 +265,6 @@ struct  Scene
 			break;
 		case 1:
 			break;
-		case 2:
-			/* 运动的Cube环阵 */
-			for (uint32_t i = 0; i < cubes_ring.size(); i++)
-			{
-				pod.model = cubes_ring[i]->modelMatrix;
-				pod.texIndex = { i % 2,0,0,0 };
-				vkCmdPushConstants(cmd, piLayout, stageVGF, 0, size, &pod);
-				cubes_ring[i]->drawGeo(cmd);
-			}
-			break;
-		case 3:
-			break;
-		case 4:
-			/* texture */
-			pod.model = ground->modelMatrix;
-			vkCmdPushConstants(cmd, piLayout, stageVGF, 0, size, &pod);
-			ground->drawGeo(cmd);
-			break;
 		case 5:
 			//画 UI
 			firstPt = 0;
@@ -329,26 +272,22 @@ struct  Scene
 			break;
 		case 6:
 			//展示 阴影的Map
-			if (input->displayShadowmap)
-			{
-				firstPt = 6;
-				vkCmdDraw(cmd, 6, 1, firstPt, 0);
-			}
+			//if (input->displayShadowmap)
+			//{
+			//	firstPt = 6;
+			//	vkCmdDraw(cmd, 6, 1, firstPt, 0);
+			//}
 			break;
 		}
 	}
 
 	void cleanup()
 	{
+		dxPoint.clean();
+
 		helmet->clean();
 		armor->clean();
 		dinosaur->clean();
-
-		ground->clean();
-		cube->clean();
-		for (uint32_t i = 0; i < cubes_ring.size(); i++)
-		{
-			cubes_ring[i]->clean();
-		}
+		landscape->clean();
 	}
 };

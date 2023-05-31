@@ -41,6 +41,7 @@ namespace textures
 				VkImageLayout imagelayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				VkImageCreateFlags createFalgs = 0;// VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
 				VkSampleCountFlagBits sampleCount = VK_SAMPLE_COUNT_1_BIT;
+				VkSamplerAddressMode samplerMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 			}formats;
 
 			VkExtent2D getExtend2D() 
@@ -57,6 +58,7 @@ namespace textures
 			uint32_t mipLevCount = 1;
 			VkFormat imgFormat = VK_FORMAT_R8G8B8A8_SRGB;
 			VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D;
+			
 		};
 		struct MgInsertPiece		//用于插入 一块数据<layer，mip-level>
 		{

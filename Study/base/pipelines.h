@@ -22,6 +22,7 @@ namespace mg
 			Deferred_Compose=401,
 
 			Counter_Clock_Wise=501,
+			Points=601,
 			//DynamicState_A=61,
 			//ColorBlend=30,
 		};

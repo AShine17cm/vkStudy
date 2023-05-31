@@ -80,6 +80,7 @@ private:
 
         createGraphicsPipeline();
         /* geos */
+
         scene.prepare(vulkanDevice,passHub.extent,input,passHub.swapchain->imageCount);
 
         createResources();
@@ -180,6 +181,7 @@ private:
         VkPhysicalDeviceFeatures deviceFeatures{};
         deviceFeatures.geometryShader = VK_TRUE;
         deviceFeatures.samplerAnisotropy = VK_TRUE;
+        deviceFeatures.wideLines = VK_TRUE;
         vulkanDevice = new mg::VulkanDevice(physicalDevice);
         vulkanDevice->createLogicalDevice(deviceFeatures, deviceExtensions, nullptr);//queueCI, command-pool
         //
@@ -274,18 +276,21 @@ private:
             /* 正常渲染 */
             mg::batches::BeginRenderpass(cmd,passHub.renderPass,passHub.swapChainFramebuffers[imageIndex],clears.data(), 2, passHub.extent);
             mg::batches::SetViewport(cmd, passHub.extent);
+            scene.draw(cmd,nullptr, -1);//调试点
+            /* pbr 渲染 */
             /* 场景信息+ShadowMap */
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow_h, dstSet, 1, &frame->scene_shadow_h, 0, nullptr);
-            drawScene(cmd, frame);
-            /* pbr 渲染 */
             dstSet = 1;
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Pbr);
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_ground, 0, nullptr);
-            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_solid, 1);
-            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_solid, 2);
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbr_bg, 0, nullptr);
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 3);
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbr, 0, nullptr);
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 2);
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 1);
+
 
             scene.draw_gltf(cmd,imageIndex,0);
-            //scene.draw_gltf(cmd, imageIndex, 1);
+            //scene.draw_gltf(cmd, imageIndex,2);
 
             drawUI(cmd, frame);
             vkCmdEndRenderPass(cmd);
@@ -296,19 +301,13 @@ private:
     }
     void genShadowMap(VkCommandBuffer cmd, Frame* frame)
     {
-        uint32_t batchIdx =-1;
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_shadow);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow, 0, 1, &frame->shadow_ubo, 0, nullptr);
-        for (uint32_t i = 0; i < 4; i++) 
-        {
-            batchIdx = i;
-            scene.draw(cmd, piHub.piLayout_shadow, batchIdx);
-        }
         //gltf 有自己的 vertexInputAttribute,需要自己的管线
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_shadow_gltf);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow, 0, 1, &frame->shadow_ubo, 0, nullptr);
         scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 0);
         scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 1);
         scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 2);
+        //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 3);
     }
     /* ui */
     void drawUI(VkCommandBuffer cmd, Frame* frame)
@@ -322,22 +321,6 @@ private:
         scene.draw(cmd, piHub.piLayout_ui, batchIdx);
         batchIdx = 6;
         scene.draw(cmd, piHub.piLayout_ui, batchIdx);
-    }
-    /* 场景信息+ShadowMap  画一遍场景 */
-    void drawScene(VkCommandBuffer cmd, Frame* frame) 
-    {
-        uint32_t dstSet = 1;
-        uint32_t batchIdx = 0;
-        /* Cube 环阵 */
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_ground, 0, nullptr);
-        batchIdx = 2;
-        scene.draw(cmd, piHub.piLayout_solid, batchIdx);
-        /* 地板的贴图 */
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_Tex);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solid, dstSet, 1, &frame->tex_ground, 0, nullptr);
-        batchIdx = 4;
-        scene.draw(cmd, piHub.piLayout_solid, batchIdx);
     }
     void createSyncObjects() {
         imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);

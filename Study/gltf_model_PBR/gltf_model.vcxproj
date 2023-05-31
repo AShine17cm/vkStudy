@@ -180,19 +180,16 @@
     <None Include="..\data\shaders\ui.frag" />
     <None Include="..\data\shaders\ui.vert" />
     <None Include="shaders\part.constants.shader" />
-    <None Include="shaders\part.pbr.frag" />
-    <None Include="shaders\part.pbr.vert" />
     <None Include="shaders\part.shadow_layers.frag" />
-    <None Include="shaders\part.shadow_single.frag" />
     <None Include="shaders\part.solid.vert" />
     <None Include="shaders\pbr.frag" />
     <None Include="shaders\pbr.vert" />
+    <None Include="shaders\point.frag" />
+    <None Include="shaders\point.vert" />
     <None Include="shaders\shadowCaster.geom" />
     <None Include="shaders\shadowCaster.vert" />
     <None Include="shaders\part.solid.frag" />
     <None Include="shaders\shadowCaster_gltf.vert" />
-    <None Include="shaders\tex.frag" />
-    <None Include="shaders\tex.vert" />
     <None Include="shaders\ui.frag" />
     <None Include="shaders\ui.vert" />
   </ItemGroup>

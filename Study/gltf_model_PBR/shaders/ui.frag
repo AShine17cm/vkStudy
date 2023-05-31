@@ -28,4 +28,5 @@ void main()
         outColor.g=texture(arraySampler,vec3(uv,1)).r*ui_ubo.debug.y;
         outColor.b=texture(arraySampler,vec3(uv,2)).r*ui_ubo.debug.z;
     }
+    //outColor=vec4(1,1,1,1);
 }

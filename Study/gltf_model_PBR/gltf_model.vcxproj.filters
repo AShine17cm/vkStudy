@@ -32,12 +32,6 @@
     <None Include="shaders\ui.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\tex.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shaders\tex.vert">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="shaders\shadowCaster.vert">
       <Filter>shaders</Filter>
     </None>
@@ -45,9 +39,6 @@
       <Filter>shaders</Filter>
     </None>
     <None Include="shaders\part.solid.vert">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shaders\part.shadow_single.frag">
       <Filter>shaders</Filter>
     </None>
     <None Include="shaders\shadowCaster.geom">
@@ -95,16 +86,16 @@
     <None Include="shaders\shadowCaster_gltf.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\part.pbr.vert">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="shaders\pbr.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\part.pbr.frag">
+    <None Include="shaders\pbr.frag">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\pbr.frag">
+    <None Include="shaders\point.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\point.vert">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

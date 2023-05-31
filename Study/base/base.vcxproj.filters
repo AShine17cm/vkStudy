@@ -99,6 +99,9 @@
     <ClCompile Include="gltfModel_pbr.cpp">
       <Filter>geo</Filter>
     </ClCompile>
+    <ClCompile Include="DebugPoints.cpp">
+      <Filter>geo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h">
@@ -187,6 +190,12 @@
     </ClInclude>
     <ClInclude Include="PerObjectData.h">
       <Filter>geo</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugPoints.h">
+      <Filter>geo</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.hpp">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

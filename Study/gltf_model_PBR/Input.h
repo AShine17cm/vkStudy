@@ -1,11 +1,16 @@
 #pragma once
 #include "GLFW/glfw3.h"
-/* 处理 键盘输入 */
+/* 处理 鼠标 键盘输入 */
 struct Input
 {
     bool flipShadows = false;
     bool displayShadowmap = true;
     int frame_op = -1;
+    /* 鼠标数据 */
+    int mb_key = -1;
+    glm::vec2 mouseStart;
+    glm::vec2 mousePre;
+    int32_t dx=0, dy=0;
 
     int opKey;
     int funcKey_;
@@ -17,6 +22,52 @@ struct Input
         auto currentTime = std::chrono::high_resolution_clock::now();
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime- startTime).count();
         float deltaTime = time - lastTime;
+        //鼠标 0-左 1-右 2-中键
+        if (mb_key==-1)
+        {
+            dx = dy = 0;
+            int mb_0 = glfwGetMouseButton(window, 0);
+            int mb_1 = glfwGetMouseButton(window, 1);
+            int mb_2 = glfwGetMouseButton(window, 2);
+            if (mb_0 == 1)
+            {
+                mb_key = 0;
+            }
+            if (mb_1 == 1)
+            {
+                mb_key = 1;
+            }
+            if (mb_2 == 1)
+            {
+                mb_key = 2;
+            }
+            if (mb_key > -1)
+            {
+                double xPos, yPos;
+                glfwGetCursorPos(window, &xPos, &yPos);
+                mouseStart = glm::vec2(xPos, yPos);
+                mousePre = mouseStart;
+                //glfwSetCursorPosCallback(window, mouse_callback);
+            }
+        }
+        else
+        {
+           int mb_state=  glfwGetMouseButton(window, mb_key);
+           if (mb_state == 0)
+           {
+               mb_key = -1;
+           }
+           else//持续按下状态
+           {
+               double xPos, yPos;
+               glfwGetCursorPos(window, &xPos, &yPos);
+               dx = (int32_t)mousePre.x - (int32_t)xPos;
+               dy = (int32_t)mousePre.y - (int32_t)yPos;
+               mousePre = glm::vec2(xPos, yPos);
+           }
+        }
+
+
         /* 检查按键 */
         opKey = -1;
         frame_op = -1;
@@ -65,4 +116,8 @@ struct Input
             break;
         }
 	}
+    void mouse_callback(GLFWwindow* window, double xPos, double yPos)
+    {
+
+    }
 };

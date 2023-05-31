@@ -32,11 +32,10 @@ layout(push_constant) uniform PushConstants
 } pushs;
 
 /* 世界坐标 计算光照向量 */
-void shade(out vec4 diff) 
+vec4 shade( ) 
 {
     vec3 N =normalize(inNormal);
-    vec3 V=scene.camera.xyz-inPos;
-    V=normalize(V);
+    vec3 V=normalize(scene.camera.xyz-inPos);
 
     /* 采样阴影-多层 */
     float shadow[LIGHT_COUNT];
@@ -57,25 +56,22 @@ void shade(out vec4 diff)
     float spec=0;
     for(int i=0;i<LIGHT_COUNT;i+=1)
     {
-        vec4  vecL=scene.lights[i].vec;
-        vec3  L=-vecL.xyz;               //平行光(指向光源)
-        float dist=0;
-        if(vecL.w>0.5)                  //点光源
+        if(i==0)
         {
-            L=vecL.xyz-inPos;
-            dist=length(L);
-            L=normalize(L);
+            vec4  vecL=scene.lights[i].vec;
+            vec3  L=vecL.xyz;               //平行光(指向光源)
+            float NdotL=max(0.0,dot(N,L));  //光照
+
+            vec3 tmp=scene.lights[i].color.rgb*(NdotL*scene.lights[i].color.a);
+            color=color+ tmp;//*shadow[i];
+            //color=color+vec3(NdotL);
+
+            vec3 R=reflect(-L,N);           //高光
+            float NdotR=max(0.0,dot(R,V));
+            spec+=pow(NdotR,16.0);//*shadow[i];
         }
-        float NdotL=max(0.0,dot(N,L));  //光照
-        vec3 tmp=scene.lights[i].color.rgb*vec3(NdotL*scene.lights[i].color.a);
-
-        color=color+ tmp*shadow[i];
-
-        vec3 R=reflect(-L,N);           //高光
-        float NdotR=max(0.0,dot(R,V));
-        spec+=pow(NdotR,16.0)*shadow[i];
     }
 
-    diff.rgb=color+spec;
-    diff.a=1.0;
+    vec3 diff=color;// vec3(spec);
+    return vec4(diff,1.0);
 }

@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
 #include "glm.hpp"
+#include "camera.hpp"
 #include "Geo.h"
+#include "Input.h"
 
 using namespace mg;
 
@@ -22,72 +24,48 @@ struct  View
 		glm::mat4 proj;
 		glm::mat4 view;
 		glm::vec4 camera;
-		glm::ivec4 debug;
+		glm::ivec4 debug = { 0,1,0,1 };
 		Light lights[LIGHT_COUNT];
 	}data;
-
-	/* 焦点 */
-	vec3 focus;
-	/* 移动范围 */
-	float baseRadius;
-	float radius;
-	vec2 range;
-	/* 水平面角 和 垂直角 <欧拉角> */
-	float hAngle;
-	float vAngle;
-	/* 加速 */
-	float acc = 1.0f;
-	int frameCount = 0;
-	int lastFrame = -1;
-
-	View(vec3 focus, float baseRadius, vec2 range, VkExtent2D extent)
+	std::vector<glm::vec4> lightPoses;
+	Camera camera;
+	View(VkExtent2D extent)
 	{
-		this->focus = focus;
-		this->baseRadius = baseRadius;
-		this->range = range;
-		/* 投影矩阵 */
-		data.proj = glm::perspective(glm::radians(45.0f), extent.width / (float)extent.height, 0.1f, 100.0f);
-		//data.proj[1][1] *= -1;
-		data.debug = { 1,1,1,1 };
-		/* 初始值 */
-		vAngle = -25;
-		hAngle = 0;
-		radius = baseRadius + (range.x + range.y) / 2;
-		radius = 11.2f;
+		camera.type = Camera::CameraType::lookat;
+		camera.setPerspective(45.0f, (float)extent.width / (float)extent.height, 0.3f, 256.0f);
+		camera.rotationSpeed = 0.25f;
+		camera.movementSpeed = 0.1f;
+		camera.setPosition({ 0.0f, 6.0f, 25.0f });
+		camera.setRotation({ -13.0f, 6.0f, 0.0f });
+
+		setup_camera();
 		setLight();
 	}
-	void setPose(float radius, float hAngle, float vAngle)
+	void setup_camera()
 	{
-		/* 钳制一些数据 */
-		if (hAngle > 360)hAngle -= 360;
-		if (hAngle < -360)hAngle += 360;
-		this->hAngle = hAngle;
-		this->vAngle = glm::clamp(vAngle, -75.0f, 75.0f);
-		this->radius = glm::clamp(radius, baseRadius + range.x, baseRadius + range.y);
-		float arcH = glm::radians(hAngle);
-		float arcV = glm::radians(vAngle);
-		/* XZ水平面上 投影半径 */
-		float projRadius = glm::cos(arcV) * radius;
-		float y = glm::sin(arcV) * radius;
-		float x = glm::sin(arcH) * projRadius;
-		float z = glm::cos(arcH) * projRadius;
-		/* 相机参数 */
-		data.camera = { x,y,z,1.0f };
-		data.view = glm::lookAt({x,y,z}, focus, { 0,1.0f,0 });
+		glm::vec3 camPos = glm::vec3(
+			-camera.position.z * sin(glm::radians(camera.rotation.y)) * cos(glm::radians(camera.rotation.x)),
+			-camera.position.z * sin(glm::radians(camera.rotation.x)),
+			camera.position.z * cos(glm::radians(camera.rotation.y)) * cos(glm::radians(camera.rotation.x))
+		);
+		data.proj = camera.matrices.perspective;
+		data.view = camera.matrices.view;
+		data.camera = glm::vec4(camPos, 1.0f);
 	}
 	/* 灯光*/
 	void setLight()
 	{
 		vec3 lightPos = { 6,-4,8 };
 		vec3 targetPos = { 0,0,0 };
-		vec3 upDir = { 0,0,1 };
+		vec3 upDir = { 0,-1,0 };
 
-		float lightFOV = 60;
-		float lightNear = 1.0f;
+		float lightFOV = 45;
+		float lightNear = 12.0f;
 		float lightFar = 100.0f;
 
 		/* 矩阵 决定了能 “看”到阴影的范围 */
 		glm::mat4 shadowProj = glm::perspective(glm::radians(lightFOV), 1.0f, lightNear, lightFar);
+		//glm::mat4 shadowProj = glm::ortho(-10.0f,200.0f,-10.0f,200.0f, lightNear, lightFar);
 		glm::mat4 shadowView;
 		glm::mat4 shadowModel = glm::mat4(1.0f);
 		glm::vec4 color;
@@ -98,72 +76,52 @@ struct  View
 			switch (i)
 			{
 			case 0:
-				lightPos = { 6,-8,-4 };
+				lightPos = { 6,8,2 };
 				color = { 1.0f,0.33f,0.33f,0.6f };
+				shadowView = glm::lookAt(lightPos, targetPos, { 0,-1,0 });
 				break;
 			case 1:
-				lightPos = { 8,-12,2 };
+				lightPos = { 12,48,0 };//ok
 				color = { 0.33f,1.0f,0.33f,0.6f };
+				shadowView = glm::lookAt(lightPos, targetPos, {0,-1,0});
 				break;
 			case 2:
-				lightPos = { 2,-8,5 };
+				lightPos = { -4,8,6 };
 				color = { 0.33f,0.33f,1.0f,0.6f };
+				shadowView = glm::lookAt(lightPos, targetPos, { 0,-1,0 });
 				break;
 			}
-			shadowView = glm::lookAt(lightPos, targetPos, upDir);
+			lightPoses.push_back(glm::vec4(lightPos,1.0));
+			//shadowView = glm::lookAt(lightPos, targetPos, upDir);
 			light.mvp = shadowProj * shadowView * shadowModel;
-			light.vec = { glm::normalize(targetPos - lightPos),0 };//平行光 方向
+			light.vec = { glm::normalize(lightPos- targetPos),0 };//平行光 方向
 			light.color = color;
 			data.lights[i] = light;
 		}
 	}
-	void update(float deltaTime, int op)
+	void update(Input* input, float deltaTime)
 	{
-		frameCount += 1;
-		float deltaHAngle = 0;
-		float deltaRadius = 0;
-		float deltaVAngle = 0;
-		float speedHAngle = 360;
-		float speedVAngle = 180;
-		float speedRadius = 50.0f;
-		/* 做加速度 */
-		if (op > 0)
+		/* 鼠标转动 */
+		int mb_key = input->mb_key;
+		int32_t dx = input->dx;
+		int32_t dy = input->dy;
+		if (mb_key > -1)
 		{
-			acc = acc + deltaTime;
-			lastFrame = frameCount;
+			//std::cout << "dx " << dx <<"dy " <<dy<< std::endl;
+			switch (mb_key)
+			{
+			case 0:
+				camera.rotate(glm::vec3(dy * camera.rotationSpeed, -dx * camera.rotationSpeed, 0.0f));
+				break;
+			case 1:
+				camera.translate(glm::vec3(-0.0f, 0.0f, dy * .2f * camera.movementSpeed));
+				break;
+			case 2:
+				camera.translate(glm::vec3(-dx * 0.01f, -dy * 0.01f, 0.0f));
+				break;
+			}
 		}
-		else if (frameCount - lastFrame > 1000)
-		{
-			acc = 1.0f;
-		}
-		acc = glm::clamp(acc, 1.0f, 2.0f) * 0.1f;
-		switch (op)
-		{
-		case 'a'://左右
-			deltaHAngle = deltaTime * speedHAngle;
-			break;
-		case 'd':
-			deltaHAngle = -deltaTime * speedHAngle;
-			break;
-		case 'w'://前后
-			deltaRadius = -deltaTime * speedRadius;
-			break;
-		case 's':
-			deltaRadius = deltaTime * speedRadius;
-			break;
-		case 'z'://上下
-			deltaVAngle = deltaTime * speedVAngle;
-			break;
-		case 'x':
-			deltaVAngle = -deltaTime * speedVAngle;
-			break;
-		default:
-			//acc = 1.0f;
-			break;
-		}
-		hAngle += deltaHAngle * acc;
-		vAngle += deltaVAngle * acc;
-		radius += deltaRadius * acc;
-		setPose(radius, hAngle, vAngle);
+		camera.update(deltaTime);
+		setup_camera();
 	}
 };

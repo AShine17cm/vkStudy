@@ -1036,6 +1036,11 @@ namespace vks
 		glm::vec3 modelTranslate = modelInfo.modelTranslate;
 		float rotate = modelInfo.roate;
 		glm::vec3 rotateAxis = modelInfo.rotateAxis;
+		// Center and scale model
+		//float scale = (1.0f / std::max(models.scene.aabb[0][0], std::max(models.scene.aabb[1][1], models.scene.aabb[2][2]))) * 0.5f;
+		//glm::vec3 translate = -glm::vec3(models.scene.aabb[3][0], models.scene.aabb[3][1], models.scene.aabb[3][2]);
+		//translate += -0.5f * glm::vec3(models.scene.aabb[0][0], models.scene.aabb[1][1], models.scene.aabb[2][2]);
+
 		//场景根节点 的缩放，平移
 		shaderValuesScene.model = glm::mat4(1.0f);
 		shaderValuesScene.model[0][0] = modelScale;

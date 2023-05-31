@@ -193,7 +193,7 @@ namespace geos
 	class GeoPlane:public Geo
 	{
 	public:
-		GeoPlane(float size, vec3 pos);
+		GeoPlane(float size, vec3 pos, vec3 normal = {0,0,1});
 	};
 
 	/*
