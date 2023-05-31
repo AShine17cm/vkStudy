@@ -28,7 +28,7 @@ layout(push_constant) uniform PushConstants
 void main() 
 {
     vec4 pos=pushs.model*vec4(inPos,1);
-    //pos.y=-pos.y;
+    pos.y=-pos.y; //gltf 的模型顶点统一翻转到 -Y轴向
     pos.xyz=pos.xyz/pos.w;
     gl_Position=vec4(pos.xyz,1.0);
 }

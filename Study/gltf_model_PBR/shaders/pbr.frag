@@ -94,41 +94,29 @@ vec3 shade( )
 
     /* 采样阴影-多层 */
     float shadow[LIGHT_COUNT];
-    //float cmb=1.0;
     for(int i=0;i<LIGHT_COUNT;i+=1)
     {
         vec4 coord=scene.lights[i].mvp* vec4(inPos,1.0);
         float layerVal=1.0;
-        //#ifdef SHADOW_PCF
         layerVal= filterPCF(coord,i);
         //layerVal= textureProj(coord,i,vec2(0));
 
         if(scene.debug[i]==0) layerVal=1.0;/* 3个光源的阴影,逐次展示，共同展示 */
         shadow[i]=layerVal;
-        //cmb=cmb*layerVal;
     }
     
     vec3 Lo=vec3(0.0);
     for(int i=0;i<LIGHT_COUNT;i+=1)
     {
-        //if(i==1)
-        {
-            vec4  vecL=scene.lights[i].vec;
-            vec3  L=vecL.xyz;               //平行光(指向光源)
-            vec3 lightColor=scene.lights[i].color.rgb*scene.lights[i].color.a;
-            //Lo=Lo+BRDF(L,V,N,pbrBasic.metallic,roughness,lightColor)*shadow[i];
-            Lo=Lo+BRDF(L,V,N,pbrBasic.metallic,roughness,lightColor);
-            //vec3 tmp= BRDF(L,V,N,pbrBasic.metallic,roughness,lightColor);
-        }
+        vec4  vecL=scene.lights[i].vec;
+        vec3  L=vecL.xyz;               //平行光(指向光源)
+        L.y=-L.y;                       //灯光 翻转到 -Y轴, 和顶点的操作一致
+        vec3 lightColor=scene.lights[i].color.rgb*scene.lights[i].color.a;
+        Lo=Lo+BRDF(L,V,N,pbrBasic.metallic,roughness,lightColor)*shadow[i];
     }
     vec3 color=pbrBasic.rgba.rgb*0.02;
     color+=Lo;
-    if(pbrBasic.rgba.a==0)
-    {
-        color=color*shadow[1];
-    }
     color=pow(color,vec3(0.4545));
-    //color=color*cmb;
     return color;
 }
 void main() 

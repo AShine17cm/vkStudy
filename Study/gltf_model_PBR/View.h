@@ -24,7 +24,7 @@ struct  View
 		glm::mat4 proj;
 		glm::mat4 view;
 		glm::vec4 camera;
-		glm::ivec4 debug = { 0,1,0,1 };
+		glm::ivec4 debug = { 1,1,1,1 };
 		Light lights[LIGHT_COUNT];
 	}data;
 	std::vector<glm::vec4> lightPoses;
@@ -60,7 +60,7 @@ struct  View
 		vec3 upDir = { 0,-1,0 };
 
 		float lightFOV = 45;
-		float lightNear = 12.0f;
+		float lightNear = 1.0f;
 		float lightFar = 100.0f;
 
 		/* 矩阵 决定了能 “看”到阴影的范围 */
@@ -71,28 +71,29 @@ struct  View
 		glm::vec4 color;
 		Light light;
 		//shadowProj[1][1] = -1;
+		/*
+		灯光设定 在 Vulkan 空间内, 顶点是否翻转，灯光方向是否需要翻转，需要根据 pbr.vert 函数确定
+		*/
+		// 灯光 在 -Y 轴上
 		for (int i = 0; i < LIGHT_COUNT; i++)
 		{
 			switch (i)
 			{
 			case 0:
-				lightPos = { 6,8,2 };
+				lightPos = { 12,-48,-24 };
 				color = { 1.0f,0.33f,0.33f,0.6f };
-				shadowView = glm::lookAt(lightPos, targetPos, { 0,-1,0 });
 				break;
 			case 1:
-				lightPos = { 12,48,0 };//ok
+				lightPos = { 0,-48,36 };
 				color = { 0.33f,1.0f,0.33f,0.6f };
-				shadowView = glm::lookAt(lightPos, targetPos, {0,-1,0});
 				break;
 			case 2:
-				lightPos = { -4,8,6 };
-				color = { 0.33f,0.33f,1.0f,0.6f };
-				shadowView = glm::lookAt(lightPos, targetPos, { 0,-1,0 });
+				lightPos = { -12,-48,0 };
+				color = { 0.33f,0.33f,1.0f,1.6f };
 				break;
 			}
 			lightPoses.push_back(glm::vec4(lightPos,1.0));
-			//shadowView = glm::lookAt(lightPos, targetPos, upDir);
+			shadowView = glm::lookAt(lightPos, targetPos, upDir);
 			light.mvp = shadowProj * shadowView * shadowModel;
 			light.vec = { glm::normalize(lightPos- targetPos),0 };//平行光 方向
 			light.color = color;

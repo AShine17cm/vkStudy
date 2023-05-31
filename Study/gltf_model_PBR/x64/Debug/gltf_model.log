@@ -21,5 +21,4 @@ E:\VulkanProj\vkStudy\Study\gltf_model_PBR\Frame.h(110,1): warning C4267: “参
 E:\VulkanProj\vkStudy\Study\gltf_model_PBR\Frame.h(112,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\gltf_model_PBR\test_gltf_Model.cpp(164,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\gltf_model_PBR\test_gltf_Model.cpp(211,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-LINK : warning LNK4098: 默认库“MSVCRT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
   gltf_model.vcxproj -> E:\VulkanProj\vkStudy\Study\gltf_model_PBR\gltf_model_PBR.exe

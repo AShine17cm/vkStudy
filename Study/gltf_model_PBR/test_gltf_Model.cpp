@@ -307,7 +307,7 @@ private:
         scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 0);
         scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 1);
         scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 2);
-        //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 3);
+        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 3);
     }
     /* ui */
     void drawUI(VkCommandBuffer cmd, Frame* frame)

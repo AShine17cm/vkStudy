@@ -34,7 +34,7 @@ struct  Scene
 		glm::ivec4 debug;
 	}ui;
 	geos::PbrBasic pbrBasic = { {1,1,1,1},0.6f,0.3f };					//roughtness,metallic
-	geos::PbrBasic pbrBasic_bg = { {0.6f,0.4f,0.2f,0},0.95f,0.05f };	//roughtness,metallic
+	geos::PbrBasic pbrBasic_bg = { {0.7f,0.6f,0.5f,1},0.7f,0.15f };	//roughtness,metallic
 
 	vks::gltfModel_pbr* helmet;
 	vks::gltfModel_pbr* armor;
@@ -68,7 +68,7 @@ struct  Scene
 		ui.pts[6 + 4] = ui.pts[6 + 1];
 		ui.pts[6 + 5] = ui.pts[6 + 0];
 
-		ui.debug = { 0,1,0,1 };
+		ui.debug = { 1,1,1,1 };
 		/* 相机控制 */
 		view = new View(extent);
 		//gltf 模型信息
@@ -213,7 +213,7 @@ struct  Scene
 	/* 更新-UBO 资源 */
 	void update(Frame* pFrame, uint32_t imageIndex, float time, float deltaTime)
 	{
-		if (input->flipShadows&&false) //3个光源的阴影,逐次展示，共同展示
+		if (input->flipShadows) //3个光源的阴影,逐次展示，共同展示
 		{
 			input->flipShadows = false;
 			flipCounter = (flipCounter + 1) % 4;
