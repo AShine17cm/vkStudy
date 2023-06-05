@@ -1,7 +1,7 @@
 #pragma once
 
 #define SHADOWMAP_DIM 2048
-#define LIGHT_COUNT 3
+#define LIGHT_COUNT 1
 
 #define countUI  2
 #define WIDTH 1000

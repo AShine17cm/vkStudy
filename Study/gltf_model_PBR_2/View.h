@@ -10,7 +10,6 @@ using namespace mg;
 /*
 	相机-灯光,	输入-控制
 */
-#define LIGHT_COUNT 3
 struct  View
 {
 	struct Light
@@ -80,16 +79,8 @@ struct  View
 			switch (i)
 			{
 			case 0:
-				lightPos = { 12,-48,-24 };
-				color = { 1.0f,0.33f,0.33f,0.6f };
-				break;
-			case 1:
-				lightPos = { 0,-48,36 };
-				color = { 0.33f,1.0f,0.33f,0.6f };
-				break;
-			case 2:
-				lightPos = { -12,-48,0 };
-				color = { 0.33f,0.33f,1.0f,1.6f };
+				lightPos = { -12,-48,24 };
+				color = { 1.0f,1.0f,0.9f,0.9f };
 				break;
 			}
 			lightPoses.push_back(glm::vec4(lightPos,1.0));

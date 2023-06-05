@@ -116,10 +116,6 @@ struct  Scene
 		geos::DebugPoints::Point pt;
 		pt = { glm::mat4(1.0),view->lightPoses[0],{1,0,0,18} };
 		dxPoint.addPoint(pt);
-		pt = { glm::mat4(1.0),view->lightPoses[1],{0,1,0,18} };
-		dxPoint.addPoint(pt);
-		pt = { glm::mat4(1.0),view->lightPoses[2],{0,0,1,18} };
-		dxPoint.addPoint(pt);
 	}
 	void prepareStep2(VkDescriptorPool descriptorPool, VkRenderPass renderPass,std::vector<Frame>* frames)
 	{
