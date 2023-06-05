@@ -23,6 +23,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <gli.hpp>
+
 #include <glm/gtx/string_cast.hpp>
 
 // ERROR is already defined in wingdi.h and collides with a define in the Draco headers

@@ -1,0 +1,5 @@
+将 你安装的 vulkan版本的  include 文件夹的内容 	拷贝到 此		vulkan文件夹下面
+比如 C:\VulkanSDK\1.3.216.0\Include
+
+将 你安装的 vulkan版本的  Lib文件夹的内容 	拷贝到 此		vulkan_Lib文件夹下面
+比如 C:\VulkanSDK\1.3.216.0\Lib

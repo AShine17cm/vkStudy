@@ -73,18 +73,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>.</OutDir>
+    <IncludePath>$(SolutionDir)VkLibraries\vulkan;$(SolutionDir)VkLibraries\glm\glm;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\include;$(SolutionDir)base;$(SolutionDir)VkLibraries\stb-master;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)x64\Debug;$(SolutionDir)VkLibraries\vulkan_Lib;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>.</OutDir>
+    <IncludePath>$(SolutionDir)VkLibraries\vulkan;$(SolutionDir)VkLibraries\glm\glm;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\include;$(SolutionDir)base;$(SolutionDir)VkLibraries\stb-master;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)x64\Debug;$(SolutionDir)VkLibraries\vulkan_Lib;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>.</OutDir>
+    <IncludePath>$(SolutionDir)VkLibraries\vulkan;$(SolutionDir)VkLibraries\glm\glm;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\include;$(SolutionDir)base;$(SolutionDir)VkLibraries\stb-master;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)x64\Debug;$(SolutionDir)VkLibraries\vulkan_Lib;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>.</OutDir>
+    <IncludePath>$(SolutionDir)VkLibraries\vulkan;$(SolutionDir)VkLibraries\glm\glm;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\include;$(SolutionDir)base;$(SolutionDir)VkLibraries\stb-master;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)x64\Debug;$(SolutionDir)VkLibraries\vulkan_Lib;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -92,14 +100,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\VulkanProj\vkStudy\VkLibraries\stb-master;E:\VulkanProj\vkStudy\Study\x64\Debug;E:\VulkanProj\vkStudy\Study\base;E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\include;E:\VulkanProj\vkStudy\VkLibraries\glm\glm;C:\VulkanSDK\1.3.216.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\lib-vc2019;C:\VulkanSDK\1.3.216.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;base.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -110,7 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\VulkanProj\vkStudy\VkLibraries\stb-master;E:\VulkanProj\vkStudy\Study\x64\Debug;E:\VulkanProj\vkStudy\Study\base;E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\include;E:\VulkanProj\vkStudy\VkLibraries\glm\glm;C:\VulkanSDK\1.3.216.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -118,8 +126,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\lib-vc2019;C:\VulkanSDK\1.3.216.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;base.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -128,14 +136,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\VulkanProj\vkStudy\VkLibraries\stb-master;E:\VulkanProj\vkStudy\Study\x64\Debug;E:\VulkanProj\vkStudy\Study\base;E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\include;E:\VulkanProj\vkStudy\VkLibraries\glm\glm;C:\VulkanSDK\1.3.216.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\lib-vc2019;C:\VulkanSDK\1.3.216.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;base.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,7 +154,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\VulkanProj\vkStudy\VkLibraries\stb-master;E:\VulkanProj\vkStudy\Study\x64\Debug;E:\VulkanProj\vkStudy\Study\base;E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\include;E:\VulkanProj\vkStudy\VkLibraries\glm\glm;C:\VulkanSDK\1.3.216.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -154,8 +162,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\VulkanProj\vkStudy\VkLibraries\glfw-3.3.7.bin.WIN64\lib-vc2019;C:\VulkanSDK\1.3.216.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;base.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
