@@ -11,6 +11,7 @@
 
 #include "VulkanglTFModel.h"
 #include "gltfModel_pbr.h"
+#include "PbrEnv.h"
 
 #include "DebugPoints.h"
 
@@ -34,12 +35,15 @@ struct  Scene
 		glm::ivec4 debug;
 	}ui;
 	geos::PbrBasic pbrBasic = { {1,1,1,1},0.6f,0.3f };					//roughtness,metallic
-	geos::PbrBasic pbrBasic_bg = { {0.7f,0.6f,0.5f,1},0.7f,0.15f };	//roughtness,metallic
+	geos::PbrBasic pbrBasic_bg = { {0.7f,0.6f,0.5f,1},0.7f,0.15f };		//roughtness,metallic
 
+	PbrEnv* env;
 	vks::gltfModel_pbr* helmet;
 	vks::gltfModel_pbr* ship;
 	vks::gltfModel_pbr* dinosaur;
 	vks::gltfModel_pbr* landscape;
+
+	geos::gltfPbrRender_spec* dinoRender;
 
 	geos::DebugPoints dxPoint;
 
@@ -76,42 +80,44 @@ struct  Scene
 		//gltf 模型信息
 		vks::gltfModel_pbr::ModelInfo helmetInfo = {
 			"../data/models/DamagedHelmet/glTF-Embedded/DamagedHelmet.gltf",
-			"../data/models/Box/glTF-Embedded/Box.gltf",
-			"../data/textures/empty.ktx",
-			"../data/environments/papermill.ktx",
 			1.6f,
 			{0,3.5f,6}
 		};
 		vks::gltfModel_pbr::ModelInfo shipInfo = {
 			"../models/ship.glb",
-			"../models/deferred_box.gltf",
-			"../data/textures/empty.ktx",
-			"../data/environments/papermill.ktx",
-			3.0f,
-			{0,3,0},
-			60,
-			{0,1,0}
+			3.0f,	{0,3,0},
+			60,	{0,1,0}
 		};
 		vks::gltfModel_pbr::ModelInfo dinosaurInfo = {
 			"../models/Rampaging T-Rex.glb",
-			"../models/deferred_box.gltf",
-			"../data/textures/empty.ktx",
-			"../data/environments/papermill.ktx",
 			1.0f,
-			{9,3.2f,0}
+			{9,3.2f,0},
+			15,	{0,1,0}
 		};
 		vks::gltfModel_pbr::ModelInfo landscapeInfo = {
 			"../models/island.glb",
-			"../models/deferred_box.gltf",
-			"../data/textures/empty.ktx",
-			"../data/environments/papermill.ktx",
 			1.0f,
 			{0,0.0f,0}
 		};
-		helmet = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, helmetInfo);
-		ship = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, shipInfo);
-		dinosaur = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, dinosaurInfo);
-		landscape = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount, landscapeInfo);
+
+		//环境照明
+		env = new PbrEnv(vulkanDevice,
+			"../data/textures/empty.ktx",
+			"../data/environments/papermill.ktx",
+			"../data/models/Box/glTF-Embedded/Box.gltf");
+
+		//baseColor+ metallicRoughness+ emissive+ normal+ oc
+		helmet = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, helmetInfo);
+
+		//normal+oc+specGloss+diffuse
+		ship = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, shipInfo);//2个材质
+		dinosaur = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, dinosaurInfo);
+		//第二个材质 specGloss+diffuse		第三个材质 oc+specGloss+diffuse
+		landscape = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, landscapeInfo);
+		//高光流
+		dinosaur->pushConstBlockMaterial.workflow = 1;
+		ship->pushConstBlockMaterial.workflow = 1;
+		landscape->pushConstBlockMaterial.workflow = 1;
 
 		geos::DebugPoints::Point pt;
 		pt = { glm::mat4(1.0),view->lightPoses[0],{1,0,0,18} };
@@ -128,11 +134,15 @@ struct  Scene
 		landscape->setup(descriptorPool);
 		landscape->preparePipelines(renderPass);
 
+		//获取渲染参数
+		dinoRender = new geos::gltfPbrRender_spec();
+		dinosaur->getSpecRender(dinoRender);
+
 		dxPoint.prepare(vulkanDevice, renderPass);
 		//添加 一个albedo 用于着色//恐龙
 		for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
-			VkDescriptorImageInfo descriptor= dinosaur->models.scene.textures[0].descriptor;
+			VkDescriptorImageInfo descriptor= dinosaur->scene.textures[0].descriptor;
 			(*frames)[i].add_pbrAlbedo(vulkanDevice->logicalDevice, descriptor);
 		}
 	}
@@ -155,7 +165,7 @@ struct  Scene
 			gltf = landscape;
 			break;
 		}
-		vkglTF::Model& model = gltf->models.scene;
+		vkglTF::Model& model = gltf->scene;
 		VkDeviceSize offsets[1] = { 0 };
 		/* 顶点，三角面数据 */
 		vkCmdBindVertexBuffers(cmd, 0, 1, &model.vertices.buffer, offsets);
@@ -198,7 +208,7 @@ struct  Scene
 			break;
 		}
 
-		vkglTF::Model& model = gltf->models.scene;
+		vkglTF::Model& model = gltf->scene;
 		VkDeviceSize offsets[1] = { 0 };
 		vkCmdBindVertexBuffers(cmd, 0, 1, &model.vertices.buffer, offsets);
 		vkCmdBindIndexBuffer(cmd, model.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
@@ -296,9 +306,12 @@ struct  Scene
 	{
 		dxPoint.clean();
 
+		env->clean();
+
 		helmet->clean();
 		ship->clean();
 		dinosaur->clean();
 		landscape->clean();
+
 	}
 };

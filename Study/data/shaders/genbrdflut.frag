@@ -16,7 +16,7 @@ float random(vec2 co)
 	float sn= mod(dt,3.14);
 	return fract(sin(sn) * c);
 }
-
+//半球上的样本点,用于Lookup Texture		均匀分布 会加剧采样
 vec2 hammersley2d(uint i, uint N) 
 {
 	// Radical inverse based on http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
@@ -56,16 +56,17 @@ float G_SchlicksmithGGX(float dotNL, float dotNV, float roughness)
 	float GV = dotNV / (dotNV * (1.0 - k) + k);
 	return GL * GV;
 }
-
+//行-粗糙度  列-视线的角度变化
 vec2 BRDF(float NoV, float roughness)
 {
 	// Normal always points along z-axis for the 2D lookup 
-	const vec3 N = vec3(0.0, 0.0, 1.0);
-	vec3 V = vec3(sqrt(1.0 - NoV*NoV), 0.0, NoV);
+	const vec3 N = vec3(0.0, 0.0, 1.0);				//法线方向 TBN 空间的 Z ?
+	vec3 V = vec3(sqrt(1.0 - NoV*NoV), 0.0, NoV);	//还原视线方向
 
 	vec2 LUT = vec2(0.0);
-	for(uint i = 0u; i < NUM_SAMPLES; i++) {
-		vec2 Xi = hammersley2d(i, NUM_SAMPLES);
+	for(uint i = 0u; i < NUM_SAMPLES; i++) 
+	{
+		vec2 Xi = hammersley2d(i, NUM_SAMPLES);				//在半球上 分布 NUM_SAMPLES 个采样点
 		vec3 H = importanceSample_GGX(Xi, roughness, N);
 		vec3 L = 2.0 * dot(V, H) * H - V;
 

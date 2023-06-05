@@ -2,11 +2,14 @@
 //#extension GL_KHR_vulkan_glsl:enable
 #include "part.constants.shader"
 #include "part.shadow_layers.frag"
+#include "part.pbr.frag"
 
-layout(location = 0) in vec3 inUV;
-layout(location = 1) in vec3 inNormal;      //大部分时候 World-Space
-layout(location = 2) in vec3 inPos;
-layout(location = 3) in vec3 inColor;
+//World-Space
+layout(location = 0) in vec3 inPos;
+layout(location = 1) in vec3 inNormal;      
+layout(location = 2) in vec2 inUV;
+layout(location = 3) in vec2 inUV1;
+layout(location = 4) in vec4 inColor;
 
 layout(location = 0) out vec4 outColor;
 
@@ -37,6 +40,8 @@ layout(set=1,binding=0) uniform PbrBasic
 	float debugViewEquation;
 
 }pbrBasic;
+
+
 #define ALBEDO vec3(pbrBasic.rgba.rgb)
 
 //法线分布 Normal Distribution
@@ -108,7 +113,6 @@ vec3 shade( )
         vec4 coord=scene.lights[i].mvp* vec4(inPos,1.0);
         float layerVal=1.0;
         layerVal= filterPCF(coord,i);
-        //layerVal= textureProj(coord,i,vec2(0));
 
         if(scene.debug[i]==0) layerVal=1.0;/* 3个光源的阴影,逐次展示，共同展示 */
         shadow[i]=layerVal;

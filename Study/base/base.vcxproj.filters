@@ -102,6 +102,12 @@
     <ClCompile Include="DebugPoints.cpp">
       <Filter>geo</Filter>
     </ClCompile>
+    <ClCompile Include="PbrEnv.cpp">
+      <Filter>geo</Filter>
+    </ClCompile>
+    <ClCompile Include="PerObjectData.cpp">
+      <Filter>geo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h">
@@ -196,6 +202,9 @@
     </ClInclude>
     <ClInclude Include="camera.hpp">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PbrEnv.h">
+      <Filter>geo</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

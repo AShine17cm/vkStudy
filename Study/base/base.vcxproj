@@ -181,6 +181,8 @@
     <ClCompile Include="GeoSquarePillar.cpp" />
     <ClCompile Include="gltfModel_pbr.cpp" />
     <ClCompile Include="mipmaps.cpp" />
+    <ClCompile Include="PbrEnv.cpp" />
+    <ClCompile Include="PerObjectData.cpp" />
     <ClCompile Include="pipelines.cpp" />
     <ClCompile Include="renderpasses.cpp" />
     <ClCompile Include="shaders.cpp" />
@@ -209,6 +211,7 @@
     <ClInclude Include="macros.h" />
     <ClInclude Include="mg.h" />
     <ClInclude Include="mipmaps.h" />
+    <ClInclude Include="PbrEnv.h" />
     <ClInclude Include="PerObjectData.h" />
     <ClInclude Include="pipelines.h" />
     <ClInclude Include="renderpasses.h" />

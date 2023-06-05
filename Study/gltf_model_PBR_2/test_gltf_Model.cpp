@@ -283,13 +283,14 @@ private:
             dstSet = 1;
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_pbr_basic);
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbrBasic_bg, 0, nullptr);
-            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 3);
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 3);//º£µº
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbrBasic, 0, nullptr);
-            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 2);
-            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 1);
+            //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 2);
+            //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 1);
 
-            scene.draw_gltf(cmd,imageIndex,0);
-            //scene.draw_gltf(cmd, imageIndex,2);
+            scene.draw_gltf(cmd,imageIndex,0);//Í·¿ø
+            scene.draw_gltf(cmd, imageIndex, 1);//·ÉÍ§
+            scene.draw_gltf(cmd, imageIndex,2);//¿ÖÁú
 
             drawUI(cmd, frame);
             vkCmdEndRenderPass(cmd);

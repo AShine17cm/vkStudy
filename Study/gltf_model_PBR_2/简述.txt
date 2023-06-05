@@ -1,0 +1,14 @@
+辉度图		irradiance cube	64像素，32*4
+输入一个方向( N 世界坐标近似 )	半球卷积采样  方位角+天顶角 (360度/180+90度/64)   卷积采样 cube
+
+预过滤贴图 	prefilterEnv	512像素
+粗糙度 		对应 mipmap 的等级	采样数 32
+
+离屏 渲染  帧大小=64,512
+对每一级别的mip，cube的每一个面 都来一次
+
+
+brdf lut		brdf look-up-texture		512像素
+离屏渲染的 frame-buffer 就是 这个texture
+
+

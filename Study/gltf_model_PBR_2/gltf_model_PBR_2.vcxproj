@@ -188,10 +188,11 @@
     <None Include="..\data\shaders\ui.frag" />
     <None Include="..\data\shaders\ui.vert" />
     <None Include="shaders\part.constants.shader" />
+    <None Include="shaders\part.pbr.frag" />
     <None Include="shaders\part.shadow_layers.frag" />
-    <None Include="shaders\pbr_albedo.frag" />
     <None Include="shaders\pbr_basic.frag" />
     <None Include="shaders\pbr_basic.vert" />
+    <None Include="shaders\pbr_ibl.frag" />
     <None Include="shaders\point.frag" />
     <None Include="shaders\point.vert" />
     <None Include="shaders\shadowCaster.geom" />

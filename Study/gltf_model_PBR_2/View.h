@@ -35,7 +35,7 @@ struct  View
 		camera.rotationSpeed = 0.25f;
 		camera.movementSpeed = 0.1f;
 		camera.setPosition({ 0.0f, 6.0f, 25.0f });
-		camera.setRotation({ -13.0f, 6.0f, 0.0f });
+		camera.setRotation({ -8.0f, -21.0f, 0.0f });
 
 		setup_camera();
 		setLight();
@@ -69,7 +69,6 @@ struct  View
 		glm::mat4 shadowModel = glm::mat4(1.0f);
 		glm::vec4 color;
 		Light light;
-		//shadowProj[1][1] = -1;
 		/*
 		灯光设定 在 Vulkan 空间内, 顶点是否翻转，灯光方向是否需要翻转，需要根据 pbr.vert 函数确定
 		*/

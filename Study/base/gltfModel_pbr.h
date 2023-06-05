@@ -3,6 +3,8 @@
 #include "VulkanTexture.hpp"
 #include "Buffer.h"
 #include "saBuffer.h"
+#include "PbrEnv.h"
+#include "PerObjectData.h"
 
 namespace vks 
 {
@@ -11,13 +13,11 @@ namespace vks
 		mg::VulkanDevice* vulkanDevice;
 		VkDevice device;
 		VkPipelineCache pipelineCache = VK_NULL_HANDLE;
+		PbrEnv* env;
 
 		struct ModelInfo
 		{
 			std::string sceneFile;	//模型文件
-			std::string skyFile;
-			std::string emptyFile;
-			std::string envMapFile;
 			float modelScale = 1.0f;
 			glm::vec3 modelTranslate = { 0,0,0 };
 			float roate = 0;
@@ -25,18 +25,7 @@ namespace vks
 
 		}modelInfo;
 
-		struct Textures {
-			vks::TextureCubeMap environmentCube;
-			vks::Texture2D empty;
-			vks::Texture2D lutBrdf;
-			vks::TextureCubeMap irradianceCube;
-			vks::TextureCubeMap prefilteredCube;
-		} textures;
-
-		struct Models {
-			vkglTF::Model scene;
-			vkglTF::Model skybox;
-		} models;
+		vkglTF::Model scene;
 
 		struct UniformBufferSet {
 			vks::saBuffer scene;
@@ -65,7 +54,6 @@ namespace vks
 
 		struct Pipelines
 		{
-			VkPipeline skybox;
 			VkPipeline pbr;
 			VkPipeline pbrDoubleSided;
 			VkPipeline pbrAlphaBlend;
@@ -78,11 +66,7 @@ namespace vks
 			VkDescriptorSetLayout node;
 		} descriptorSetLayouts;
 
-		struct DescriptorSets {
-			VkDescriptorSet scene;
-			VkDescriptorSet skybox;
-		};
-		std::vector<DescriptorSets> descriptorSets;
+		std::vector<VkDescriptorSet> descSet_Scene;
 		std::vector<UniformBufferSet> uniformBuffers;
 
 		enum PBRWorkflows { PBR_WORKFLOW_METALLIC_ROUGHNESS = 0, PBR_WORKFLOW_SPECULAR_GLOSINESS = 1 };
@@ -104,16 +88,14 @@ namespace vks
 			float alphaMaskCutoff;
 		} pushConstBlockMaterial;
 
-		gltfModel_pbr(mg::VulkanDevice* vulkanDevice,uint32_t swapchainImgCount,ModelInfo modelInfo);
+		gltfModel_pbr(mg::VulkanDevice* vulkanDevice,uint32_t swapchainImgCount,PbrEnv* env, ModelInfo modelInfo);
 		void setup(VkDescriptorPool pool);
 		void clean();
+		void getSpecRender(geos::gltfPbrRender_spec* render);
 		void renderNode(VkCommandBuffer cmd, vkglTF::Node* node, uint32_t cbIndex, vkglTF::Material::AlphaMode alphaMode);
 		//管线提前绑定
 		void renderNode_ByXPipe(VkCommandBuffer cmd,vkglTF::Node* node, VkPipelineLayout pipeLayout, VkPipelineStageFlags stageFlags,vkglTF::Material::AlphaMode alphaMode);
 		void load_gltf();
-		void loadEnvironment();
-		void generateBRDFLUT();
-		void generateCubemaps();
 		void prepareUniformBuffers();
 		void updateUniformBuffers(uint32_t currentBuffer,glm::mat4 proj, glm::mat4 view, glm::vec3 camPos);
 		void setupDescriptors(VkDescriptorPool descriptorPool);

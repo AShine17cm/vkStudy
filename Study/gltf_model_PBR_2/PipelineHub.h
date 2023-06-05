@@ -142,7 +142,7 @@ struct PipelineHub
 		shaderStages = { VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_FRAGMENT_BIT };
 		shaderFiles = { "shaders/pbr_basic.vert.spv", "shaders/pbr_basic.frag.spv" };
 		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_pbrBasic, &pi_pbr_basic,&vertexInputSCI_gltf);
-		shaderFiles = { "shaders/pbr_basic.vert.spv", "shaders/pbr_albedo.frag.spv" };
+		shaderFiles = { "shaders/pbr_basic.vert.spv", "shaders/pbr_ibl.frag.spv" };
 		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_pbrAlbedo, &pi_pbr_albedo, &vertexInputSCI_gltf);
 	}
 	/* 根据 shader 创建 pipeline */

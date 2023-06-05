@@ -9,10 +9,11 @@ layout (location = 4) in vec4 inJoint0;
 layout (location = 5) in vec4 inWeight0;
 layout (location = 6) in vec4 inColor0;
 
-layout(location=0)out vec3 uv;
+layout(location=0)out vec3 posWS;
 layout(location=1)out vec3 normal;
-layout(location=2)out vec3 posWS;
-layout(location=3)out vec3 outColor;
+layout(location=2)out vec2 uv;
+layout(location=3)out vec2 uv1;
+layout(location=4)out vec4 outColor;
 
 struct Light{ mat4 mvp;vec4 vec;vec4 color;  };
 layout(set=0,binding=0) uniform UniformObjectData
@@ -32,11 +33,13 @@ layout(push_constant) uniform PushConstants
 
 void main() 
 {
-    uv=vec3(inUV0,pushs.tex.w);
+    uv=inUV0;
+    uv1=inUV1;
+    outColor=inColor0;
+
     normal=normalize(transpose(inverse(mat3(pushs.model)))*inNormal);
     vec4 pos=pushs.model*vec4(inPos,1.0);
     pos.y=-pos.y;
     posWS=pos.xyz/pos.w;
-    outColor=vec3(1);
     gl_Position=scene.proj * scene.view * vec4(posWS,1.0);
 }
