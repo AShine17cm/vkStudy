@@ -12,7 +12,7 @@ layout (location = 6) in vec4 inColor0;
 layout(location=0)out vec3 uv;
 layout(location=1)out vec3 normal;
 layout(location=2)out vec3 posWS;
-//layout(location=3)out vec3 outColor;
+layout(location=3)out vec3 outColor;
 
 struct Light{ mat4 mvp;vec4 vec;vec4 color;  };
 layout(set=0,binding=0) uniform UniformObjectData
@@ -33,6 +33,7 @@ layout(push_constant) uniform PushConstants
 void main() 
 {
     uv=vec3(inUV0,pushs.tex.w);
+	outColor=inColor0.rgb;
     normal=normalize(transpose(inverse(mat3(pushs.model)))*inNormal);
     vec4 pos=pushs.model*vec4(inPos,1.0);
     pos.y=-pos.y;

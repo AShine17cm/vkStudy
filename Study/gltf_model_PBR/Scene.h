@@ -130,12 +130,6 @@ struct  Scene
 		landscape->preparePipelines(renderPass);
 
 		dxPoint.prepare(vulkanDevice, renderPass);
-		//添加 一个albedo 用于着色//恐龙
-		for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-		{
-			VkDescriptorImageInfo descriptor= dinosaur->scene.textures[0].descriptor;
-			(*frames)[i].add_pbrAlbedo(vulkanDevice->logicalDevice, descriptor);
-		}
 	}
 	/* 画一个 gltf 模型 */
 	void draw_gltf(VkCommandBuffer cmd, uint32_t cmd_idx, int modelIdx)

@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "mipmaps.h"
 //#include "textures.h"
+#include <algorithm>
 
 //µÚÈý·½¿â
 #define STB_IMAGE_IMPLEMENTATION

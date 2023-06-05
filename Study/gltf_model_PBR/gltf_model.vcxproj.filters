@@ -89,9 +89,6 @@
     <None Include="shaders\point.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\pbr_albedo.frag">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="shaders\shadowCaster.geom">
       <Filter>shaders</Filter>
     </None>
