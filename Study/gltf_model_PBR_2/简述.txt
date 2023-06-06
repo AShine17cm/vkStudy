@@ -18,3 +18,13 @@ brdf lut		brdf look-up-texture		512像素
 
 高光流			纹理+高光		在 gltf 材质的 extension中
 
+MSAA (用 Subpass 来做 )	片上缓存 		额外的两个 渲染目标可以设定为 VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT
+第一个 Color Attachment	渲染目标 		(可用片上高速缓存代替)
+第二个 Color Attachment	渲染目标		将第一个 Color Attachment 的 resolve 目标
+Depth 照搬 Color的流程
+
+
+MSAA 是 RenderPass 层级	
+影响到	RenderPass 中	所有执行的 GraphicsPipeline ( 需要设定状态 MultiSample StateCreateInfo 的  rasterizationSamples )
+如果某个	Pipeline	未设定正确的  MultiSample  图像位置就会出现 奇怪的漂移 和 遮挡关系
+

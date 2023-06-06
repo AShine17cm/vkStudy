@@ -8,13 +8,14 @@ namespace vks
 	/*	imageCount 做初始化
 		后续的 buffer索引需要走 imageIndex
 	*/
-	gltfModel_pbr::gltfModel_pbr(mg::VulkanDevice* vulkanDevice,uint32_t swapchainImgCount,PbrEnv* env, gltfModel_pbr::ModelInfo modelInfo)
+	gltfModel_pbr::gltfModel_pbr(mg::VulkanDevice* vulkanDevice,uint32_t swapchainImgCount,PbrEnv* env, gltfModel_pbr::ModelInfo modelInfo,bool msaa)
 	{
 		this->vulkanDevice = vulkanDevice;
 		this->device = vulkanDevice->logicalDevice;
 		this->modelInfo = modelInfo;
 		this->env = env;
 		this->shaderValuesParams.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
+		this->msaa = msaa;
 
 		uniformBuffers.resize(swapchainImgCount);
 		descSet_Scene.resize(swapchainImgCount);
@@ -518,10 +519,10 @@ namespace vks
 		VkPipelineMultisampleStateCreateInfo multisampleStateCI{};
 		multisampleStateCI.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 		multisampleStateCI.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-		//if (settings.multiSampling) 
-		//{
-		//	multisampleStateCI.rasterizationSamples = settings.sampleCount;
-		//}
+		if (msaa) 
+		{
+			multisampleStateCI.rasterizationSamples = VK_SAMPLE_COUNT_4_BIT;
+		}
 
 		std::vector<VkDynamicState> dynamicStateEnables = {
 			VK_DYNAMIC_STATE_VIEWPORT,
@@ -582,11 +583,6 @@ namespace vks
 		pipelineCI.pDynamicState = &dynamicStateCI;
 		pipelineCI.stageCount = static_cast<uint32_t>(shaderStages.size());
 		pipelineCI.pStages = shaderStages.data();
-
-		//if (settings.multiSampling) 
-		//{
-		//	multisampleStateCI.rasterizationSamples = settings.sampleCount;
-		//}
 
 		// PBR pipeline
 		shaderStages = {

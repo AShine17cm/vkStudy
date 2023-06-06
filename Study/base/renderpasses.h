@@ -31,5 +31,14 @@ namespace renderpasses
 		VkRenderPass* renderPass,
 		VkSampleCountFlagBits SAMPLE_COUNT = VK_SAMPLE_COUNT_1_BIT
 	);
+
+	//创建 只有一个color attachment的render-pass
+	void createRenderPass_MSAA(
+		VkFormat format,
+		VkFormat depthFromat,
+		VkDevice device,
+		VkRenderPass* renderPass,
+		VkSampleCountFlagBits SAMPLE_COUNT = VK_SAMPLE_COUNT_4_BIT
+	);
 }
 }

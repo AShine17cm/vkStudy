@@ -22,7 +22,7 @@ namespace geos
 		uint32_t size = sizeof(DebugPoints::Point);
 		std::vector<Point> points;
 
-		void prepare(mg::VulkanDevice* vulkanDevice,VkRenderPass renderPass);
+		void prepare(mg::VulkanDevice* vulkanDevice,VkRenderPass renderPass,bool msaa=false);
 		void draw(VkCommandBuffer cmd,glm::mat4 mvp);
 		void addPoint(Point point);
 		void clean();

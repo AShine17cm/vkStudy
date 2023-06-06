@@ -1,2 +1,3 @@
-﻿  gltfModel_pbr.cpp
+﻿  DebugPoints.cpp
+E:\VulkanProj\vkStudy\Study\base\DebugPoints.cpp(118,54): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
   base.vcxproj -> E:\VulkanProj\vkStudy\Study\x64\Debug\base.lib

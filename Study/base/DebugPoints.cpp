@@ -11,7 +11,7 @@
 */
 namespace geos 
 {
-	void DebugPoints::prepare(mg::VulkanDevice* vulkanDevice,VkRenderPass renderPass)
+	void DebugPoints::prepare(mg::VulkanDevice* vulkanDevice,VkRenderPass renderPass,bool msaa)
 	{
 		this->vulkanDevice = vulkanDevice;
 		this->device = vulkanDevice->logicalDevice;
@@ -103,7 +103,10 @@ namespace geos
 		multisampleSCI.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 		multisampleSCI.flags = 0;
 		//multisampleSCI.sampleShadingEnable = VK_FALSE;
-
+		if (msaa)
+		{
+			multisampleSCI.rasterizationSamples = VK_SAMPLE_COUNT_4_BIT;
+		}
 		//Dynamic State
 		std::vector<VkDynamicState> dynamicStates = {
 			VK_DYNAMIC_STATE_VIEWPORT,

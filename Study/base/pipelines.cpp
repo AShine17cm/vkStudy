@@ -126,7 +126,8 @@ namespace mg
 					viewportSCI.pNext = extends[i];
 					break;
 				case MgPipelineEx::Multisample:
-					pipelineCI.pMultisampleState = (VkPipelineMultisampleStateCreateInfo*)extends[i];
+					//pipelineCI.pMultisampleState = (VkPipelineMultisampleStateCreateInfo*)extends[i];
+					multisampleSCI.rasterizationSamples = VK_SAMPLE_COUNT_4_BIT;
 					break;
 				case MgPipelineEx::DynamicState:
 					pipelineCI.pDynamicState = (VkPipelineDynamicStateCreateInfo*)extends[i];

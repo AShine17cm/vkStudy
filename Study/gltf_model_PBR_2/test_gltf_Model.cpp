@@ -181,6 +181,7 @@ private:
         VkPhysicalDeviceFeatures deviceFeatures{};
         deviceFeatures.geometryShader = VK_TRUE;
         deviceFeatures.samplerAnisotropy = VK_TRUE;
+        //deviceFeatures.sampleRateShading = VK_TRUE;
         deviceFeatures.wideLines = VK_TRUE;
         vulkanDevice = new mg::VulkanDevice(physicalDevice);
         vulkanDevice->createLogicalDevice(deviceFeatures, deviceExtensions, nullptr);//queueCI, command-pool
@@ -251,7 +252,7 @@ private:
 
         MG_CHECK_RESULT(vkBeginCommandBuffer(cmd, &beginInfo));
 
-        std::array<VkClearValue, 2> clears{};
+        std::array<VkClearValue, 3> clears{};
 
         Frame* frame = &frames[currentFrame];
         uint32_t dstSet = 0;    //场景矩阵 信息
@@ -272,9 +273,10 @@ private:
         if (true) 
         {
             clears[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
-            clears[1].depthStencil = { 1.0f,0 };
+            clears[1].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+            clears[2].depthStencil = { 1.0f,0 };
             /* 正常渲染 */
-            mg::batches::BeginRenderpass(cmd,passHub.renderPass,passHub.swapChainFramebuffers[imageIndex],clears.data(), 2, passHub.extent);
+            mg::batches::BeginRenderpass(cmd,passHub.renderPass,passHub.swapChainFramebuffers[imageIndex],clears.data(), 3, passHub.extent);
             mg::batches::SetViewport(cmd, passHub.extent);
             scene.draw(cmd,nullptr, -1);//调试点
             /* pbr 渲染 */

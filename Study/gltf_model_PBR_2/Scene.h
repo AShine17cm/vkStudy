@@ -108,13 +108,12 @@ struct  Scene
 			"../data/models/Box/glTF-Embedded/Box.gltf");
 
 		//baseColor+ metallicRoughness+ emissive+ normal+ oc
-		helmet = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, helmetInfo);	//只有一个 金属流材质
-
+		helmet = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, helmetInfo,true);	//只有一个 金属流材质
 		//normal+oc+specGloss+diffuse
-		ship = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, shipInfo);		//2个材质
-		dinosaur = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, dinosaurInfo);
+		ship = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, shipInfo,true);		//2个材质
+		dinosaur = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, dinosaurInfo,true);
 		//第二个材质 specGloss+diffuse		第三个材质 oc+specGloss+diffuse
-		landscape = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, landscapeInfo);
+		landscape = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, landscapeInfo,true);
 
 
 		geos::DebugPoints::Point pt;
@@ -154,7 +153,7 @@ struct  Scene
 		ship->counter = 0;
 		ship->getSpecRender(shipRender2,1);
 
-		dxPoint.prepare(vulkanDevice, renderPass);
+		dxPoint.prepare(vulkanDevice, renderPass,true);
 		//添加 一个albedo 用于着色//恐龙
 		for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{

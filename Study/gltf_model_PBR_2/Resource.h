@@ -30,14 +30,20 @@ struct Resource
         };
         tex_depth = new textures::Texture(vulkanDevice, imgInfo);
         tex_depth->load(nullptr);
+
+        //imgInfo.formats.sampleCount = VK_SAMPLE_COUNT_4_BIT;
+
         /* 阴影贴图 */
         imgInfo.extent3D = { SHADOWMAP_DIM,SHADOWMAP_DIM,1 };
         imgInfo.layers = LIGHT_COUNT;
         imgInfo.formats.samplerMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        imgInfo.formats.sampleCount = VK_SAMPLE_COUNT_1_BIT;//还原上面的操作
         tex_shadow = new textures::Texture(vulkanDevice, imgInfo);
         tex_shadow->viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
         tex_shadow->extends = { textures::MgTextureEx::Sampler_ShadowMap };
         tex_shadow->load(nullptr);
+
+
 
         /* Textures */
         imgInfo.layers = 1;

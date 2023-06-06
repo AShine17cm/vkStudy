@@ -14,6 +14,7 @@ namespace vks
 		VkDevice device;
 		VkPipelineCache pipelineCache = VK_NULL_HANDLE;
 		PbrEnv* env;
+		bool msaa = false;
 		int counter;
 		struct ModelInfo
 		{
@@ -88,7 +89,7 @@ namespace vks
 			float alphaMaskCutoff;
 		} pushConstBlockMaterial;
 
-		gltfModel_pbr(mg::VulkanDevice* vulkanDevice,uint32_t swapchainImgCount,PbrEnv* env, ModelInfo modelInfo);
+		gltfModel_pbr(mg::VulkanDevice* vulkanDevice,uint32_t swapchainImgCount,PbrEnv* env, ModelInfo modelInfo,bool msaa=false);
 		void setup(VkDescriptorPool pool);
 		void clean();
 		void getPrimitives(std::vector<vkglTF::Node*>* nodes,std::vector<vkglTF::Primitive*>* prims, std::vector<vkglTF::Node*>* nodeX);
