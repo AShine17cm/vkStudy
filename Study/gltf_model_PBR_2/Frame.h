@@ -28,6 +28,8 @@ struct Frame
 	VkDescriptorSet pbrBasic;				//metallic + tex
 	VkDescriptorSet pbr_Env;
 	VkDescriptorSet pbr_IBL_dino;
+	VkDescriptorSet pbr_IBL_ship1;
+	VkDescriptorSet pbr_IBL_ship2;
 
 	mg::Buffer ubo_ui;
 	mg::Buffer ubo_scene;				//相机 灯光
@@ -36,6 +38,8 @@ struct Frame
 	mg::Buffer ubo_pbr_albedo;
 
 	mg::Buffer ubo_pbr_dino;
+	mg::Buffer ubo_pbr_ship1;
+	mg::Buffer ubo_pbr_ship2;
 
 	bool mips_subView = false;
 	int opKey_cached;					//只能操作属于当前 Command-Buffer 的 DescriptorSet
@@ -57,6 +61,8 @@ struct Frame
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrBasic, 1, descriptorPool, device, &pbrBasic_bg);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrEnv, 1, descriptorPool, device, &pbr_Env);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrTexs, 1, descriptorPool, device, &pbr_IBL_dino);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrTexs, 1, descriptorPool, device, &pbr_IBL_ship1);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrTexs, 1, descriptorPool, device, &pbr_IBL_ship2);
 
 		vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -85,6 +91,14 @@ struct Frame
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 			sizeof(geos::PbrMaterial), &ubo_pbr_dino);
+		vulkanDevice->createBuffer(
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			sizeof(geos::PbrMaterial), &ubo_pbr_ship1);
+		vulkanDevice->createBuffer(
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			sizeof(geos::PbrMaterial), &ubo_pbr_ship2);
 
 		ubo_scene.map();//给出mapped地址
 		ubo_ui.map();
@@ -92,6 +106,8 @@ struct Frame
 		ubo_pbr_bg.map();
 		ubo_pbr_albedo.map();
 		ubo_pbr_dino.map();
+		ubo_pbr_ship1.map();
+		ubo_pbr_ship2.map();
 	}
 
 	/* 绑定set和资源(ubo,tex) */
@@ -168,17 +184,37 @@ struct Frame
 			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
 		};
 		counts = { 1,1,1,1,1,1};
+
+		//对应于模型的资源
+		mg::Buffer* ubo = nullptr;
+		VkDescriptorSet desc_set = nullptr;
+		switch (modelIdx)
+		{
+		case 1:
+			ubo = &ubo_pbr_ship1;
+			desc_set = pbr_IBL_ship1;
+			break;
+		case 11:
+			ubo = &ubo_pbr_ship2;
+			desc_set = pbr_IBL_ship2;
+			break;
+		case 2:
+			ubo = &ubo_pbr_dino;
+			desc_set = pbr_IBL_dino;
+			break;
+		}
+
 		infos = {
-			&ubo_pbr_dino.descriptor,
+			&ubo->descriptor,
 			render->colorImg,
 			render->isMetallic?render->metalRough: render->specImg,
 			render->normalImg,
 			render->ocImg,
 			render->mat.emissiveTextureSet==-1? render->emptyImg:render->emissiveImg
 		};
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), pbr_IBL_dino, device);
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), desc_set, device);
 
-		memcpy(ubo_pbr_dino.mapped, &render->mat, sizeof(geos::PbrMaterial));
+		memcpy(ubo->mapped, &render->mat, sizeof(geos::PbrMaterial));
 	}
 	/* 切换贴图格式 */
 	void update(VkDevice device, Resource* res)
@@ -205,5 +241,7 @@ struct Frame
 		ubo_pbr_bg.destroy();
 		ubo_pbr_albedo.destroy();
 		ubo_pbr_dino.destroy();
+		ubo_pbr_ship1.destroy();
+		ubo_pbr_ship2.destroy();
 	}
 };

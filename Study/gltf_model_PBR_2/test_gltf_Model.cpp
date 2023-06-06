@@ -283,7 +283,7 @@ private:
             dstSet = 1;
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_pbr_basic);
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbrBasic_bg, 0, nullptr);
-            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 3);//海岛
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 3,-1);//海岛
             //自定义 基础 Pbr 渲染
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbrBasic, 0, nullptr);
             //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 2);
@@ -295,10 +295,15 @@ private:
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrEnv, dstSet, 1, &frame->pbr_Env, 0, nullptr);
             dstSet = 2;//pbr 纹理
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrIBL, dstSet, 1, &frame->pbr_IBL_dino, 0, nullptr);
-            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrIBL, 2);
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrIBL, 2,-1);
+            //船
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrIBL, dstSet, 1, &frame->pbr_IBL_ship1, 0, nullptr);
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrIBL, 1, 1);//第一个节点
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrIBL, dstSet, 1, &frame->pbr_IBL_ship2, 0, nullptr);
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrIBL, 1, 2);
 
             scene.draw_gltf(cmd,imageIndex,0);//头盔 金属流
-            scene.draw_gltf(cmd, imageIndex, 1);//飞艇 高光流  2个材质
+            //scene.draw_gltf(cmd, imageIndex, 1);//飞艇 高光流  2个材质
             //scene.draw_gltf(cmd, imageIndex,2);//恐龙
 
             drawUI(cmd, frame);
@@ -313,10 +318,10 @@ private:
         //gltf 有自己的 vertexInputAttribute,需要自己的管线
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_shadow_gltf);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow, 0, 1, &frame->shadow_ubo, 0, nullptr);
-        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 0);
-        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 1);
-        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 2);
-        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 3);
+        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 0,-1);
+        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 1,-1);
+        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 2,-1);
+        scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 3,-1);
     }
     /* ui */
     void drawUI(VkCommandBuffer cmd, Frame* frame)

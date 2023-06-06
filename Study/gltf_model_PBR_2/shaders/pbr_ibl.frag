@@ -281,7 +281,6 @@ vec4 shade( )
     vec4 coord=scene.lights[0].mvp* vec4(inPos,1.0);
     float shadow= filterPCF(coord,0);
     if(scene.debug[0]==0) shadow=1.0;
-	//shadow=1.0;/////
 
 	color*=shadow;
     vec4 finalColor= vec4(color,baseColor.a);
@@ -298,10 +297,10 @@ vec4 shade( )
 				finalColor.rgb = texture(normalMap,inUV).rgb; // normalize(inNormal);
 				break;
 			case 3:
-				finalColor.rgb = (mat.occlusionTextureSet > -1) ? texture(aoMap, mat.occlusionTextureSet == 0 ? inUV : inUV1).rrr : vec3(0.0f);
+				finalColor.rgb = (mat.occlusionTextureSet > -1) ? texture(aoMap, inUV).rrr : vec3(0.0f);
 				break;
 			case 4:
-				//finalColor.rgb = (mat.emissiveTextureSet > -1) ? texture(emissiveMap, mat.emissiveTextureSet == 0 ? inUV : inUV1).rgb : vec3(0.0f);
+				finalColor.rgb = (mat.emissiveTextureSet > -1) ? texture(emissiveMap, inUV).rgb : vec3(0.0f);
 				break;
 			case 5:
 				finalColor.rgb = texture(physicalDescriptorMap, inUV).bbb;

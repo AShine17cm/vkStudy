@@ -46,33 +46,45 @@ namespace vks
 			destroyBuffer(&buffer.skybox);
 		}
 	}
-	//获取加载到的贴图的信息 第一个有料的节点
-	void gltfModel_pbr::getSpecRender(geos::gltfPbrRender_spec* render)
+
+	void gltfModel_pbr::getPrimitives(std::vector<vkglTF::Node*>* nodes, std::vector<vkglTF::Primitive*>* prims, std::vector<vkglTF::Node*>* nodeX)
 	{
-		vkglTF::Node* node = scene.nodes[0];
-		vkglTF::Primitive* primitive = NULL;
-		while (true)
+		for (int i = 0; i < (*nodes).size(); i++)
 		{
+			vkglTF::Node* node = (*nodes)[i];
+
 			if (node->mesh != nullptr)
 			{
-				primitive= node->mesh->primitives[0];
-				break;
-			}
-			else if(node->children.size()==0)
-			{
-				break;
-			}
-			else
-			{
-				node = node->children[0];
+				for (auto pri : node->mesh->primitives)
+				{
+					(*prims).push_back(pri);
+					(*nodeX).push_back(node);
+				}
 			}
 		}
-		if (primitive == NULL) 
+		for (int i = 0; i < (*nodes).size(); i++)
+		{
+			vkglTF::Node* node = (*nodes)[i];
+
+			if (node->children.size()>0)
+			{
+				getPrimitives(&(node->children), prims,nodeX);
+			}
+		}
+	}
+	//获取加载到的贴图的信息 第一个有料的节点
+	void gltfModel_pbr::getSpecRender(geos::gltfPbrRender_spec* render,int idxNode)
+	{
+		std::vector<vkglTF::Primitive*> primitives;
+		std::vector<vkglTF::Node*> nodes;
+		getPrimitives(&scene.nodes, &primitives,&nodes);
+
+		if (primitives.size()<idxNode) 
 		{
 			std::cout << "gltfModel_pbr 未找到 mesh" << std::endl;
 			return;
 		}
-		
+		vkglTF::Primitive* primitive = primitives[idxNode];
 		render->normalImg = &primitive->material.normalTexture->descriptor;
 		render->ocImg = &primitive->material.occlusionTexture->descriptor;
 
@@ -88,7 +100,7 @@ namespace vks
 		}
 		//到根节点的矩阵
 		//render->toRoot = node->mesh->uniformBuffer.descriptorSet;
-		render->model = shaderValuesScene.model * node->getMatrix();
+		render->model = shaderValuesScene.model * nodes[idxNode]->getMatrix();
 		geos::PbrMaterial* mat = &render->mat;
 
 		mat->emissiveFactor = primitive->material.emissiveFactor;
@@ -201,23 +213,27 @@ namespace vks
 		}
 	}
 	//用提前绑定的管线 渲染(阴影) (要保证vertex的InputAttribute和管线一致属性)
-	void gltfModel_pbr::renderNode_ByXPipe(VkCommandBuffer cmd, vkglTF::Node* node,VkPipelineLayout pipeLayout,VkPipelineStageFlags stageFlags, vkglTF::Material::AlphaMode alphaMode)
+	void gltfModel_pbr::renderNode_ByXPipe(VkCommandBuffer cmd, vkglTF::Node* node,VkPipelineLayout pipeLayout,VkPipelineStageFlags stageFlags, vkglTF::Material::AlphaMode alphaMode,int idxNode)
 	{
 		if (node->mesh) {
 			for (vkglTF::Primitive* primitive : node->mesh->primitives)
 			{
 				if (primitive->material.alphaMode == alphaMode)
 				{
-					//节点矩阵
-					geos::PerObjectData pod = { shaderValuesScene.model * node->getMatrix(), {0,0,0,0} };
-					vkCmdPushConstants(cmd, pipeLayout, stageFlags, 0, sizeof(geos::PerObjectData), &pod);
-					if (primitive->hasIndices) 
+					counter += 1;
+					if (idxNode < 0 || counter == idxNode)
 					{
-						vkCmdDrawIndexed(cmd, primitive->indexCount, 1, primitive->firstIndex, 0, 0);
-					}
-					else 
-					{
-						vkCmdDraw(cmd, primitive->vertexCount, 1, 0, 0);
+						//节点矩阵
+						geos::PerObjectData pod = { shaderValuesScene.model * node->getMatrix(), {0,0,0,0} };
+						vkCmdPushConstants(cmd, pipeLayout, stageFlags, 0, sizeof(geos::PerObjectData), &pod);
+						if (primitive->hasIndices) 
+						{
+							vkCmdDrawIndexed(cmd, primitive->indexCount, 1, primitive->firstIndex, 0, 0);
+						}
+						else 
+						{
+							vkCmdDraw(cmd, primitive->vertexCount, 1, 0, 0);
+						}
 					}
 				}
 			}
@@ -225,7 +241,7 @@ namespace vks
 		//递归 节点
 		for (auto child : node->children)
 		{
-			renderNode_ByXPipe(cmd, child, pipeLayout, stageFlags, alphaMode);
+			renderNode_ByXPipe(cmd, child, pipeLayout, stageFlags, alphaMode,idxNode);
 		}
 	}
 	void gltfModel_pbr::load_gltf( )

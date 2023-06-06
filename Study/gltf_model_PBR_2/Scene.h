@@ -18,7 +18,7 @@
 using namespace mg;
 
 /*
-将Geo 以不同的材质 渲染
+	将Geo 以不同的材质 渲染
 	camera 做transition 时 z轴取反
 	shader 里 y 轴取反
 */
@@ -44,10 +44,10 @@ struct  Scene
 	vks::gltfModel_pbr* landscape;
 
 	geos::gltfPbrRender_spec* dinoRender;
+	geos::gltfPbrRender_spec* shipRender1;
+	geos::gltfPbrRender_spec* shipRender2;
 
 	geos::DebugPoints dxPoint;
-
-	float rotateRadius = 4.2f;
 
 	float deltaTime, timer = 0;
 	bool displayShadowMap = true;
@@ -115,10 +115,7 @@ struct  Scene
 		dinosaur = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, dinosaurInfo);
 		//第二个材质 specGloss+diffuse		第三个材质 oc+specGloss+diffuse
 		landscape = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, landscapeInfo);
-		//高光流
-		dinosaur->pushConstBlockMaterial.workflow = 1;
-		ship->pushConstBlockMaterial.workflow = 1;
-		landscape->pushConstBlockMaterial.workflow = 1;
+
 
 		geos::DebugPoints::Point pt;
 		pt = { glm::mat4(1.0),view->lightPoses[0],{1,0,0,18} };
@@ -140,7 +137,22 @@ struct  Scene
 		dinoRender->isMetallic = false;
 		dinoRender->emptyImg = &env->empty.descriptor;
 		dinoRender->mat.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
+		dinosaur->counter = 0;
 		dinosaur->getSpecRender(dinoRender);
+
+		shipRender1 = new geos::gltfPbrRender_spec();
+		shipRender1->isMetallic = false;
+		shipRender1->emptyImg = &env->empty.descriptor;
+		shipRender1->mat.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
+		ship->counter = 0;
+		ship->getSpecRender(shipRender1,0);
+
+		shipRender2 = new geos::gltfPbrRender_spec();
+		shipRender2->isMetallic = false;
+		shipRender2->emptyImg = &env->empty.descriptor;
+		shipRender2->mat.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
+		ship->counter = 0;
+		ship->getSpecRender(shipRender2,1);
 
 		dxPoint.prepare(vulkanDevice, renderPass);
 		//添加 一个albedo 用于着色//恐龙
@@ -148,6 +160,8 @@ struct  Scene
 		{
 			(*frames)[i].add_pbrEnv(vulkanDevice->logicalDevice, env);
 			(*frames)[i].add_pbrRender(vulkanDevice->logicalDevice, dinoRender,2);
+			(*frames)[i].add_pbrRender(vulkanDevice->logicalDevice, shipRender1, 1);
+			(*frames)[i].add_pbrRender(vulkanDevice->logicalDevice, shipRender2, 11);
 		}
 	}
 	/* 画一个 gltf 模型 */
@@ -193,7 +207,7 @@ struct  Scene
 			gltf->renderNode(cmd, node, cmd_idx, vkglTF::Material::ALPHAMODE_BLEND);
 		}
 	}
-	void draw_gltf_ByXPipe(VkCommandBuffer cmd, VkPipelineLayout pipeLayout, int modelIdx)
+	void draw_gltf_ByXPipe(VkCommandBuffer cmd, VkPipelineLayout pipeLayout, int modelIdx,int idxNode)
 	{
 		vks::gltfModel_pbr* gltf = nullptr;
 		switch (modelIdx)
@@ -211,8 +225,8 @@ struct  Scene
 			gltf = landscape;
 			break;
 		}
-
 		vkglTF::Model& model = gltf->scene;
+		gltf->counter = 0;//记录渲染
 		VkDeviceSize offsets[1] = { 0 };
 		vkCmdBindVertexBuffers(cmd, 0, 1, &model.vertices.buffer, offsets);
 		vkCmdBindIndexBuffer(cmd, model.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
@@ -220,7 +234,7 @@ struct  Scene
 		gltf->boundPipeline = VK_NULL_HANDLE;
 		for (auto node : model.nodes)
 		{
-			gltf->renderNode_ByXPipe(cmd, node, pipeLayout, stageVGF, vkglTF::Material::ALPHAMODE_OPAQUE);
+			gltf->renderNode_ByXPipe(cmd, node, pipeLayout, stageVGF, vkglTF::Material::ALPHAMODE_OPAQUE, idxNode);
 		}
 	}
 	void draw_points(VkCommandBuffer cmd)
@@ -238,6 +252,8 @@ struct  Scene
 
 			pbrBasic.debugViewEquation = flipCounter_equation;
 			dinoRender->mat.debugViewEquation = flipCounter_equation;
+			shipRender1->mat.debugViewEquation = flipCounter_equation;
+			shipRender2->mat.debugViewEquation = flipCounter_equation;
 		}
 		if (input->flipViewInputs)
 		{
@@ -246,6 +262,8 @@ struct  Scene
 
 			pbrBasic.debugViewInputs = flipCounter_viewInputs;
 			dinoRender->mat.debugViewInputs = flipCounter_viewInputs;
+			shipRender1->mat.debugViewInputs = flipCounter_viewInputs;
+			shipRender2->mat.debugViewInputs = flipCounter_viewInputs;
 		}
 
 		if (input->flipShadows) //3个光源的阴影,逐次展示，共同展示
@@ -283,6 +301,8 @@ struct  Scene
 		memcpy(pFrame->ubo_pbr_bg.mapped, &pbrBasic_bg, sizeof(geos::PbrBasic));
 
 		memcpy(pFrame->ubo_pbr_dino.mapped, &dinoRender->mat, sizeof(geos::PbrMaterial));
+		memcpy(pFrame->ubo_pbr_ship1.mapped, &shipRender1->mat, sizeof(geos::PbrMaterial));
+		memcpy(pFrame->ubo_pbr_ship2.mapped, &shipRender2->mat, sizeof(geos::PbrMaterial));
 	}
 	/*
 	用idx 将 geo 以不同的方式渲染
