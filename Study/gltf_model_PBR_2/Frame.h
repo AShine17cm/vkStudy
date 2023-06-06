@@ -25,7 +25,6 @@ struct Frame
 	VkDescriptorSet scene_shadow_h;		//阴影合成  管线上的资源继承
 
 	VkDescriptorSet pbrBasic_bg;
-	VkDescriptorSet pbrBasic;				//metallic + tex
 	VkDescriptorSet pbr_Env;
 	VkDescriptorSet pbr_IBL_dino;
 	VkDescriptorSet pbr_IBL_ship1;
@@ -33,9 +32,8 @@ struct Frame
 
 	mg::Buffer ubo_ui;
 	mg::Buffer ubo_scene;				//相机 灯光
-	mg::Buffer ubo_pbr;
 	mg::Buffer ubo_pbr_bg;
-	mg::Buffer ubo_pbr_albedo;
+	//mg::Buffer ubo_pbr_albedo;
 
 	mg::Buffer ubo_pbr_dino;
 	mg::Buffer ubo_pbr_ship1;
@@ -57,7 +55,6 @@ struct Frame
 		descriptors::allocateDescriptorSet(&pipes->setLayout_shadow, 1, descriptorPool, device, &shadow_ubo);	//阴影阶段
 
 		descriptors::allocateDescriptorSet(&pipes->setLayout_shadow_h, 1, descriptorPool, device, &scene_shadow_h);//阴影合成
-		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrBasic, 1, descriptorPool, device, &pbrBasic);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrBasic, 1, descriptorPool, device, &pbrBasic_bg);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrEnv, 1, descriptorPool, device, &pbr_Env);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrTexs, 1, descriptorPool, device, &pbr_IBL_dino);
@@ -77,15 +74,7 @@ struct Frame
 		vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			sizeof(geos::PbrBasic), &ubo_pbr);
-		vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 			sizeof(geos::PbrBasic), &ubo_pbr_bg);
-		vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			sizeof(geos::PbrBasic), &ubo_pbr_albedo);
 		//单次渲染
 		vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -102,9 +91,8 @@ struct Frame
 
 		ubo_scene.map();//给出mapped地址
 		ubo_ui.map();
-		ubo_pbr.map();
 		ubo_pbr_bg.map();
-		ubo_pbr_albedo.map();
+
 		ubo_pbr_dino.map();
 		ubo_pbr_ship1.map();
 		ubo_pbr_ship2.map();
@@ -141,13 +129,8 @@ struct Frame
 		//pbr
 		types = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER };
 		counts = { 1 };
-		infos = { &ubo_pbr.descriptor };
-		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), pbrBasic, device);
 		infos = { &ubo_pbr_bg.descriptor };
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), pbrBasic_bg, device);
-
-
-
 	}
 	void add_pbrEnv(VkDevice device, PbrEnv* env)
 	{
@@ -237,9 +220,8 @@ struct Frame
 	{
 		ubo_ui.destroy();
 		ubo_scene.destroy();
-		ubo_pbr.destroy();
 		ubo_pbr_bg.destroy();
-		ubo_pbr_albedo.destroy();
+
 		ubo_pbr_dino.destroy();
 		ubo_pbr_ship1.destroy();
 		ubo_pbr_ship2.destroy();

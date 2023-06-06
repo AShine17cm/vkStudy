@@ -34,7 +34,6 @@ struct  Scene
 		std::array<vec4, 6 * countUI> pts;				//用于在 近剪切平面上画 UI
 		glm::ivec4 debug;
 	}ui;
-	geos::PbrBasic pbrBasic = { {1,1,1,1},0.6f,0.3f };					//roughtness,metallic
 	geos::PbrBasic pbrBasic_bg = { {0.7f,0.6f,0.5f,1},0.7f,0.15f };		//roughtness,metallic
 
 	PbrEnv* env;
@@ -249,7 +248,6 @@ struct  Scene
 			input->flipEquation = false;
 			flipCounter_equation =(flipCounter_equation + 1) % 6;		//0::从 1 到 5
 
-			pbrBasic.debugViewEquation = flipCounter_equation;
 			dinoRender->mat.debugViewEquation = flipCounter_equation;
 			shipRender1->mat.debugViewEquation = flipCounter_equation;
 			shipRender2->mat.debugViewEquation = flipCounter_equation;
@@ -259,7 +257,6 @@ struct  Scene
 			input->flipViewInputs = false;
 			flipCounter_viewInputs =  (flipCounter_viewInputs + 1) % 7;	//0::从 1 到 6
 
-			pbrBasic.debugViewInputs = flipCounter_viewInputs;
 			dinoRender->mat.debugViewInputs = flipCounter_viewInputs;
 			shipRender1->mat.debugViewInputs = flipCounter_viewInputs;
 			shipRender2->mat.debugViewInputs = flipCounter_viewInputs;
@@ -296,7 +293,6 @@ struct  Scene
 		//拷贝数据
 		memcpy(pFrame->ubo_ui.mapped, &ui, sizeof(UIData));
 		memcpy(pFrame->ubo_scene.mapped, &view->data, sizeof(View::UniformBufferObject));
-		memcpy(pFrame->ubo_pbr.mapped, &pbrBasic, sizeof(geos::PbrBasic));
 		memcpy(pFrame->ubo_pbr_bg.mapped, &pbrBasic_bg, sizeof(geos::PbrBasic));
 
 		memcpy(pFrame->ubo_pbr_dino.mapped, &dinoRender->mat, sizeof(geos::PbrMaterial));

@@ -18,6 +18,8 @@ brdf lut		brdf look-up-texture		512像素
 
 高光流			纹理+高光		在 gltf 材质的 extension中
 
+MSAA			硬件Feature	samplerAnisotropy		sampleRateShading ( 非几何边缘 的 内部高频锯齿 )
+
 MSAA (用 Subpass 来做 )	片上缓存 		额外的两个 渲染目标可以设定为 VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT
 第一个 Color Attachment	渲染目标 		(可用片上高速缓存代替)
 第二个 Color Attachment	渲染目标		将第一个 Color Attachment 的 resolve 目标

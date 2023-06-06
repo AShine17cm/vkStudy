@@ -30,9 +30,6 @@ struct Resource
         };
         tex_depth = new textures::Texture(vulkanDevice, imgInfo);
         tex_depth->load(nullptr);
-
-        //imgInfo.formats.sampleCount = VK_SAMPLE_COUNT_4_BIT;
-
         /* ÒõÓ°ÌùÍ¼ */
         imgInfo.extent3D = { SHADOWMAP_DIM,SHADOWMAP_DIM,1 };
         imgInfo.layers = LIGHT_COUNT;
@@ -42,8 +39,6 @@ struct Resource
         tex_shadow->viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
         tex_shadow->extends = { textures::MgTextureEx::Sampler_ShadowMap };
         tex_shadow->load(nullptr);
-
-
 
         /* Textures */
         imgInfo.layers = 1;
