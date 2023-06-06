@@ -284,13 +284,22 @@ private:
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_pbr_basic);
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbrBasic_bg, 0, nullptr);
             scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 3);//海岛
+            //自定义 基础 Pbr 渲染
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbrBasic, 0, nullptr);
             //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 2);
             //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 1);
+            // 
+            //自定义的 IBL
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_pbr_IBL);
+            dstSet = 1;//pbr 环境
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrEnv, dstSet, 1, &frame->pbr_Env, 0, nullptr);
+            dstSet = 2;//pbr 纹理
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrIBL, dstSet, 1, &frame->pbr_IBL_dino, 0, nullptr);
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrIBL, 2);
 
-            scene.draw_gltf(cmd,imageIndex,0);//头盔
-            scene.draw_gltf(cmd, imageIndex, 1);//飞艇
-            scene.draw_gltf(cmd, imageIndex,2);//恐龙
+            scene.draw_gltf(cmd,imageIndex,0);//头盔 金属流
+            scene.draw_gltf(cmd, imageIndex, 1);//飞艇 高光流  2个材质
+            //scene.draw_gltf(cmd, imageIndex,2);//恐龙
 
             drawUI(cmd, frame);
             vkCmdEndRenderPass(cmd);

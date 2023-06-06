@@ -90,6 +90,7 @@ struct  Scene
 		};
 		vks::gltfModel_pbr::ModelInfo dinosaurInfo = {
 			"../models/Rampaging T-Rex.glb",
+			//"../models/Unicorn.glb",
 			1.0f,
 			{9,3.2f,0},
 			15,	{0,1,0}
@@ -107,10 +108,10 @@ struct  Scene
 			"../data/models/Box/glTF-Embedded/Box.gltf");
 
 		//baseColor+ metallicRoughness+ emissive+ normal+ oc
-		helmet = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, helmetInfo);
+		helmet = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, helmetInfo);	//只有一个 金属流材质
 
 		//normal+oc+specGloss+diffuse
-		ship = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, shipInfo);//2个材质
+		ship = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, shipInfo);		//2个材质
 		dinosaur = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, dinosaurInfo);
 		//第二个材质 specGloss+diffuse		第三个材质 oc+specGloss+diffuse
 		landscape = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, landscapeInfo);
@@ -136,14 +137,17 @@ struct  Scene
 
 		//获取渲染参数
 		dinoRender = new geos::gltfPbrRender_spec();
+		dinoRender->isMetallic = false;
+		dinoRender->emptyImg = &env->empty.descriptor;
+		dinoRender->mat.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
 		dinosaur->getSpecRender(dinoRender);
 
 		dxPoint.prepare(vulkanDevice, renderPass);
 		//添加 一个albedo 用于着色//恐龙
 		for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
-			VkDescriptorImageInfo descriptor= dinosaur->scene.textures[0].descriptor;
-			(*frames)[i].add_pbrAlbedo(vulkanDevice->logicalDevice, descriptor);
+			(*frames)[i].add_pbrEnv(vulkanDevice->logicalDevice, env);
+			(*frames)[i].add_pbrRender(vulkanDevice->logicalDevice, dinoRender,2);
 		}
 	}
 	/* 画一个 gltf 模型 */
@@ -231,13 +235,17 @@ struct  Scene
 		{
 			input->flipEquation = false;
 			flipCounter_equation =(flipCounter_equation + 1) % 6;		//0::从 1 到 5
+
 			pbrBasic.debugViewEquation = flipCounter_equation;
+			dinoRender->mat.debugViewEquation = flipCounter_equation;
 		}
 		if (input->flipViewInputs)
 		{
 			input->flipViewInputs = false;
 			flipCounter_viewInputs =  (flipCounter_viewInputs + 1) % 7;	//0::从 1 到 6
+
 			pbrBasic.debugViewInputs = flipCounter_viewInputs;
+			dinoRender->mat.debugViewInputs = flipCounter_viewInputs;
 		}
 
 		if (input->flipShadows) //3个光源的阴影,逐次展示，共同展示
@@ -273,6 +281,8 @@ struct  Scene
 		memcpy(pFrame->ubo_scene.mapped, &view->data, sizeof(View::UniformBufferObject));
 		memcpy(pFrame->ubo_pbr.mapped, &pbrBasic, sizeof(geos::PbrBasic));
 		memcpy(pFrame->ubo_pbr_bg.mapped, &pbrBasic_bg, sizeof(geos::PbrBasic));
+
+		memcpy(pFrame->ubo_pbr_dino.mapped, &dinoRender->mat, sizeof(geos::PbrMaterial));
 	}
 	/*
 	用idx 将 geo 以不同的方式渲染

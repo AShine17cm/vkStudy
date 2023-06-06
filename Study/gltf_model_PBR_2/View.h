@@ -64,7 +64,6 @@ struct  View
 
 		/* 矩阵 决定了能 “看”到阴影的范围 */
 		glm::mat4 shadowProj = glm::perspective(glm::radians(lightFOV), 1.0f, lightNear, lightFar);
-		//glm::mat4 shadowProj = glm::ortho(-10.0f,200.0f,-10.0f,200.0f, lightNear, lightFar);
 		glm::mat4 shadowView;
 		glm::mat4 shadowModel = glm::mat4(1.0f);
 		glm::vec4 color;
@@ -79,7 +78,7 @@ struct  View
 			{
 			case 0:
 				lightPos = { -12,-48,24 };
-				color = { 1.0f,1.0f,0.9f,0.9f };
+				color = { 1.0f,1.0f,1.0f,1.0f };
 				break;
 			}
 			lightPoses.push_back(glm::vec4(lightPos,1.0));

@@ -25,16 +25,17 @@ layout(set=0,binding=0) uniform UniformObjectData
 }scene;
 //layout(set=0,binding=1)   uniform sampler2DArray shadowMap;
 
-layout (set=1,binding=0) uniform PbrMaterial 
+layout (set=1,binding = 0) uniform samplerCube samplerIrradiance;
+layout (set=1,binding = 1) uniform sampler2D samplerBRDFLUT;
+layout (set=1,binding = 2) uniform samplerCube prefilteredMap;
+
+layout (set=2,binding=0) uniform PbrMaterial 
 {
-	vec4 baseColorFactor;
+	vec4 baseColorFactor;	//金属流
 	vec4 emissiveFactor;
-	vec4 diffuseFactor;
+	vec4 diffuseFactor;		//高光流
 	vec4 specularFactor;
 
-	int baseColorTextureSet;
-	int physicalDescriptorTextureSet;
-	int normalTextureSet;	
 	int occlusionTextureSet;
 	int emissiveTextureSet;
 
@@ -52,15 +53,11 @@ layout (set=1,binding=0) uniform PbrMaterial
 	float debugViewEquation;
 } mat;
 
-layout (set=1,binding = 1) uniform samplerCube samplerIrradiance;
-layout (set=1,binding = 2) uniform sampler2D samplerBRDFLUT;
-layout (set=1,binding = 3) uniform samplerCube prefilteredMap;
-
-layout (set = 2, binding = 0) uniform sampler2D colorMap;
-layout (set = 2, binding = 1) uniform sampler2D physicalDescriptorMap;
-layout (set = 2, binding = 2) uniform sampler2D normalMap;
-layout (set = 2, binding = 3) uniform sampler2D aoMap;
-//layout (set = 2, binding = 4) uniform sampler2D emissiveMap;
+layout (set = 2, binding = 1) uniform sampler2D colorMap;
+layout (set = 2, binding = 2) uniform sampler2D physicalDescriptorMap;
+layout (set = 2, binding = 3) uniform sampler2D normalMap;
+layout (set = 2, binding = 4) uniform sampler2D aoMap;
+layout (set = 2, binding = 5) uniform sampler2D emissiveMap;
 
 #define ALBEDO vec3(pbrBasic.rgba.rgb)
 #define MANUAL_SRGB 1
@@ -105,7 +102,7 @@ vec3 getNormal()
 {
 	// Perturb normal, see http://www.thetenthplanet.de/archives/1180
     //normal tex 不存在，inUV1 是 00?
-	vec3 tangentNormal = texture(normalMap, mat.normalTextureSet == 0 ? inUV : inUV1).xyz * 2.0 - 1.0;
+	vec3 tangentNormal = texture(normalMap, inUV).xyz * 2.0 - 1.0;
 
 	vec3 q1 = dFdx(inPos);
 	vec3 q2 = dFdy(inPos);
@@ -202,26 +199,11 @@ vec4 shade( )
 
 	vec3 f0 = vec3(0.04);
 
-	if (mat.alphaMask == 1.0f) 
-	{
-		if (mat.baseColorTextureSet > -1) 
-		{
-			baseColor = SRGBtoLINEAR(texture(colorMap, mat.baseColorTextureSet == 0 ? inUV : inUV1)) * mat.baseColorFactor;
-		} else {
-			baseColor = mat.baseColorFactor;
-		}
-		if (baseColor.a < mat.alphaMaskCutoff) {
-			discard;
-		}
-	}
+	baseColor = SRGBtoLINEAR(texture(colorMap,inUV )) * mat.baseColorFactor;
+
 	//specular///////  高光流
 	// Values from specular glossiness workflow are converted to metallic roughness
-	if (mat.physicalDescriptorTextureSet > -1) 
-	{
-		perceptualRoughness = 1.0 - texture(physicalDescriptorMap, mat.physicalDescriptorTextureSet == 0 ? inUV : inUV1).a;
-	} else {
-		perceptualRoughness = 0.0;
-	}
+	perceptualRoughness = 1.0 - texture(physicalDescriptorMap, inUV).a;
 	const float epsilon = 1e-6;
 
 	vec4 diffuse = SRGBtoLINEAR(texture(colorMap, inUV));
@@ -248,9 +230,11 @@ vec4 shade( )
 	vec3 specularEnvironmentR0 = specularColor.rgb;
 	vec3 specularEnvironmentR90 = vec3(1.0, 1.0, 1.0) * reflectance90;
 
-	vec3 n = (mat.normalTextureSet > -1) ? getNormal() : normalize(inNormal);
+	vec3 n = getNormal();
 	vec3 v = normalize(scene.camera.xyz - inPos);    // Vector from surface point to camera
-	vec3 l = normalize(scene.lights[0].vec.xyz);     // Vector from surface point to light
+	vec3 L=scene.lights[0].vec.xyz;					//平行光(指向光源)
+    L.y=-L.y;										//灯光 翻转到 -Y轴, 和顶点的操作一致
+	vec3 l = normalize(L);							// Vector from surface point to light
 	vec3 h = normalize(l+v);                        // Half vector between both l and v
 	vec3 reflection = -normalize(reflect(v, n));
 	reflection.y *= -1.0f;
@@ -297,19 +281,21 @@ vec4 shade( )
     vec4 coord=scene.lights[0].mvp* vec4(inPos,1.0);
     float shadow= filterPCF(coord,0);
     if(scene.debug[0]==0) shadow=1.0;
+	//shadow=1.0;/////
 
 	color*=shadow;
     vec4 finalColor= vec4(color,baseColor.a);
+
 	//调试 纹理
 	if (mat.debugViewInputs > 0.0) 
 	{
 		int index = int(mat.debugViewInputs);
 		switch (index) {
 			case 1:
-				finalColor.rgba = mat.baseColorTextureSet > -1 ? texture(colorMap, mat.baseColorTextureSet == 0 ? inUV : inUV1) : vec4(1.0f);
+				finalColor.rgba = texture(colorMap, inUV );
 				break;
 			case 2:
-				finalColor.rgb = (mat.normalTextureSet > -1) ? texture(normalMap, mat.normalTextureSet == 0 ? inUV : inUV1).rgb : normalize(inNormal);
+				finalColor.rgb = texture(normalMap,inUV).rgb; // normalize(inNormal);
 				break;
 			case 3:
 				finalColor.rgb = (mat.occlusionTextureSet > -1) ? texture(aoMap, mat.occlusionTextureSet == 0 ? inUV : inUV1).rrr : vec3(0.0f);

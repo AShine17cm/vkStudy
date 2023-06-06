@@ -15,19 +15,21 @@ struct PipelineHub
 	VkDescriptorSetLayout setLayout_shadow;		//阴影渲染 
 	VkDescriptorSetLayout setLayout_shadow_h;	//阴影合成 h:holder  管线上的资源继承
 	VkDescriptorSetLayout setLayout_pbrBasic;
-	VkDescriptorSetLayout setLayout_pbrAlbedo;
+	VkDescriptorSetLayout setLayout_pbrEnv;
+	VkDescriptorSetLayout setLayout_pbrTexs;
 	/* set-layout 组合的 pipe-layout */
 	VkPipelineLayout piLayout_ui;
 	VkPipelineLayout piLayout_shadow;		//阴影渲染
 	VkPipelineLayout piLayout_shadow_h;		//阴影合成: h表示占位，用于后续渲染的继承
 	VkPipelineLayout piLayout_pbrBasic;		//场景数据+ShadowMap+ PBR + Object 贴图
-	VkPipelineLayout piLayout_pbrAlbedo;
+	VkPipelineLayout piLayout_pbrEnv;
+	VkPipelineLayout piLayout_pbrIBL;
 
 	VkPipeline pi_ui;						//shader::<ui.shader>
 	VkPipeline pi_shadow_gltf;				//gltf 文件有自己的顶点属性布局
 	/* 使用同一个 pipeline-layout */
 	VkPipeline pi_pbr_basic;						//shader::<pbr.shader>	用gltf 模型 做PBR 测试
-	VkPipeline pi_pbr_albedo;
+	VkPipeline pi_pbr_IBL;
 
 	void prepare(VkDevice device, RenderPassHub* passHub, uint32_t constantSize)
 	{
@@ -62,10 +64,36 @@ struct PipelineHub
 		stages = { VK_SHADER_STAGE_FRAGMENT_BIT  };
 		desCounts = { 1};
 		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_pbrBasic);
-		types = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ,VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER };
-		stages = { VK_SHADER_STAGE_FRAGMENT_BIT ,VK_SHADER_STAGE_FRAGMENT_BIT };
-		desCounts = { 1,1};
-		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_pbrAlbedo);
+		//环境+参数  辉度图  lut  预过滤环境
+		types = { 
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+		};
+		stages = { 
+			VK_SHADER_STAGE_FRAGMENT_BIT ,
+			VK_SHADER_STAGE_FRAGMENT_BIT ,
+			VK_SHADER_STAGE_FRAGMENT_BIT };
+		desCounts = { 1,1,1};
+		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_pbrEnv);
+		//纹理+金属度/高光+法线+OC+自发光 
+		types = {
+			VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+		};
+		stages = {
+			VK_SHADER_STAGE_FRAGMENT_BIT ,
+			VK_SHADER_STAGE_FRAGMENT_BIT ,
+			VK_SHADER_STAGE_FRAGMENT_BIT ,
+			VK_SHADER_STAGE_FRAGMENT_BIT ,
+			VK_SHADER_STAGE_FRAGMENT_BIT ,
+			VK_SHADER_STAGE_FRAGMENT_BIT };
+		desCounts = { 1,1,1,1,1,1 };
+		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_pbrTexs);
 		/* Pipeline-Layout */
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -98,13 +126,20 @@ struct PipelineHub
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 		pipelineLayoutInfo.pPushConstantRanges = &pushRange;
 		MG_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &piLayout_pbrBasic));
-
-		VkDescriptorSetLayout setL_pbrTex[] = { setLayout_shadow_h,setLayout_pbrAlbedo };
+		//Pbr  Env
+		VkDescriptorSetLayout setL_pbrEnv[] = { setLayout_shadow_h,setLayout_pbrEnv };
 		pipelineLayoutInfo.setLayoutCount = 2;
+		pipelineLayoutInfo.pSetLayouts = setL_pbrEnv;
+		pipelineLayoutInfo.pushConstantRangeCount = 1;
+		pipelineLayoutInfo.pPushConstantRanges = &pushRange;
+		MG_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &piLayout_pbrEnv));
+		//Pbr  IBL
+		VkDescriptorSetLayout setL_pbrTex[] = { setLayout_shadow_h,setLayout_pbrEnv,setLayout_pbrTexs };
+		pipelineLayoutInfo.setLayoutCount = 3;
 		pipelineLayoutInfo.pSetLayouts = setL_pbrTex;
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 		pipelineLayoutInfo.pPushConstantRanges = &pushRange;
-		MG_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &piLayout_pbrAlbedo));
+		MG_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &piLayout_pbrIBL));
 
 		/* Pipeline-s */
 		std::vector<VkShaderStageFlagBits> shaderStages; 
@@ -143,7 +178,7 @@ struct PipelineHub
 		shaderFiles = { "shaders/pbr_basic.vert.spv", "shaders/pbr_basic.frag.spv" };
 		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_pbrBasic, &pi_pbr_basic,&vertexInputSCI_gltf);
 		shaderFiles = { "shaders/pbr_basic.vert.spv", "shaders/pbr_ibl.frag.spv" };
-		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_pbrAlbedo, &pi_pbr_albedo, &vertexInputSCI_gltf);
+		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_pbrIBL, &pi_pbr_IBL, &vertexInputSCI_gltf);
 	}
 	/* 根据 shader 创建 pipeline */
 	void createPipeline(VkDevice device, VkRenderPass renderPass, 
@@ -209,18 +244,22 @@ struct PipelineHub
 		vkDestroyPipeline(device, pi_shadow_gltf, nullptr);
 
 		vkDestroyPipeline(device, pi_pbr_basic, nullptr);
-		vkDestroyPipeline(device, pi_pbr_albedo, nullptr);
+		vkDestroyPipeline(device, pi_pbr_IBL, nullptr);
 
 		vkDestroyPipelineLayout(device, piLayout_ui, nullptr);
 		vkDestroyPipelineLayout(device, piLayout_shadow_h, nullptr);
 		vkDestroyPipelineLayout(device, piLayout_shadow, nullptr);			//阴影渲染 灯光矩阵
+
 		vkDestroyPipelineLayout(device, piLayout_pbrBasic, nullptr);
-		vkDestroyPipelineLayout(device, piLayout_pbrAlbedo, nullptr);
+		vkDestroyPipelineLayout(device, piLayout_pbrEnv, nullptr);
+		vkDestroyPipelineLayout(device, piLayout_pbrIBL, nullptr);
 
 		vkDestroyDescriptorSetLayout(device, setLayout_ui, nullptr);
 		vkDestroyDescriptorSetLayout(device, setLayout_shadow, nullptr);
 		vkDestroyDescriptorSetLayout(device, setLayout_shadow_h, nullptr);
+
 		vkDestroyDescriptorSetLayout(device, setLayout_pbrBasic, nullptr);
-		vkDestroyDescriptorSetLayout(device, setLayout_pbrAlbedo, nullptr);
+		vkDestroyDescriptorSetLayout(device, setLayout_pbrEnv, nullptr);
+		vkDestroyDescriptorSetLayout(device, setLayout_pbrTexs, nullptr);
 	}
 };

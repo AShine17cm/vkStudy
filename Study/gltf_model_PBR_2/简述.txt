@@ -12,3 +12,9 @@ brdf lut		brdf look-up-texture		512像素
 离屏渲染的 frame-buffer 就是 这个texture
 
 
+在 Scene.h 中
+加载 pbr 的环境数据  		 辉度图	Lut	预过滤贴图
+单个物体的渲染数据		gltfPbrRender	纹理+法线+OC+自发光+金属度/高光	曝光 调试参数
+
+高光流			纹理+高光		在 gltf 材质的 extension中
+

@@ -46,7 +46,7 @@ namespace vks
 			destroyBuffer(&buffer.skybox);
 		}
 	}
-	//获取加载到的贴图的信息
+	//获取加载到的贴图的信息 第一个有料的节点
 	void gltfModel_pbr::getSpecRender(geos::gltfPbrRender_spec* render)
 	{
 		vkglTF::Node* node = scene.nodes[0];
@@ -72,12 +72,48 @@ namespace vks
 			std::cout << "gltfModel_pbr 未找到 mesh" << std::endl;
 			return;
 		}
-		render->colorImg = &primitive->material.baseColorTexture->descriptor;
+		
 		render->normalImg = &primitive->material.normalTexture->descriptor;
 		render->ocImg = &primitive->material.occlusionTexture->descriptor;
-		render->specImg = &primitive->material.extension.specularGlossinessTexture->descriptor;
 
+		//高光贴图
+		if (primitive->material.emissiveTexture == nullptr)
+		{
+			render->mat.emissiveTextureSet = -1;
+		}
+		else
+		{
+			render->mat.emissiveTextureSet = 0;
+			render->emissiveImg = &primitive->material.emissiveTexture->descriptor;
+		}
+		//到根节点的矩阵
+		//render->toRoot = node->mesh->uniformBuffer.descriptorSet;
+		render->model = shaderValuesScene.model * node->getMatrix();
+		geos::PbrMaterial* mat = &render->mat;
 
+		mat->emissiveFactor = primitive->material.emissiveFactor;
+		mat->alphaMask = static_cast<float>(primitive->material.alphaMode == vkglTF::Material::ALPHAMODE_MASK);
+		mat->alphaMaskCutoff = primitive->material.alphaCutoff;
+
+		//金属流
+		if (render->isMetallic)//metallic
+		{
+			render->colorImg = &primitive->material.baseColorTexture->descriptor;
+			render->metalRough = &primitive->material.metallicRoughnessTexture->descriptor;
+
+			mat->baseColorFactor = primitive->material.baseColorFactor;
+			mat->metallicFactor = primitive->material.metallicFactor;
+			mat->roughnessFactor = primitive->material.roughnessFactor;
+		}
+		//高光流
+		if (!render->isMetallic)//specular
+		{
+			render->colorImg = &primitive->material.extension.diffuseTexture->descriptor;
+			render->specImg = &primitive->material.extension.specularGlossinessTexture->descriptor;
+
+			mat->diffuseFactor = primitive->material.extension.diffuseFactor;
+			mat->specularFactor = glm::vec4(primitive->material.extension.specularFactor, 1.0f);
+		}
 	}
 	void gltfModel_pbr::renderNode(VkCommandBuffer cmd,vkglTF::Node* node, uint32_t cbIndex, vkglTF::Material::AlphaMode alphaMode)
 	{

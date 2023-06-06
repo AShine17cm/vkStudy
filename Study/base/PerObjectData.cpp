@@ -4,20 +4,17 @@ namespace geos
 {
 	PbrMaterial::PbrMaterial()
 	{
-		baseColorFactor = { 1,1,1,1 };
-		emissiveFactor = { 0,0,0,0 };
-		diffuseFactor = { 1,1,1,1 };
-		specularFactor = { 1,1,1,1 };
-
-		baseColorTextureSet = 0;
-		physicalDescriptorTextureSet = 0;
-		normalTextureSet = 0;
+		baseColorFactor = { 1,1,1,1 };		//金属流
+		emissiveFactor = { 1,1,1,1 };		//为 1
+		diffuseFactor = { 1,1,1,1 };		//高光流
+		specularFactor = { 0,0,0,1 };		//高光流
+		//texture set 不是 0 就是 -1
 		occlusionTextureSet = 0;
 		emissiveTextureSet = -1;
 
-		metallicFactor = 0.8f;
-		roughnessFactor = 0.2f;
-		alphaMask = 1.0f;
+		metallicFactor = 1.0f;	//有贴图 一般为 1
+		roughnessFactor = 1.0f;	//有贴图 一般为 1
+		alphaMask = 0.0f;
 		alphaMaskCutoff = 1.0f;
 
 		exposure = 4.5f;
