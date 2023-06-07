@@ -320,6 +320,23 @@ vec4 shade( )
 	if (mat.debugViewInputs > 0.0) 
 	{
 		int index = int(mat.debugViewInputs);
+		float roughX=0;
+		float metalX=0;
+
+		if(mat.isMetallic==0)//高光流的 调试信息 转 金属度
+		{
+			roughX = 1.0 - texture(physicalDescriptorMap, inUV).a;// a通道 光泽度
+			vec4 diffX = SRGBtoLINEAR(texture(colorMap, inUV));
+			vec3 specX = SRGBtoLINEAR(texture(physicalDescriptorMap, inUV)).rgb;
+			float maxSpecX = max(max(specX.r, specX.g), specX.b);
+			//光泽度 转为 金属度
+			metalX = convertMetallic(diffX.rgb, specX, maxSpecX);
+		}else
+		{
+			vec4 samX = texture(physicalDescriptorMap, inUV);
+			roughX=samX.g;
+			metalX=samX.b;
+		}
 		switch (index) {
 			case 1:
 				finalColor.rgba = texture(colorMap, inUV );
@@ -334,10 +351,12 @@ vec4 shade( )
 				finalColor.rgb = (mat.emissiveTextureSet > -1) ? texture(emissiveMap, inUV).rgb : vec3(0.0f);
 				break;
 			case 5:
-				finalColor.rgb = texture(physicalDescriptorMap, inUV).bbb;//金属度
+				finalColor.rgb =vec3(metalX);
+				//finalColor.rgb = texture(physicalDescriptorMap, inUV).bbb;//金属度
 				break;
 			case 6:
-				finalColor.rgb = texture(physicalDescriptorMap, inUV).ggg;//粗糙度
+				finalColor.rgb =vec3(roughX);
+				//finalColor.rgb =texture(physicalDescriptorMap, inUV).ggg;//粗糙度
 				break;
 		}
 		finalColor = SRGBtoLINEAR(finalColor);
