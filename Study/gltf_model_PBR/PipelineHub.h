@@ -121,7 +121,7 @@ struct PipelineHub
 		//ui
 		shaderStages= { VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_FRAGMENT_BIT };
 		shaderFiles = { "shaders/ui.vert.spv","shaders/ui.frag.spv" };
-		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_ui, &pi_ui, &vertexInputSCI_ui);
+		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_ui, &pi_ui, &vertexInputSCI_ui,pipelines::MgPipelineEx::Multisample);
 		/* 阴影阶段 使用定制的RenderPass */
 		shaderStages = { VK_SHADER_STAGE_VERTEX_BIT,VK_SHADER_STAGE_GEOMETRY_BIT };
 		shaderFiles = { "shaders/shadowCaster_gltf.vert.spv","shaders/shadowCaster.geom.spv" };
@@ -129,7 +129,7 @@ struct PipelineHub
 		/* pbr */
 		shaderStages = { VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_FRAGMENT_BIT };
 		shaderFiles = { "shaders/pbr_basic.vert.spv", "shaders/pbr_basic.frag.spv" };
-		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_pbrBasic, &pi_pbr_basic,&vertexInputSCI_gltf);
+		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_pbrBasic, &pi_pbr_basic,&vertexInputSCI_gltf,pipelines::MgPipelineEx::Multisample);
 	}
 	/* 根据 shader 创建 pipeline */
 	void createPipeline(VkDevice device, VkRenderPass renderPass, 
@@ -166,6 +166,9 @@ struct PipelineHub
 		switch (kind)
 		{
 		case pipelines::MgPipelineEx::ShadowMap:
+			extends.push_back(kind);
+			break;
+		case pipelines::MgPipelineEx::Multisample:
 			extends.push_back(kind);
 			break;
 		}

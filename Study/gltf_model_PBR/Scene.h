@@ -105,10 +105,10 @@ struct  Scene
 			"../data/environments/papermill.ktx",
 			"../data/models/Box/glTF-Embedded/Box.gltf");
 
-		helmet = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, helmetInfo);
-		ship = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, shipInfo);
-		dinosaur = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, dinosaurInfo);
-		landscape = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, landscapeInfo);
+		helmet = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, helmetInfo,true);
+		ship = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, shipInfo,true);
+		dinosaur = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, dinosaurInfo,true);
+		landscape = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, landscapeInfo,true);
 
 		geos::DebugPoints::Point pt;
 		pt = { glm::mat4(1.0),view->lightPoses[0],{1,0,0,18} };
@@ -129,7 +129,7 @@ struct  Scene
 		landscape->setup(descriptorPool);
 		landscape->preparePipelines(renderPass);
 
-		dxPoint.prepare(vulkanDevice, renderPass);
+		dxPoint.prepare(vulkanDevice, renderPass,true);
 	}
 	/* 画一个 gltf 模型 */
 	void draw_gltf(VkCommandBuffer cmd, uint32_t cmd_idx, int modelIdx)

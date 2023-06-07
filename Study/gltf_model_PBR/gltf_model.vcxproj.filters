@@ -21,7 +21,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test_gltf_Model.cpp">
+    <ClCompile Include="mg_Pbr_1.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

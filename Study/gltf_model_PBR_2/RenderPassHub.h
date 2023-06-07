@@ -27,7 +27,7 @@ struct RenderPassHub
 	VkExtent2D extent;
 	VkExtent2D shadowExtent;
 
-	//MSAA 多出来的两块内存
+	//MSAA 多出来的两块 透明内存
 	struct MultisampleTarget {
 		struct {
 			VkImage image;
@@ -49,8 +49,8 @@ struct RenderPassHub
 		extent = { WIDTH,HEIGHT };
 		swapchain = new mg::SwapChain(WIDTH, HEIGHT);
 		swapchain->createSwapChain(vulkanDevice->physicalDevice, device, surface);
+
 		setupMultisampleTarget(swapchain->imageFormat, depthFormat);				//MSAA 额外的 render target
-	
 		mg::renderpasses::createRenderPass_MSAA(swapchain->imageFormat, depthFormat, device, &renderPass);
 		/* 渲染Shadow-Map 所用的 RenderPass */
 		mg::renderpasses::createDepthRenderPass(depthFormat, device, &shadowPass);
