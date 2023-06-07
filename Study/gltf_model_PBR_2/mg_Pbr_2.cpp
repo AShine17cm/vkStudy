@@ -6,9 +6,8 @@
 #include "Frame.h"
 #include "Scene.h"
 #include "Input.h"
+#include "ui.h"
 #include "PerObjectData.h"
-
-//#include "VulkanglTFModel.h"
 
 class GeneralApp {
 public:
@@ -44,7 +43,8 @@ private:
     /* resource */
     Resource resource;
     Input* input;
-
+    ImGUI* imGui;
+    float deltaTime = 0.01f;
     std::vector<VkCommandBuffer> commandBuffers;
 
     std::vector<VkSemaphore> imageAvailableSemaphores;
@@ -88,19 +88,20 @@ private:
         scene.prepareStep2(descriptorPool, passHub.renderPass,&frames);
  
         passHub.createFrameBuffers(&resource);//为了 共享一个 depth-tex
+        prepareImGui();
 
         createCommandBuffers();
         createSyncObjects();
     }
-
+    void prepareImGui()
+    {
+        imGui = new ImGUI(vulkanDevice);
+        imGui->init((float)WIDTH, (float)HEIGHT);
+        imGui->initResources(passHub.renderPass, vulkanDevice->graphicsQueue, true);
+    }
     void mainLoop() {
         while (!glfwWindowShouldClose(window)) {
             input->Process(window);
-            /* 防止cmd对descriptor的占用，使用cache */
-            //for (int i = 0; i < frames.size(); i++) 
-            //{
-            //    frames[i].CacheKey(input->frame_op);
-            //}
             drawFrame( );
             glfwPollEvents();
         }
@@ -110,6 +111,7 @@ private:
 
     void cleanup() {
 
+        delete imGui;
         passHub.clean();
         piHub.cleanup(device);
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
@@ -214,8 +216,8 @@ private:
         resource.prepare(vulkanDevice,passHub.extent);
 
         VkDeviceSize bufferSizes[4] = {
-            sizeof(View::UniformBufferObject),
-            sizeof(Scene::UIData) };
+            sizeof(View::UniformBufferObject)
+            };
         /* Frame */
         frames.resize(MAX_FRAMES_IN_FLIGHT);
         for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
@@ -239,7 +241,7 @@ private:
         auto currentTime = std::chrono::high_resolution_clock::now();
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
         /* 计算帧之间的时间差 */
-        float deltaTime = time - lastTime;
+        deltaTime = time - lastTime;
         lastTime = time;
         /* 更新 模型和Camera */
         scene.update(pFrame,imageIndex, time, deltaTime);
@@ -312,7 +314,7 @@ private:
             //scene.draw_gltf(cmd, imageIndex, 1);//飞艇
             //scene.draw_gltf(cmd, imageIndex,2);//恐龙
 
-            drawUI(cmd, frame);
+            imGui->drawFrame(cmd);
             vkCmdEndRenderPass(cmd);
         }
 
@@ -328,19 +330,6 @@ private:
         scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 1,-1);
         scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 2,-1);
         scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_shadow, 3,-1);
-    }
-    /* ui */
-    void drawUI(VkCommandBuffer cmd, Frame* frame)
-    {
-        uint32_t dstSet = 0;
-        uint32_t batchIdx = 0;
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_ui);
-        dstSet = 0;
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ui, dstSet, 1, &frame->ui, 0, nullptr);
-        batchIdx = 5;
-        scene.draw(cmd, piHub.piLayout_ui, batchIdx);
-        batchIdx = 6;
-        scene.draw(cmd, piHub.piLayout_ui, batchIdx);
     }
     void createSyncObjects() {
         imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -363,9 +352,8 @@ private:
         }
     }
 
-
-
     void drawFrame( ) {
+
         vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
@@ -380,11 +368,16 @@ private:
             return;
         } 
 
+        imGui->updateUI(deltaTime, input->mousePre, input->mb_key==0, input->mb_key==1, input->mb_key==2);
+        ImGuiIO& io= ImGui::GetIO();
+        input->uiMask = io.WantCaptureMouse;//鼠标在 UI 上
+        imGui->newFrame();
+        imGui->updateBuffers();
+
         updateScene(currentFrame, imageIndex);
 
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
-
-        vkResetCommandBuffer(commandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+        //vkResetCommandBuffer(commandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
 
         recordCommandBuffer(commandBuffers[currentFrame], imageIndex);
 
@@ -394,7 +387,7 @@ private:
         VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[currentFrame]};
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitSemaphores =  waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffers[currentFrame];
@@ -418,6 +411,8 @@ private:
         result = vkQueuePresentKHR(presentQueue, &presentInfo);
 
         currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+
+        vkQueueWaitIdle(vulkanDevice->graphicsQueue);//需要解决 ImGUI 更新顶点的问题
     }
 
 

@@ -29,11 +29,6 @@ struct  Scene
 	VulkanDevice* vulkanDevice;
 	View* view;
 	Input* input;
-	struct UIData
-	{
-		std::array<vec4, 6 * countUI> pts;				//用于在 近剪切平面上画 UI
-		glm::ivec4 debug;
-	}ui;
 	geos::PbrBasic pbrBasic_bg = { {0.7f,0.6f,0.5f,1},0.7f,0.15f };		//roughtness,metallic
 
 	PbrEnv* env;
@@ -59,22 +54,6 @@ struct  Scene
 	{
 		this->vulkanDevice = vulkanDevice;
 		this->input = input;
-		/* ui点 */
-		ui.pts[0] = { -0.95,-0.7f,0,1 };
-		ui.pts[1] = { -0.45f,-0.95,1,0 };
-		ui.pts[2] = { -0.95,-0.95,0,0 };
-		ui.pts[3] = { -0.45f,-0.7f,1,1 };
-		ui.pts[4] = ui.pts[1];
-		ui.pts[5] = ui.pts[0];
-
-		ui.pts[6 + 0] = { 0.2f,-0.2f,0,1 };
-		ui.pts[6 + 1] = { 1.0f,-1.0f,1,0 };
-		ui.pts[6 + 2] = { 0.2f,-1.0f,0,0 };
-		ui.pts[6 + 3] = { 1.0f,-0.2f,1,1 };
-		ui.pts[6 + 4] = ui.pts[6 + 1];
-		ui.pts[6 + 5] = ui.pts[6 + 0];
-
-		ui.debug = { 1,1,1,1 };
 		/* 相机控制 */
 		view = new View(extent);
 		//gltf 模型信息
@@ -287,22 +266,7 @@ struct  Scene
 		{
 			input->flipShadows = false;
 			flipCounter_shadow = (flipCounter_shadow + 1) % 4;
-			switch (flipCounter_shadow)
-			{
-			case 0:
-				ui.debug = { 1,0,0,0 };
-				break;
-			case 1:
-				ui.debug = { 0,1,0,0 };
-				break;
-			case 2:
-				ui.debug = { 0,0,1,0 };
-				break;
-			case 3:
-				ui.debug = { 1,1,1,0 };
-				break;
-			}
-			view->data.debug = ui.debug;
+			view->data.debug = { 1,1,1,1 };//这里不起作用
 		}
 		this->deltaTime = deltaTime;
 		this->timer += deltaTime;
@@ -312,7 +276,6 @@ struct  Scene
 		dinosaur->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
 		landscape->updateUniformBuffers(imageIndex, view->data.proj, view->data.view, glm::vec3(view->data.camera));
 		//拷贝数据
-		memcpy(pFrame->ubo_ui.mapped, &ui, sizeof(UIData));
 		memcpy(pFrame->ubo_scene.mapped, &view->data, sizeof(View::UniformBufferObject));
 		memcpy(pFrame->ubo_pbr_bg.mapped, &pbrBasic_bg, sizeof(geos::PbrBasic));
 

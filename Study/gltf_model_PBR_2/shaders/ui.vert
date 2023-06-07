@@ -1,23 +1,25 @@
 #version 450
 
-out gl_PerVertex
+layout (location = 0) in vec2 inPos;
+layout (location = 1) in vec2 inUV;
+layout (location = 2) in vec4 inColor;
+
+layout (push_constant) uniform PushConstants {
+	vec2 scale;
+	vec2 translate;
+} pushConstants;
+
+layout (location = 0) out vec2 outUV;
+layout (location = 1) out vec4 outColor;
+
+out gl_PerVertex 
 {
-    vec4 gl_Position;
+	vec4 gl_Position;   
 };
 
-#define uiCount 2
-//(-1.0,-1.0)вСио╫г  (1.0,-1.0)срио╫г
-layout(set=0,binding=0) uniform ui
-{
-    vec4 pts[6*uiCount];
-    ivec4 debug;
-}ui_ubo;
-
-layout(location=0)out vec2 uv;
-layout(location=1)out flat int uiIdx;
 void main() 
 {
-    gl_Position=vec4(ui_ubo.pts[gl_VertexIndex].xy,0.0,1.0);
-    uv=ui_ubo.pts[gl_VertexIndex].zw;
-    uiIdx=gl_VertexIndex/6;
+	outUV = inUV;
+	outColor = inColor;
+	gl_Position = vec4(inPos * pushConstants.scale + pushConstants.translate, 0.0, 1.0);
 }

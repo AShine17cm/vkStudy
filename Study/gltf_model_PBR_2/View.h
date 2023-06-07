@@ -95,7 +95,7 @@ struct  View
 		int mb_key = input->mb_key;
 		int32_t dx = input->dx;
 		int32_t dy = input->dy;
-		if (mb_key > -1)
+		if (mb_key > -1&& !input->uiMask)//鼠标在 ui 上面 ?
 		{
 			//std::cout << "dx " << dx <<"dy " <<dy<< std::endl;
 			switch (mb_key)

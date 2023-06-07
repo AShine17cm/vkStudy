@@ -13,7 +13,6 @@ struct Resource
 
     textures::Texture* tex_depth;   //场景的深度测试
     textures::Texture* tex_sand;   
-    textures::Texture* tex_ui;      //一个操作说明
 
 
     void prepare(VulkanDevice* vulkanDevice,VkExtent2D swapchainExtent) 
@@ -49,9 +48,6 @@ struct Resource
             VK_IMAGE_USAGE_SAMPLED_BIT ,
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
         imgInfo.formats.samplerMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        tex_ui = new textures::Texture(vulkanDevice, imgInfo);
-        tex_ui->load("../textures/ui_pbr.psd");
-        tex_ui->genMips();
 
         tex_sand = new textures::Texture(vulkanDevice, imgInfo);
         tex_sand->load("../textures/sand.psd");
@@ -62,7 +58,6 @@ struct Resource
         /* 阴影贴图 */
         tex_shadow->destroy();
         tex_sand->destroy();
-        tex_ui->destroy();
         tex_depth->destroy();
     }
 };

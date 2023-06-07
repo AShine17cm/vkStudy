@@ -30,3 +30,6 @@ MSAA 是 RenderPass 层级
 影响到	RenderPass 中	所有执行的 GraphicsPipeline ( 需要设定状态 MultiSample StateCreateInfo 的  rasterizationSamples )
 如果某个	Pipeline	未设定正确的  MultiSample  图像位置就会出现 奇怪的漂移 和 遮挡关系
 
+ImGUI
+添加 ImGUI	为了解决 其动态更新顶点 Buffer 的问题， 加了 vkQueueWaitIdle
+

@@ -74,25 +74,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>.</OutDir>
-    <IncludePath>$(SolutionDir)VkLibraries\glm;$(SolutionDir)VkLibraries\glm\glm;$(SolutionDir)VkLibraries\tinygltf;$(SolutionDir)VkLibraries\gli-master\gli;$(SolutionDir)VkLibraries\vulkan;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\include;$(SolutionDir)base;$(SolutionDir)VkLibraries\stb-master;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)VkLibraries\imgui;$(SolutionDir)VkLibraries\glm;$(SolutionDir)VkLibraries\glm\glm;$(SolutionDir)VkLibraries\tinygltf;$(SolutionDir)VkLibraries\gli-master\gli;$(SolutionDir)VkLibraries\vulkan;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\include;$(SolutionDir)base;$(SolutionDir)VkLibraries\stb-master;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)x64\Debug;$(SolutionDir)VkLibraries\vulkan_Lib;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>.</OutDir>
-    <IncludePath>$(SolutionDir)VkLibraries\glm;$(SolutionDir)VkLibraries\glm\glm;$(SolutionDir)VkLibraries\tinygltf;$(SolutionDir)VkLibraries\gli-master\gli;$(SolutionDir)VkLibraries\vulkan;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\include;$(SolutionDir)base;$(SolutionDir)VkLibraries\stb-master;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)VkLibraries\imgui;$(SolutionDir)VkLibraries\glm;$(SolutionDir)VkLibraries\glm\glm;$(SolutionDir)VkLibraries\tinygltf;$(SolutionDir)VkLibraries\gli-master\gli;$(SolutionDir)VkLibraries\vulkan;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\include;$(SolutionDir)base;$(SolutionDir)VkLibraries\stb-master;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)x64\Debug;$(SolutionDir)VkLibraries\vulkan_Lib;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>.</OutDir>
-    <IncludePath>$(SolutionDir)VkLibraries\glm;$(SolutionDir)VkLibraries\glm\glm;$(SolutionDir)VkLibraries\tinygltf;$(SolutionDir)VkLibraries\gli-master\gli;$(SolutionDir)VkLibraries\vulkan;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\include;$(SolutionDir)base;$(SolutionDir)VkLibraries\stb-master;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)VkLibraries\imgui;$(SolutionDir)VkLibraries\glm;$(SolutionDir)VkLibraries\glm\glm;$(SolutionDir)VkLibraries\tinygltf;$(SolutionDir)VkLibraries\gli-master\gli;$(SolutionDir)VkLibraries\vulkan;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\include;$(SolutionDir)base;$(SolutionDir)VkLibraries\stb-master;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)x64\Debug;$(SolutionDir)VkLibraries\vulkan_Lib;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>.</OutDir>
-    <IncludePath>$(SolutionDir)VkLibraries\glm;$(SolutionDir)VkLibraries\glm\glm;$(SolutionDir)VkLibraries\tinygltf;$(SolutionDir)VkLibraries\gli-master\gli;$(SolutionDir)VkLibraries\vulkan;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\include;$(SolutionDir)base;$(SolutionDir)VkLibraries\stb-master;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)VkLibraries\imgui;$(SolutionDir)VkLibraries\glm;$(SolutionDir)VkLibraries\glm\glm;$(SolutionDir)VkLibraries\tinygltf;$(SolutionDir)VkLibraries\gli-master\gli;$(SolutionDir)VkLibraries\vulkan;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\include;$(SolutionDir)base;$(SolutionDir)VkLibraries\stb-master;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)x64\Debug;$(SolutionDir)VkLibraries\vulkan_Lib;$(SolutionDir)VkLibraries\glfw-3.3.7.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -169,6 +169,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="mg_Pbr_2.cpp" />
+    <ClCompile Include="ui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\base\base.vcxproj">
@@ -211,6 +212,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SimpleRandom.h" />
+    <ClInclude Include="ui.h" />
     <ClInclude Include="View.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

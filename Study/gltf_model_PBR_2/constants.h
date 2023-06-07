@@ -4,7 +4,7 @@
 #define LIGHT_COUNT 1
 
 #define countUI  2
-#define WIDTH 1000
+#define WIDTH 1200
 #define HEIGHT 800
 #define MAX_FRAMES_IN_FLIGHT 2
 

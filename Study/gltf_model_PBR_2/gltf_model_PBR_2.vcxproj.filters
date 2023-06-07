@@ -24,6 +24,9 @@
     <ClCompile Include="mg_Pbr_2.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ui.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\ui.frag">
@@ -128,6 +131,9 @@
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="constants.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ui.h">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

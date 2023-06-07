@@ -3,6 +3,7 @@
 /* 处理 鼠标 键盘输入 */
 struct Input
 {
+    bool uiMask = false;
     bool flipShadows = false;
     bool flipEquation = false;
     bool flipViewInputs = false;
