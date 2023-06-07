@@ -42,6 +42,7 @@ struct  Scene
 	vks::gltfModel_pbr* dinosaur;
 	vks::gltfModel_pbr* landscape;
 
+	geos::gltfPbrRender_spec* helmetRender;
 	geos::gltfPbrRender_spec* dinoRender;
 	geos::gltfPbrRender_spec* shipRender1;
 	geos::gltfPbrRender_spec* shipRender2;
@@ -88,8 +89,8 @@ struct  Scene
 			60,	{0,1,0}
 		};
 		vks::gltfModel_pbr::ModelInfo dinosaurInfo = {
-			"../models/Rampaging T-Rex.glb",
-			//"../models/Unicorn.glb",
+			//"../models/Rampaging T-Rex.glb",
+			"../models/Unicorn.glb",
 			1.0f,
 			{9,3.2f,0},
 			15,	{0,1,0}
@@ -131,25 +132,32 @@ struct  Scene
 		landscape->preparePipelines(renderPass);
 
 		//获取渲染参数
+		helmetRender = new geos::gltfPbrRender_spec();
+		helmetRender->isMetallic = true;
+		helmetRender->emptyImg = &env->empty.descriptor;
+		helmetRender->mat.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
+		helmetRender->mat.isMetallic = 1;
+		helmet->getSpecRender(helmetRender);
+
 		dinoRender = new geos::gltfPbrRender_spec();
 		dinoRender->isMetallic = false;
 		dinoRender->emptyImg = &env->empty.descriptor;
 		dinoRender->mat.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
-		dinosaur->counter = 0;
+		dinoRender->mat.isMetallic = 0;
 		dinosaur->getSpecRender(dinoRender);
 
 		shipRender1 = new geos::gltfPbrRender_spec();
 		shipRender1->isMetallic = false;
 		shipRender1->emptyImg = &env->empty.descriptor;
 		shipRender1->mat.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
-		ship->counter = 0;
+		shipRender1->mat.isMetallic = 0;
 		ship->getSpecRender(shipRender1,0);
 
 		shipRender2 = new geos::gltfPbrRender_spec();
 		shipRender2->isMetallic = false;
 		shipRender2->emptyImg = &env->empty.descriptor;
 		shipRender2->mat.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
-		ship->counter = 0;
+		shipRender2->mat.isMetallic = 0;
 		ship->getSpecRender(shipRender2,1);
 
 		dxPoint.prepare(vulkanDevice, renderPass,true);
@@ -157,6 +165,7 @@ struct  Scene
 		for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
 			(*frames)[i].add_pbrEnv(vulkanDevice->logicalDevice, env);
+			(*frames)[i].add_pbrRender(vulkanDevice->logicalDevice, helmetRender, 0);
 			(*frames)[i].add_pbrRender(vulkanDevice->logicalDevice, dinoRender,2);
 			(*frames)[i].add_pbrRender(vulkanDevice->logicalDevice, shipRender1, 1);
 			(*frames)[i].add_pbrRender(vulkanDevice->logicalDevice, shipRender2, 11);
@@ -248,15 +257,27 @@ struct  Scene
 			input->flipEquation = false;
 			flipCounter_equation =(flipCounter_equation + 1) % 6;		//0::从 1 到 5
 
+			helmetRender->mat.debugViewEquation = flipCounter_equation;
 			dinoRender->mat.debugViewEquation = flipCounter_equation;
 			shipRender1->mat.debugViewEquation = flipCounter_equation;
 			shipRender2->mat.debugViewEquation = flipCounter_equation;
+
+			helmetRender->mat.debugViewInputs = 0;
+			dinoRender->mat.debugViewInputs = 0;
+			shipRender1->mat.debugViewInputs = 0;
+			shipRender2->mat.debugViewInputs = 0;
 		}
 		if (input->flipViewInputs)
 		{
 			input->flipViewInputs = false;
 			flipCounter_viewInputs =  (flipCounter_viewInputs + 1) % 7;	//0::从 1 到 6
 
+			helmetRender->mat.debugViewEquation = 0;
+			dinoRender->mat.debugViewEquation = 0;
+			shipRender1->mat.debugViewEquation = 0;
+			shipRender2->mat.debugViewEquation = 0;
+
+			helmetRender->mat.debugViewInputs = flipCounter_viewInputs;
 			dinoRender->mat.debugViewInputs = flipCounter_viewInputs;
 			shipRender1->mat.debugViewInputs = flipCounter_viewInputs;
 			shipRender2->mat.debugViewInputs = flipCounter_viewInputs;
@@ -295,6 +316,7 @@ struct  Scene
 		memcpy(pFrame->ubo_scene.mapped, &view->data, sizeof(View::UniformBufferObject));
 		memcpy(pFrame->ubo_pbr_bg.mapped, &pbrBasic_bg, sizeof(geos::PbrBasic));
 
+		memcpy(pFrame->ubo_pbr_helmet.mapped, &helmetRender->mat, sizeof(geos::PbrMaterial));
 		memcpy(pFrame->ubo_pbr_dino.mapped, &dinoRender->mat, sizeof(geos::PbrMaterial));
 		memcpy(pFrame->ubo_pbr_ship1.mapped, &shipRender1->mat, sizeof(geos::PbrMaterial));
 		memcpy(pFrame->ubo_pbr_ship2.mapped, &shipRender2->mat, sizeof(geos::PbrMaterial));

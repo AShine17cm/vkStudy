@@ -1,2 +1,4 @@
-﻿  gltfModel_pbr.cpp
+﻿  PerObjectData.cpp
+  gltfModel_pbr.cpp
+  正在生成代码...
   base.vcxproj -> E:\VulkanProj\vkStudy\Study\x64\Debug\base.lib

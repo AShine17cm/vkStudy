@@ -31,6 +31,8 @@ namespace geos
 		glm::vec4 diffuseFactor = { 1,1,1,1 };
 		glm::vec4 specularFactor = { 0,0,0,1 };
 
+		int isMetallic = 1;
+
 		int occlusionTextureSet = 0;
 		int emissiveTextureSet = -1;
 

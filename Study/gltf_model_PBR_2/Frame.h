@@ -26,6 +26,7 @@ struct Frame
 
 	VkDescriptorSet pbrBasic_bg;
 	VkDescriptorSet pbr_Env;
+	VkDescriptorSet pbr_IBL_helmet;
 	VkDescriptorSet pbr_IBL_dino;
 	VkDescriptorSet pbr_IBL_ship1;
 	VkDescriptorSet pbr_IBL_ship2;
@@ -35,6 +36,7 @@ struct Frame
 	mg::Buffer ubo_pbr_bg;
 	//mg::Buffer ubo_pbr_albedo;
 
+	mg::Buffer ubo_pbr_helmet;
 	mg::Buffer ubo_pbr_dino;
 	mg::Buffer ubo_pbr_ship1;
 	mg::Buffer ubo_pbr_ship2;
@@ -57,6 +59,8 @@ struct Frame
 		descriptors::allocateDescriptorSet(&pipes->setLayout_shadow_h, 1, descriptorPool, device, &scene_shadow_h);//阴影合成
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrBasic, 1, descriptorPool, device, &pbrBasic_bg);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrEnv, 1, descriptorPool, device, &pbr_Env);
+
+		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrTexs, 1, descriptorPool, device, &pbr_IBL_helmet);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrTexs, 1, descriptorPool, device, &pbr_IBL_dino);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrTexs, 1, descriptorPool, device, &pbr_IBL_ship1);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrTexs, 1, descriptorPool, device, &pbr_IBL_ship2);
@@ -79,6 +83,10 @@ struct Frame
 		vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			sizeof(geos::PbrMaterial), &ubo_pbr_helmet);
+		vulkanDevice->createBuffer(
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 			sizeof(geos::PbrMaterial), &ubo_pbr_dino);
 		vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -93,6 +101,7 @@ struct Frame
 		ubo_ui.map();
 		ubo_pbr_bg.map();
 
+		ubo_pbr_helmet.map();
 		ubo_pbr_dino.map();
 		ubo_pbr_ship1.map();
 		ubo_pbr_ship2.map();
@@ -173,6 +182,10 @@ struct Frame
 		VkDescriptorSet desc_set = nullptr;
 		switch (modelIdx)
 		{
+		case 0:
+			ubo = &ubo_pbr_helmet;
+			desc_set = pbr_IBL_helmet;
+			break;
 		case 1:
 			ubo = &ubo_pbr_ship1;
 			desc_set = pbr_IBL_ship1;
@@ -190,7 +203,7 @@ struct Frame
 		infos = {
 			&ubo->descriptor,
 			render->colorImg,
-			render->isMetallic?render->metalRough: render->specImg,
+			render->isMetallic?render->metalRough: render->specImg,//金属流/高光流
 			render->normalImg,
 			render->ocImg,
 			render->mat.emissiveTextureSet==-1? render->emptyImg:render->emissiveImg
@@ -222,6 +235,7 @@ struct Frame
 		ubo_scene.destroy();
 		ubo_pbr_bg.destroy();
 
+		ubo_pbr_helmet.destroy();
 		ubo_pbr_dino.destroy();
 		ubo_pbr_ship1.destroy();
 		ubo_pbr_ship2.destroy();

@@ -283,20 +283,22 @@ private:
             /* 场景信息+ShadowMap */
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow_h, dstSet, 1, &frame->scene_shadow_h, 0, nullptr);
             dstSet = 1;
+            //自定义 基础 Pbr 渲染
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_pbr_basic);
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbrBasic_bg, 0, nullptr);
-            //海岛
-            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 3,-1);
-            //自定义 基础 Pbr 渲染
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 3,-1);    //海岛
             //vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrBasic, dstSet, 1, &frame->pbrBasic, 0, nullptr);
-            //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 2);
-            //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 1);
+            //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 2);     //飞艇
+            //scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrBasic, 1);     //恐龙
             // 
             //自定义的 IBL
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_pbr_IBL);
             dstSet = 1;//pbr 环境
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrEnv, dstSet, 1, &frame->pbr_Env, 0, nullptr);
             dstSet = 2;//pbr 纹理
+            //头盔  金属流
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrIBL, dstSet, 1, &frame->pbr_IBL_helmet, 0, nullptr);
+            scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrIBL, 0, -1);
             //恐龙  高光流
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrIBL, dstSet, 1, &frame->pbr_IBL_dino, 0, nullptr);
             scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrIBL, 2,-1);
@@ -306,7 +308,7 @@ private:
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_pbrIBL, dstSet, 1, &frame->pbr_IBL_ship2, 0, nullptr);
             scene.draw_gltf_ByXPipe(cmd, piHub.piLayout_pbrIBL, 1, 2);
 
-            scene.draw_gltf(cmd,imageIndex,0);//头盔 金属流
+            //scene.draw_gltf(cmd,imageIndex,0);//头盔 金属流
             //scene.draw_gltf(cmd, imageIndex, 1);//飞艇
             //scene.draw_gltf(cmd, imageIndex,2);//恐龙
 

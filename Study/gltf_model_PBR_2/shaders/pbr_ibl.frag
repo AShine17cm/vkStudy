@@ -36,6 +36,7 @@ layout (set=2,binding=0) uniform PbrMaterial
 	vec4 diffuseFactor;		//高光流
 	vec4 specularFactor;
 
+	int isMetallic;
 	int occlusionTextureSet;
 	int emissiveTextureSet;
 
@@ -201,22 +202,45 @@ vec4 shade( )
 
 	baseColor = SRGBtoLINEAR(texture(colorMap,inUV )) * mat.baseColorFactor;
 
+	//metallic/////// 金属流
+	if(mat.isMetallic==1)
+	{
+		// Metallic and Roughness material properties are packed together
+		// In glTF, these factors can be specified by fixed scalar values
+		// or from a metallic-roughness map
+		perceptualRoughness = mat.roughnessFactor;
+		metallic = mat.metallicFactor;
+
+		// Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
+		// This layout intentionally reserves the 'r' channel for (optional) occlusion map data
+		vec4 mrSample = texture(physicalDescriptorMap, inUV);
+		perceptualRoughness = mrSample.g * perceptualRoughness;
+		metallic = mrSample.b * metallic;
+
+		// Roughness is authored as perceptual roughness; as is convention,
+		// convert to material roughness by squaring the perceptual roughness [2].
+
+		// The albedo may be defined from a base texture or a flat color
+		baseColor = SRGBtoLINEAR(texture(colorMap, inUV)) * mat.baseColorFactor;
+	}
+
 	//specular///////  高光流
-	// Values from specular glossiness workflow are converted to metallic roughness
-	perceptualRoughness = 1.0 - texture(physicalDescriptorMap, inUV).a;
-	const float epsilon = 1e-6;
+	if(mat.isMetallic==0)
+	{
+		// Values from specular glossiness workflow are converted to metallic roughness
+		perceptualRoughness = 1.0 - texture(physicalDescriptorMap, inUV).a;
+		const float epsilon = 1e-6;
 
-	vec4 diffuse = SRGBtoLINEAR(texture(colorMap, inUV));
-	vec3 specular = SRGBtoLINEAR(texture(physicalDescriptorMap, inUV)).rgb;
-	float maxSpecular = max(max(specular.r, specular.g), specular.b);
-	// Convert metallic value from specular glossiness inputs
-	metallic = convertMetallic(diffuse.rgb, specular, maxSpecular);
+		vec4 diffuse = SRGBtoLINEAR(texture(colorMap, inUV));
+		vec3 specular = SRGBtoLINEAR(texture(physicalDescriptorMap, inUV)).rgb;
+		float maxSpecular = max(max(specular.r, specular.g), specular.b);
+		// Convert metallic value from specular glossiness inputs
+		metallic = convertMetallic(diffuse.rgb, specular, maxSpecular);
 
-	vec3 baseColorDiffusePart = diffuse.rgb * ((1.0 - maxSpecular) / (1 - c_MinRoughness) / max(1 - metallic, epsilon)) * mat.diffuseFactor.rgb;
-	vec3 baseColorSpecularPart = specular - (vec3(c_MinRoughness) * (1 - metallic) * (1 / max(metallic, epsilon))) * mat.specularFactor.rgb;
-	baseColor = vec4(mix(baseColorDiffusePart, baseColorSpecularPart, metallic * metallic), diffuse.a);
-	//specular/////
-
+		vec3 baseColorDiffusePart = diffuse.rgb * ((1.0 - maxSpecular) / (1 - c_MinRoughness) / max(1 - metallic, epsilon)) * mat.diffuseFactor.rgb;
+		vec3 baseColorSpecularPart = specular - (vec3(c_MinRoughness) * (1 - metallic) * (1 / max(metallic, epsilon))) * mat.specularFactor.rgb;
+		baseColor = vec4(mix(baseColorDiffusePart, baseColorSpecularPart, metallic * metallic), diffuse.a);
+	}
 	baseColor *= inColor;
 	diffuseColor = baseColor.rgb * (vec3(1.0) - f0);
 	diffuseColor *= 1.0 - metallic;
@@ -281,8 +305,14 @@ vec4 shade( )
     vec4 coord=scene.lights[0].mvp* vec4(inPos,1.0);
     float shadow= filterPCF(coord,0);
     if(scene.debug[0]==0) shadow=1.0;
-
 	color*=shadow;
+	//自发光
+	if (mat.emissiveTextureSet > -1)
+	{
+		vec3 emissive = SRGBtoLINEAR(texture(emissiveMap, inUV)).rgb;
+		color += emissive;
+	}
+
     vec4 finalColor= vec4(color,baseColor.a);
 
 	//调试 纹理
