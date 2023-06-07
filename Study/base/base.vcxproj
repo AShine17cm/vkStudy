@@ -167,6 +167,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\VkLibraries\imgui\imgui.cpp" />
+    <ClCompile Include="..\VkLibraries\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\VkLibraries\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\VkLibraries\imgui\imgui_widgets.cpp" />
     <ClCompile Include="batches.cpp" />
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="buffers.cpp" />

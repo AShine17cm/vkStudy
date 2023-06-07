@@ -19,6 +19,9 @@
     <Filter Include="thirdParty">
       <UniqueIdentifier>{e2137e70-9848-465a-bc34-1dd03adf2371}</UniqueIdentifier>
     </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{9d19f56f-07a1-417a-b2d9-db7b2631aedc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestCode.cpp">
@@ -107,6 +110,18 @@
     </ClCompile>
     <ClCompile Include="PerObjectData.cpp">
       <Filter>geo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VkLibraries\imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VkLibraries\imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VkLibraries\imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VkLibraries\imgui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

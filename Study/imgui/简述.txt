@@ -1,0 +1,9 @@
+引入将 imgui 的库
+将 imgui 的 几个cpp文件 加入到 base 的source 过滤器中
+
+抽离了一个  ui.h 和 ui.cpp 类	shaders文件夹 ui.vert 和 ui.frag
+在初始化时 创建这个类 和 相关 管线资源
+
+主循环	每帧 提供 deltaTime	鼠标状态
+修改变量  	newFrame + updateBuffers 更新一些想要动态改变的变量
+渲染	RenderPass   中调用 imgui -> drawFrame
