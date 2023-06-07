@@ -8,6 +8,7 @@
 #include "Frame.h"
 #include "View.h"
 #include "Input.h"
+#include "ui.h"
 
 #include "VulkanglTFModel.h"
 #include "gltfModel_pbr.h"
@@ -29,6 +30,7 @@ struct  Scene
 	VulkanDevice* vulkanDevice;
 	View* view;
 	Input* input;
+	UIData* uiData;
 	geos::PbrBasic pbrBasic_bg = { {0.7f,0.6f,0.5f,1},0.7f,0.15f };		//roughtness,metallic
 
 	PbrEnv* env;
@@ -47,8 +49,6 @@ struct  Scene
 	float deltaTime, timer = 0;
 	bool displayShadowMap = true;
 	int flipCounter_shadow = 3;		// 用于阴影的调试
-	int flipCounter_equation = 6;	//保证第一次 切换到 1
-	int flipCounter_viewInputs =7;	//保证第一次 切换到 1
 	//创建 模型
 	void prepare(VulkanDevice* vulkanDevice, VkExtent2D extent, Input* input, uint32_t swapchainImgCount)
 	{
@@ -99,8 +99,10 @@ struct  Scene
 		pt = { glm::mat4(1.0),view->lightPoses[0],{1,0,0,18} };
 		dxPoint.addPoint(pt);
 	}
-	void prepareStep2(VkDescriptorPool descriptorPool, VkRenderPass renderPass,std::vector<Frame>* frames)
+	void prepareStep2(VkDescriptorPool descriptorPool, VkRenderPass renderPass,std::vector<Frame>* frames, UIData* uiData)
 	{
+		this->uiData = uiData;
+
 		helmet->setup(descriptorPool);
 		helmet->preparePipelines(renderPass);
 		ship->setup(descriptorPool);
@@ -231,35 +233,35 @@ struct  Scene
 	/* 更新-UBO 资源 */
 	void update(Frame* pFrame, uint32_t imageIndex, float time, float deltaTime)
 	{
-		if (input->flipEquation)
+		helmetRender->mat.debugViewEquation = 0;
+		helmetRender->mat.debugViewInputs = 0;
+
+		shipRender1->mat.debugViewEquation = 0;
+		shipRender2->mat.debugViewEquation = 0;
+
+		shipRender1->mat.debugViewInputs = 0;
+		shipRender2->mat.debugViewInputs = 0;
+
+		dinoRender->mat.debugViewEquation = 0;
+		dinoRender->mat.debugViewInputs = 0;
+
+		if (uiData->operate[0])
 		{
-			input->flipEquation = false;
-			flipCounter_equation =(flipCounter_equation + 1) % 6;		//0::从 1 到 5
-
-			helmetRender->mat.debugViewEquation = flipCounter_equation;
-			dinoRender->mat.debugViewEquation = flipCounter_equation;
-			shipRender1->mat.debugViewEquation = flipCounter_equation;
-			shipRender2->mat.debugViewEquation = flipCounter_equation;
-
-			helmetRender->mat.debugViewInputs = 0;
-			dinoRender->mat.debugViewInputs = 0;
-			shipRender1->mat.debugViewInputs = 0;
-			shipRender2->mat.debugViewInputs = 0;
+			helmetRender->mat.debugViewEquation = uiData->equationCounter;
+			helmetRender->mat.debugViewInputs = uiData->inputsCounter;
 		}
-		if (input->flipViewInputs)
+		if (uiData->operate[1])
 		{
-			input->flipViewInputs = false;
-			flipCounter_viewInputs =  (flipCounter_viewInputs + 1) % 7;	//0::从 1 到 6
+			shipRender1->mat.debugViewEquation = uiData->equationCounter;
+			shipRender2->mat.debugViewEquation = uiData->equationCounter;
 
-			helmetRender->mat.debugViewEquation = 0;
-			dinoRender->mat.debugViewEquation = 0;
-			shipRender1->mat.debugViewEquation = 0;
-			shipRender2->mat.debugViewEquation = 0;
-
-			helmetRender->mat.debugViewInputs = flipCounter_viewInputs;
-			dinoRender->mat.debugViewInputs = flipCounter_viewInputs;
-			shipRender1->mat.debugViewInputs = flipCounter_viewInputs;
-			shipRender2->mat.debugViewInputs = flipCounter_viewInputs;
+			shipRender1->mat.debugViewInputs = uiData->inputsCounter;
+			shipRender2->mat.debugViewInputs = uiData->inputsCounter;
+		}
+		if (uiData->operate[2])
+		{
+			dinoRender->mat.debugViewEquation = uiData->equationCounter;
+			dinoRender->mat.debugViewInputs = uiData->inputsCounter;
 		}
 
 		if (input->flipShadows) //3个光源的阴影,逐次展示，共同展示

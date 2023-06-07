@@ -81,14 +81,14 @@ private:
         createGraphicsPipeline();
         /* geos */
 
-        scene.prepare(vulkanDevice,passHub.extent,input,passHub.swapchain->imageCount);
+        scene.prepare(vulkanDevice,passHub.extent,input, passHub.swapchain->imageCount);
 
         createResources();
 
-        scene.prepareStep2(descriptorPool, passHub.renderPass,&frames);
+        prepareImGui();
+        scene.prepareStep2(descriptorPool, passHub.renderPass,&frames,&imGui->data);
  
         passHub.createFrameBuffers(&resource);//为了 共享一个 depth-tex
-        prepareImGui();
 
         createCommandBuffers();
         createSyncObjects();

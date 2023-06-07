@@ -5,8 +5,8 @@ struct Input
 {
     bool uiMask = false;
     bool flipShadows = false;
-    bool flipEquation = false;
-    bool flipViewInputs = false;
+    //bool flipEquation = false;
+    //bool flipViewInputs = false;
     /* Êó±êÊý¾Ý */
     int mb_key = -1;
     glm::vec2 mouseStart;
@@ -103,16 +103,16 @@ struct Input
         switch (funcKey)
         {
         case GLFW_KEY_1:
-            flipEquation = true;
+            flipShadows = true;
+            //flipEquation = true;
             funcKey = -1;
             break;
         case GLFW_KEY_2:
-            flipViewInputs = true;
-            funcKey = -1;
+            //flipViewInputs = true;
+            //funcKey = -1;
             break;
         case GLFW_KEY_3:
-            flipShadows = true;
-            funcKey = -1;
+            //funcKey = -1;
 
             break;
         case GLFW_KEY_4:

@@ -211,8 +211,7 @@ vec4 shade( )
 		perceptualRoughness = mat.roughnessFactor;
 		metallic = mat.metallicFactor;
 
-		// Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
-		// This layout intentionally reserves the 'r' channel for (optional) occlusion map data
+		// 粗糙度 g  金属度 b   OC (可选) r
 		vec4 mrSample = texture(physicalDescriptorMap, inUV);
 		perceptualRoughness = mrSample.g * perceptualRoughness;
 		metallic = mrSample.b * metallic;
@@ -228,13 +227,15 @@ vec4 shade( )
 	if(mat.isMetallic==0)
 	{
 		// Values from specular glossiness workflow are converted to metallic roughness
-		perceptualRoughness = 1.0 - texture(physicalDescriptorMap, inUV).a;
+		//高光流 转 金属流
+		perceptualRoughness = 1.0 - texture(physicalDescriptorMap, inUV).a;// a通道 光泽度
 		const float epsilon = 1e-6;
 
 		vec4 diffuse = SRGBtoLINEAR(texture(colorMap, inUV));
 		vec3 specular = SRGBtoLINEAR(texture(physicalDescriptorMap, inUV)).rgb;
 		float maxSpecular = max(max(specular.r, specular.g), specular.b);
 		// Convert metallic value from specular glossiness inputs
+		//光泽度 转为 金属度
 		metallic = convertMetallic(diffuse.rgb, specular, maxSpecular);
 
 		vec3 baseColorDiffusePart = diffuse.rgb * ((1.0 - maxSpecular) / (1 - c_MinRoughness) / max(1 - metallic, epsilon)) * mat.diffuseFactor.rgb;
@@ -333,10 +334,10 @@ vec4 shade( )
 				finalColor.rgb = (mat.emissiveTextureSet > -1) ? texture(emissiveMap, inUV).rgb : vec3(0.0f);
 				break;
 			case 5:
-				finalColor.rgb = texture(physicalDescriptorMap, inUV).bbb;
+				finalColor.rgb = texture(physicalDescriptorMap, inUV).bbb;//金属度
 				break;
 			case 6:
-				finalColor.rgb = texture(physicalDescriptorMap, inUV).ggg;
+				finalColor.rgb = texture(physicalDescriptorMap, inUV).ggg;//粗糙度
 				break;
 		}
 		finalColor = SRGBtoLINEAR(finalColor);

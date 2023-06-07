@@ -358,25 +358,37 @@ void ImGUI::newFrame( )
 {
 	ImGui::NewFrame();
 	float scale = 1.0f;
-	// SRS - Set initial position and size of Example settings window
-	ImGui::SetNextWindowPos(ImVec2(20 * scale, 360 * scale), ImGuiSetCond_FirstUseEver);
+	
+	ImGui::SetNextWindowPos(ImVec2(20 * scale, 20 * scale), ImGuiSetCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300 * scale, 200 * scale), ImGuiSetCond_FirstUseEver);
-	ImGui::Begin("Example settings");
-	ImGui::Text("Camera");
-	ImGui::InputFloat3("position", &data.valueX, 2);
-	ImGui::Checkbox("Render models", &data.displayModels);
-	ImGui::Separator();
-	ImGui::SliderFloat("Light speed", &data.lightSpeed, 0.1f, 1.0f);
-	if (ImGui::Button("Button"))
-	{
 
+	ImGui::Begin("Debug Shading");
+	//选择 操作模型
+	ImGui::Text("Models:");
+	ImGui::Checkbox(data.models[0].c_str(), &data.operate[0]); ImGui::SameLine();
+	ImGui::Checkbox(data.models[1].c_str(), &data.operate[1]); ImGui::SameLine();
+	ImGui::Checkbox(data.models[2].c_str(), &data.operate[2]); 
+	ImGui::Separator();
+	if (ImGui::Button("Equation"))
+	{
+		data.equationCounter = (data.equationCounter + 1) % 6;// data.brdf->size();
+		data.inputsCounter = -1;
 	}
-	static int e = 0;
-	ImGui::RadioButton("radio a", &e, 0); ImGui::SameLine();
-	ImGui::RadioButton("radio b", &e, 1); ImGui::SameLine();
-	ImGui::RadioButton("radio c", &e, 2);
+	ImGui::SameLine(); ImGui::Spacing();ImGui::SameLine(); ImGui::Text(data.brdf[data.equationCounter].c_str());
+	if (ImGui::Button("Inputs"))
+	{
+		data.equationCounter = -1;
+		data.inputsCounter = (data.inputsCounter + 1) % 7;// data.inputs->size();
+	}
+	ImGui::SameLine(); ImGui::Spacing(); ImGui::SameLine(); ImGui::Text(data.inputs[data.inputsCounter].c_str());
+
+	//ImGui::InputFloat3("position", &data.valueX, 2);
+	//ImGui::SliderFloat("Light speed", &data.lightSpeed, 0.1f, 1.0f);
+	//static int e = 0;
+	//ImGui::RadioButton("radio a", &e, 0);
 	//颜色拾取
-	ImGui::ColorEdit4("Color", data.color);
+	//ImGui::ColorEdit4("Color", data.color);
+
 	ImGui::End();
 
 	// Render to generate draw buffers

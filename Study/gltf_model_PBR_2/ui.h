@@ -8,11 +8,14 @@
 
 struct UIData
 {
-	bool displayModels;
+	std::string models[3] = { "Helmet","Ship","Dino" };
+	std::string brdf[6] = { "NONE","Diff( L,N )","F ( L,H )","G ( L,V,H )","D ( H )","Specular" };
+	std::string inputs[7] = { "NONE","Color","Normal","Occlusion","Emission","Metallic","Roughness" };
+	bool operate[3] = { true,false,false };
 	float color[4] = { 1,1,1,1 };
-	float lightSpeed;
-	float valueX = 1.0f;
-	// UI params are set via push constants
+	int32_t equationCounter = 0;
+	int32_t inputsCounter = 0;
+
 	struct PushConstBlock {
 		glm::vec2 scale;
 		glm::vec2 translate;
