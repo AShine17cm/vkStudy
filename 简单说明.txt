@@ -12,3 +12,4 @@
 6. deferred
 7. multi_threading
 8. gltfModel_pbr
+9. gltfModel_pbr 2

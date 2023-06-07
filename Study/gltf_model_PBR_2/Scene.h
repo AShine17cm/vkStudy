@@ -89,8 +89,8 @@ struct  Scene
 			60,	{0,1,0}
 		};
 		vks::gltfModel_pbr::ModelInfo dinosaurInfo = {
-			//"../models/Rampaging T-Rex.glb",
-			"../models/Unicorn.glb",
+			"../models/Rampaging T-Rex.glb",
+			//"../models/Unicorn.glb",
 			1.0f,
 			{9,3.2f,0},
 			15,	{0,1,0}
