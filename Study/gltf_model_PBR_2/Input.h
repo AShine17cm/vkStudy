@@ -5,8 +5,6 @@ struct Input
 {
     bool uiMask = false;
     bool flipShadows = false;
-    //bool flipEquation = false;
-    //bool flipViewInputs = false;
     /* Êó±êÊı¾İ */
     int mb_key = -1;
     glm::vec2 mouseStart;

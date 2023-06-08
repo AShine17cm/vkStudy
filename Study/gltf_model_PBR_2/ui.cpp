@@ -372,12 +372,12 @@ void ImGUI::newFrame( )
 	if (ImGui::Button("Equation"))
 	{
 		data.equationCounter = (data.equationCounter + 1) % 6;// data.brdf->size();
-		data.inputsCounter = -1;
+		data.inputsCounter = 0;
 	}
 	ImGui::SameLine(); ImGui::Spacing();ImGui::SameLine(); ImGui::Text(data.brdf[data.equationCounter].c_str());
 	if (ImGui::Button("Inputs"))
 	{
-		data.equationCounter = -1;
+		data.equationCounter = 0;
 		data.inputsCounter = (data.inputsCounter + 1) % 7;// data.inputs->size();
 	}
 	ImGui::SameLine(); ImGui::Spacing(); ImGui::SameLine(); ImGui::Text(data.inputs[data.inputsCounter].c_str());
