@@ -7,7 +7,6 @@
 离屏 渲染  帧大小=64,512
 对每一级别的mip，cube的每一个面 都来一次
 
-
 brdf lut		brdf look-up-texture		512像素
 离屏渲染的 frame-buffer 就是 这个texture
 

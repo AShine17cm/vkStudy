@@ -97,12 +97,11 @@ vec4 SRGBtoLINEAR(vec4 srgbIn)
 	return srgbIn;
 	#endif //MANUAL_SRGB
 }
-// Find the normal for this fragment, pulling either from a predefined normal map
-// or from the interpolated mesh normal and tangent attributes.
+
+//切线方向 是 UV 的梯度差，UV 变化最大的方向
 vec3 getNormal()
 {
 	// Perturb normal, see http://www.thetenthplanet.de/archives/1180
-    //normal tex 不存在，inUV1 是 00?
 	vec3 tangentNormal = texture(normalMap, inUV).xyz * 2.0 - 1.0;
 
 	vec3 q1 = dFdx(inPos);
