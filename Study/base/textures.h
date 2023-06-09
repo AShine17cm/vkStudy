@@ -26,6 +26,8 @@ namespace textures
 			Sampler_AnisotropyDisable = 301,
 			Sampler_BorderWhite = 302,
 			Sampler_ShadowMap=303,
+
+			NO_ExtraSetting=400,	//不做额外的设置
 		};
 		struct MgImageInfo
 		{
@@ -101,12 +103,11 @@ namespace textures
 		//可处理Array, 内存布局和ktx相关
 		void createTexture(
 			MgImageInfo info,
-			uint32_t size,
+			uint32_t insertSize,
 			VulkanDevice* device,
 			VkImage* image,
 			VkDeviceMemory* imageMemory,
 			void* texData,
-			//uint32_t* offsets,
 			MgTextureEx* extend,
 			uint32_t exCount);
 		/* 在某一层，某一个mipLevel中插入数据 */

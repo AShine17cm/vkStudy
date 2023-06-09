@@ -1,6 +1,6 @@
-﻿  imgui.cpp
-  imgui_demo.cpp
-  imgui_draw.cpp
-  imgui_widgets.cpp
-  正在生成代码...
+﻿  Texture.cpp
+E:\VulkanProj\vkStudy\Study\base\Texture.cpp(34,19): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\Texture.cpp(51,105): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\Texture.cpp(51,32): warning C4244: “参数”: 从“VkDeviceSize”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\Texture.cpp(53,119): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
   base.vcxproj -> E:\VulkanProj\vkStudy\Study\x64\Debug\base.lib

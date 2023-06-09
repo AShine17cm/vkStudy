@@ -9,7 +9,7 @@ namespace textures
 		/* 创建 layer=1,mipLevels=1的贴图 */
 		void createTexture(
 			MgImageInfo info,
-			uint32_t size,
+			uint32_t insertSize,
 			VulkanDevice* device,
 			VkImage* image,
 			VkDeviceMemory* imageMemory,
@@ -36,7 +36,7 @@ namespace textures
 			imageCI.flags			= info.formats.createFalgs;
 			imageCI.samples			= info.formats.sampleCount;
 			imageCI.initialLayout	= VK_IMAGE_LAYOUT_UNDEFINED;//VK_IMAGE_LAYOUT_PREINITIALIZED
-			imageCI.samples			= VK_SAMPLE_COUNT_1_BIT;
+			imageCI.samples			= info.formats.sampleCount;// VK_SAMPLE_COUNT_1_BIT;
 			imageCI.sharingMode		= VK_SHARING_MODE_EXCLUSIVE;
 			imageCI.tiling			= VK_IMAGE_TILING_OPTIMAL;
 			//检查扩展
@@ -47,6 +47,9 @@ namespace textures
 				{
 				case MgTextureEx::Image_Cube:
 					imageCI.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;//This flag required for cube map images
+					break;
+				case MgTextureEx::NO_ExtraSetting:
+					imageCI.usage = info.formats.usageFlags;
 					break;
 				}
 			}
@@ -64,7 +67,7 @@ namespace textures
 			{
 				return;
 			}
-			MgInsertPiece piece = { info, 0, 0, size };
+			MgInsertPiece piece = { info, 0, 0, insertSize };
 			InsertPiece(device, image, texData, piece);
 		}
 		/* 在某一层，某一个mipLevel中插入数据 */

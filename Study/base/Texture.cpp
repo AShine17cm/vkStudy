@@ -48,7 +48,7 @@ namespace textures
 		viewInfo.imgFormat = info.formats.format;
 		viewInfo.viewType = viewType;
 		//数据格式 相关
-		textures::createTexture(info,imageSize,vulkanDevice,&image, &memory,data,nullptr,0);
+		textures::createTexture(info,imageSize,vulkanDevice,&image, &memory,data,extends.data(),extends.size());
 		textures::createImageView(vulkanDevice->logicalDevice,image, &view,viewInfo);
 		textures::createSampler(vulkanDevice,info.mipLevels,&sampler,extends.data(), extends.size(),info.formats.samplerMode);
 		updateDescriptor();
