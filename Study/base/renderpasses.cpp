@@ -247,13 +247,14 @@ namespace mg
 			MG_CHECK_RESULT(vkCreateRenderPass(device, &renderPassCI, nullptr, renderPass));
 		}
 		//
-				//创建 color+depth 的render-pass
+		//创建 color+depth 的render-pass
 		void createRenderPass_MSAA(
 			VkFormat colorFormat,
 			VkFormat depthFormat,
 			VkDevice device,
 			VkRenderPass* renderPass,
-			VkSampleCountFlagBits sampleCount
+			VkSampleCountFlagBits sampleCount,
+			VkBool32 isScreen
 		)
 		{
 			
@@ -269,8 +270,7 @@ namespace mg
 			attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			attachments[0].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-			// This is the frame buffer attachment to where the multisampled image
-			// will be resolved to and which will be presented to the swapchain
+			//MSAA 的最终输出帧
 			attachments[1].format = colorFormat;
 			attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
 			attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -278,7 +278,7 @@ namespace mg
 			attachments[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 			attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-			attachments[1].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+			attachments[1].finalLayout = isScreen ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 			// Multisampled depth attachment we render to
 			attachments[2].format = depthFormat;
@@ -348,6 +348,141 @@ namespace mg
 			renderPassCI.dependencyCount = 2;
 			renderPassCI.pDependencies = dependencies.data();
 			MG_CHECK_RESULT(vkCreateRenderPass(device, &renderPassCI, nullptr, renderPass));
+		}
+
+		void createRenderPass_HDR(
+			VkFormat colorFormat,
+			VkFormat depthFromat,
+			VkDevice device,
+			VkRenderPass* renderPass
+		) 
+		{
+			const uint32_t countAtt = 2;
+			// Set up separate renderpass with references to the color and depth attachments
+			std::array<VkAttachmentDescription, countAtt> attachmentDescs = {};
+
+			//2个 颜色帧
+			for (uint32_t i = 0; i < countAtt; ++i)
+			{
+				attachmentDescs[i].samples = VK_SAMPLE_COUNT_1_BIT;
+				attachmentDescs[i].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+				attachmentDescs[i].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+				attachmentDescs[i].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+				attachmentDescs[i].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+				if (i == 2)
+				{
+					attachmentDescs[i].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+					attachmentDescs[i].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+				}
+				else
+				{
+					attachmentDescs[i].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+					attachmentDescs[i].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;//shader 读取
+				}
+			}
+
+			// Formats
+			attachmentDescs[0].format = colorFormat;
+			attachmentDescs[1].format = colorFormat;
+			//attachmentDescs[2].format = depthFromat;
+
+			std::vector<VkAttachmentReference> colorReferences;
+			colorReferences.push_back({ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+			colorReferences.push_back({ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+
+			//VkAttachmentReference depthReference = {};
+			//depthReference.attachment = 2;
+			//depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+			VkSubpassDescription subpass = {};
+			subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+			subpass.pColorAttachments = colorReferences.data();
+			subpass.colorAttachmentCount = 2;
+			//subpass.pDepthStencilAttachment = &depthReference;
+
+			//用subpass dependency 转换attachment 的 layout
+			std::array<VkSubpassDependency, 2> dependencies;
+
+			dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+			dependencies[0].dstSubpass = 0;
+			dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+			dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+			dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+			dependencies[1].srcSubpass = 0;
+			dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+			dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+			dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+			dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+			VkRenderPassCreateInfo renderPassInfo = {};
+			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+			renderPassInfo.pAttachments = attachmentDescs.data();
+			renderPassInfo.attachmentCount = static_cast<uint32_t>(attachmentDescs.size());
+			renderPassInfo.subpassCount = 1;
+			renderPassInfo.pSubpasses = &subpass;
+			renderPassInfo.dependencyCount = 2;
+			renderPassInfo.pDependencies = dependencies.data();
+
+			MG_CHECK_RESULT(vkCreateRenderPass(device, &renderPassInfo, nullptr, renderPass));
+		}
+
+		void createRenderPass_Bloom(
+			VkFormat colorFormat,
+			VkDevice device,
+			VkRenderPass* renderPass
+		)
+		{
+			std::array<VkAttachmentDescription, 1> attachmentDescs = {};
+			attachmentDescs[0].samples = VK_SAMPLE_COUNT_1_BIT;
+			attachmentDescs[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			attachmentDescs[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+			attachmentDescs[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			attachmentDescs[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			attachmentDescs[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			attachmentDescs[0].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			attachmentDescs[0].format = colorFormat;
+
+			std::vector<VkAttachmentReference> colorReferences;
+			colorReferences.push_back({ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+
+			VkSubpassDescription subpass = {};
+			subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+			subpass.pColorAttachments = colorReferences.data();
+			subpass.colorAttachmentCount = 1;
+
+			std::array<VkSubpassDependency, 2> dependencies;
+
+			dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+			dependencies[0].dstSubpass = 0;
+			dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+			dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+			dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+			dependencies[1].srcSubpass = 0;
+			dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+			dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+			dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+			dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+			VkRenderPassCreateInfo renderPassInfo = {};
+			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+			renderPassInfo.pAttachments = attachmentDescs.data();
+			renderPassInfo.attachmentCount = static_cast<uint32_t>(attachmentDescs.size());
+			renderPassInfo.subpassCount = 1;
+			renderPassInfo.pSubpasses = &subpass;
+			renderPassInfo.dependencyCount = 2;
+			renderPassInfo.pDependencies = dependencies.data();
+
+			MG_CHECK_RESULT(vkCreateRenderPass(device, &renderPassInfo, nullptr, renderPass));
 		}
 	}
 }

@@ -360,9 +360,15 @@ void ImGUI::newFrame( )
 	float scale = 1.0f;
 	
 	ImGui::SetNextWindowPos(ImVec2(20 * scale, 20 * scale), ImGuiSetCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(300 * scale, 200 * scale), ImGuiSetCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300 * scale, 300 * scale), ImGuiSetCond_FirstUseEver);
 
 	ImGui::Begin("Debug Shading");
+	//
+	ImGui::Checkbox("Bloom", &data.bloom);
+	ImGui::SliderFloat("Exposure", &data.exposure, 0.1f, 5.0f);
+	ImGui::SliderFloat("Threshold", &data.brightThreshold, 0.1f, 0.98f);
+	ImGui::SliderFloat("BlurScale", &data.blurScale, 0.0015f, 0.015f);
+	ImGui::SliderFloat("BlurStrength", &data.blurStength, 0.5f, 5.0f);
 	//选择 操作模型
 	ImGui::Text("Models:");
 	ImGui::Checkbox(data.models[0].c_str(), &data.operate[0]); ImGui::SameLine();

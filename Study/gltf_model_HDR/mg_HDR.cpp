@@ -86,9 +86,14 @@ private:
         createResources();
 
         prepareImGui();
-        scene.prepareStep2(descriptorPool, passHub.renderPass,&frames,&imGui->data);
+        scene.prepareStep2(descriptorPool, passHub.msaaTarget.renderPass,&frames,&imGui->data);
  
         passHub.createFrameBuffers(&resource);//为了 共享一个 depth-tex
+        //准备 hdr 的描述符
+        for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        {
+             frames[i].add_hdr(device, &passHub);
+        }
 
         createCommandBuffers();
         createSyncObjects();
@@ -97,7 +102,7 @@ private:
     {
         imGui = new ImGUI(vulkanDevice);
         imGui->init((float)WIDTH, (float)HEIGHT);
-        imGui->initResources(passHub.renderPass, vulkanDevice->graphicsQueue, true);
+        imGui->initResources(passHub.uiPass, vulkanDevice->graphicsQueue, false);
     }
     void mainLoop() {
         while (!glfwWindowShouldClose(window)) {
@@ -196,7 +201,7 @@ private:
 
     void createGraphicsPipeline() {
 
-        piHub.prepare(device,&passHub,sizeof(geos::PerObjectData));
+        piHub.prepare(device,&passHub,sizeof(geos::PerObjectData),sizeof(geos::HdrPushData));
     }
 
     void createResources() 
@@ -278,9 +283,9 @@ private:
             clears[1].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
             clears[2].depthStencil = { 1.0f,0 };
             /* 正常渲染 */
-            mg::batches::BeginRenderpass(cmd,passHub.renderPass,passHub.swapChainFramebuffers[imageIndex],clears.data(), 3, passHub.extent);
+            mg::batches::BeginRenderpass(cmd,passHub.msaaTarget.renderPass,passHub.msaaTarget.frameBuffer,clears.data(), 3, passHub.extent);
             mg::batches::SetViewport(cmd, passHub.extent);
-            scene.draw(cmd,nullptr, -1);//调试点
+            //scene.draw(cmd,nullptr, -1);//调试点
             /* pbr 渲染 */
             /* 场景信息+ShadowMap */
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_shadow_h, dstSet, 1, &frame->scene_shadow_h, 0, nullptr);
@@ -313,11 +318,71 @@ private:
             //scene.draw_gltf(cmd,imageIndex,0);//头盔 金属流
             //scene.draw_gltf(cmd, imageIndex, 1);//飞艇
             //scene.draw_gltf(cmd, imageIndex,2);//恐龙
+            vkCmdEndRenderPass(cmd);
 
-            imGui->drawFrame(cmd);
+            
+        }
+        /* 曝光 将高动态 映射到 低动态的帧，分离高亮部分 */
+        if(true)
+        {
+            clears[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+            clears[1].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+            mg::batches::BeginRenderpass(cmd, passHub.offscreen.renderPass, passHub.offscreen.frameBuffer, clears.data(), 2, passHub.extent);
+            mg::batches::SetViewport(cmd, passHub.extent);
+            dstSet = 0; //正常的选结果 作为输入
+            geos::HdrPushData hdrData = { {imGui->data.exposure,imGui->data.brightThreshold,0,0},{0,0,0,0} };
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_hdr_offscreen, dstSet, 1, &frame->hdr_offscreen, 0, nullptr);
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_hdr_offscreen);
+            vkCmdPushConstants(cmd, piHub.piLayout_hdr_offscreen, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(geos::HdrPushData), &hdrData);//曝光度
+            vkCmdDraw(cmd, 6, 1, 0, 0);
             vkCmdEndRenderPass(cmd);
         }
+        //做Bloom, Blend 模式
+        if (true)
+        {
+            clears[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+            mg::batches::BeginRenderpass(cmd, passHub.bloomPass.renderPass, passHub.bloomPass.frameBuffer, clears.data(), 1, passHub.extent);
+            mg::batches::SetViewport(cmd, passHub.extent);
+            dstSet = 0; //正常的渲染结果 作为输入
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_hdr_bloom, dstSet, 1, &frame->hdr_bloom, 0, nullptr);
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_hdr_bloom);
 
+            geos::HdrPushData first = { {imGui->data.blurScale,imGui->data.blurStength,0,0},{0,0,0,0} };// 第一次
+            vkCmdPushConstants(cmd, piHub.piLayout_hdr_bloom, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(geos::HdrPushData), &first);
+            vkCmdDraw(cmd, 6, 1, 0, 0);
+
+            //geos::HdrPushData second = { {imGui->data.blurScale,imGui->data.blurStength,0,0},{1,0,0,0} };// 第二次
+            //vkCmdPushConstants(cmd, piHub.piLayout_hdr_bloom, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(geos::HdrPushData), &second);
+            //vkCmdDraw(cmd, 6, 1, 0, 0);
+
+            vkCmdEndRenderPass(cmd);
+        }
+        //输出 低动态帧
+        if (true)
+        {
+            clears[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+            mg::batches::BeginRenderpass(cmd, passHub.renderPass, passHub.swapChainFramebuffers[imageIndex], clears.data(), 1, passHub.extent);
+            mg::batches::SetViewport(cmd, passHub.extent);
+            dstSet = 0;
+            geos::HdrPushData hdrData = { {1.0f,0,0,0},{0,0,0,0} };
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_ldr, dstSet, 1, &frame->ldr, 0, nullptr);
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_ldr);
+            vkCmdPushConstants(cmd, piHub.piLayout_ldr, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(geos::HdrPushData), &hdrData);
+            vkCmdDraw(cmd, 6, 1, 0, 0);
+
+            if (imGui->data.bloom)
+            {
+                dstSet = 0;//输入一样 image
+                vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_blend, dstSet, 1, &frame->blend, 0, nullptr);
+                vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_blend);
+                vkCmdPushConstants(cmd, piHub.piLayout_ldr, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(geos::HdrPushData), &hdrData);
+                vkCmdDraw(cmd, 6, 1, 0, 0);
+            }
+
+            imGui->drawFrame(cmd);
+
+            vkCmdEndRenderPass(cmd);
+        }
 
         MG_CHECK_RESULT(vkEndCommandBuffer(cmd));
     }

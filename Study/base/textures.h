@@ -40,7 +40,7 @@ namespace textures
 				VkImageType type = VK_IMAGE_TYPE_2D;
 				VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
 				VkImageUsageFlags usageFlags = VK_IMAGE_USAGE_SAMPLED_BIT;
-				VkImageLayout imagelayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+				VkImageLayout imagelayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;		//用于 descriptor 的创建
 				VkImageCreateFlags createFalgs = 0;// VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
 				VkSampleCountFlagBits sampleCount = VK_SAMPLE_COUNT_1_BIT;
 				VkSamplerAddressMode samplerMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;

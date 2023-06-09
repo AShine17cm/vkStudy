@@ -129,7 +129,7 @@ vec3 shade( )
     }
     vec3 color=pbrBasic.rgba.rgb*0.02;
     color+=Lo;
-    color=pow(color,vec3(0.4545));
+    //color=pow(color,vec3(0.4545));
     return color;
 }
 void main() 

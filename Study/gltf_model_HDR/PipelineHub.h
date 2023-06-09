@@ -16,6 +16,11 @@ struct PipelineHub
 	VkDescriptorSetLayout setLayout_pbrBasic;
 	VkDescriptorSetLayout setLayout_pbrEnv;
 	VkDescriptorSetLayout setLayout_pbrTexs;
+
+	VkDescriptorSetLayout setLayout_hdr_offscreen;
+	VkDescriptorSetLayout setLayout_hdr_bloom;
+	VkDescriptorSetLayout setLayout_ldr;
+	VkDescriptorSetLayout setLayout_blend;
 	/* set-layout 组合的 pipe-layout */
 	VkPipelineLayout piLayout_shadow;		//阴影渲染
 	VkPipelineLayout piLayout_shadow_h;		//阴影合成: h表示占位，用于后续渲染的继承
@@ -23,12 +28,22 @@ struct PipelineHub
 	VkPipelineLayout piLayout_pbrEnv;
 	VkPipelineLayout piLayout_pbrIBL;
 
+	VkPipelineLayout piLayout_hdr_offscreen;
+	VkPipelineLayout piLayout_hdr_bloom;
+	VkPipelineLayout piLayout_ldr;
+	VkPipelineLayout piLayout_blend;
+
 	VkPipeline pi_shadow_gltf;				//gltf 文件有自己的顶点属性布局
 	/* 使用同一个 pipeline-layout */
 	VkPipeline pi_pbr_basic;						//shader::<pbr.shader>	用gltf 模型 做PBR 测试
 	VkPipeline pi_pbr_IBL;
 
-	void prepare(VkDevice device, RenderPassHub* passHub, uint32_t constantSize)
+	VkPipeline pi_hdr_offscreen;
+	VkPipeline pi_hdr_bloom;
+	VkPipeline pi_ldr;
+	VkPipeline pi_blend;
+
+	void prepare(VkDevice device, RenderPassHub* passHub, uint32_t constantSize,uint32_t hdr_constant)
 	{
 		VkShaderStageFlags stageVGF = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_GEOMETRY_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 		/* Descriptor-Layout */
@@ -80,6 +95,32 @@ struct PipelineHub
 			VK_SHADER_STAGE_FRAGMENT_BIT };
 		desCounts = { 1,1,1,1,1,1 };
 		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_pbrTexs);
+		//HDR  高动态 映射 地动态,高亮分离
+		types = {
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+		};
+		stages = {
+			VK_SHADER_STAGE_FRAGMENT_BIT 
+		};
+		desCounts = { 1 };
+		//HDR Bloom
+		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_hdr_offscreen);
+		//Blend
+		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_blend);
+
+		types = {
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+		};
+		stages = {
+			VK_SHADER_STAGE_FRAGMENT_BIT,
+			VK_SHADER_STAGE_FRAGMENT_BIT
+		};
+		desCounts = { 1,1 };
+		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_hdr_bloom);
+		//Ldr
+		mg::descriptors::createDescriptorSetLayout(types.data(), stages.data(), desCounts.data(), types.size(), device, &setLayout_ldr);
+
 		/* Pipeline-Layout */
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -121,6 +162,29 @@ struct PipelineHub
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 		pipelineLayoutInfo.pPushConstantRanges = &pushRange;
 		MG_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &piLayout_pbrIBL));
+		//Hdr Offscreen
+		VkPushConstantRange pushRange_hdr = { VK_SHADER_STAGE_FRAGMENT_BIT,0,hdr_constant };//曝光度
+		VkDescriptorSetLayout setL_hdrTex[] = { setLayout_hdr_offscreen };
+		pipelineLayoutInfo.setLayoutCount = 1;
+		pipelineLayoutInfo.pSetLayouts = setL_hdrTex;
+		pipelineLayoutInfo.pushConstantRangeCount = 1;
+		pipelineLayoutInfo.pPushConstantRanges = &pushRange_hdr;
+		MG_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &piLayout_hdr_offscreen));
+		//Hdr Bloom
+		VkDescriptorSetLayout setL_hdrBloom[] = { setLayout_hdr_bloom };
+		pipelineLayoutInfo.setLayoutCount = 1;
+		pipelineLayoutInfo.pSetLayouts = setL_hdrBloom;
+		MG_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &piLayout_hdr_bloom));
+		//LDR
+		VkDescriptorSetLayout setL_ldr[] = { setLayout_ldr };
+		pipelineLayoutInfo.setLayoutCount = 1;
+		pipelineLayoutInfo.pSetLayouts = setL_ldr;
+		MG_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &piLayout_ldr));
+		//Blend
+		VkDescriptorSetLayout setL_blend[] = { setLayout_blend };
+		pipelineLayoutInfo.setLayoutCount = 1;
+		pipelineLayoutInfo.pSetLayouts = setL_blend;
+		MG_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &piLayout_blend));
 
 		/* Pipeline-s */
 		std::vector<VkShaderStageFlagBits> shaderStages; 
@@ -154,9 +218,22 @@ struct PipelineHub
 		/* pbr */
 		shaderStages = { VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_FRAGMENT_BIT };
 		shaderFiles = { "shaders/pbr_basic.vert.spv", "shaders/pbr_basic.frag.spv" };
-		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_pbrBasic, &pi_pbr_basic,&vertexInputSCI_gltf,pipelines::MgPipelineEx::Multisample);
+		createPipeline(device, passHub->msaaTarget.renderPass, &shaderFiles, shaderStages, &piLayout_pbrBasic, &pi_pbr_basic,&vertexInputSCI_gltf,pipelines::MgPipelineEx::Multisample);
 		shaderFiles = { "shaders/pbr_basic.vert.spv", "shaders/pbr_ibl.frag.spv" };
-		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_pbrIBL, &pi_pbr_IBL, &vertexInputSCI_gltf, pipelines::MgPipelineEx::Multisample);
+		createPipeline(device, passHub->msaaTarget.renderPass, &shaderFiles, shaderStages, &piLayout_pbrIBL, &pi_pbr_IBL, &vertexInputSCI_gltf, pipelines::MgPipelineEx::Multisample);
+		/* hdr */
+		shaderStages = { VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_FRAGMENT_BIT };
+		shaderFiles = { "shaders/screen.vert.spv", "shaders/hdr_offscreen.frag.spv" };
+		createPipeline(device, passHub->offscreen.renderPass, &shaderFiles, shaderStages, &piLayout_hdr_offscreen, &pi_hdr_offscreen, &vertexInputSCI_ui,pipelines::MgPipelineEx::Hdr_Offscreen);
+		//需要 开启Blend
+		shaderFiles = { "shaders/screen.vert.spv", "shaders/hdr_bloom.frag.spv" };
+		createPipeline(device, passHub->bloomPass.renderPass, &shaderFiles, shaderStages, &piLayout_hdr_bloom, &pi_hdr_bloom, &vertexInputSCI_ui,pipelines::MgPipelineEx::Bloom_Blend);
+		/* ldr */
+		shaderFiles = { "shaders/screen.vert.spv", "shaders/ldr.frag.spv" };
+		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_ldr, &pi_ldr, &vertexInputSCI_ui);
+		/* blend */
+		shaderFiles = { "shaders/screen.vert.spv", "shaders/blend.frag.spv" };
+		createPipeline(device, passHub->renderPass, &shaderFiles, shaderStages, &piLayout_blend, &pi_blend, &vertexInputSCI_ui, pipelines::MgPipelineEx::Bloom_Blend);
 	}
 	/* 根据 shader 创建 pipeline */
 	void createPipeline(VkDevice device, VkRenderPass renderPass, 
@@ -183,9 +260,32 @@ struct PipelineHub
 			shaderStages.push_back(shaderStage);
 		}
 		/* Color Blend*/
-		VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-		colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-		colorBlendAttachment.blendEnable = VK_FALSE;
+		std::array<VkPipelineColorBlendAttachmentState, 2> colorBlends;
+		//VkPipelineColorBlendAttachmentState colorBlendAttachment{};
+		colorBlends[0] = {};
+		colorBlends[0].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+		colorBlends[0].blendEnable = VK_FALSE;
+		colorBlends[1] = {};
+		colorBlends[1].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+		colorBlends[1].blendEnable = VK_FALSE;
+
+		uint32_t countBlend = 1;
+		if (pipelines::MgPipelineEx::Hdr_Offscreen == kind)
+		{
+			countBlend = 2;
+		}
+		//Bloom 混合到帧中
+		if (pipelines::MgPipelineEx::Bloom_Blend==kind)
+		{
+			colorBlends[0].colorWriteMask = 0xF;
+			colorBlends[0].blendEnable = VK_TRUE;
+			colorBlends[0].colorBlendOp = VK_BLEND_OP_ADD;
+			colorBlends[0].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+			colorBlends[0].dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
+			colorBlends[0].alphaBlendOp = VK_BLEND_OP_ADD;
+			colorBlends[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+			colorBlends[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_DST_ALPHA;
+		}
 
 		std::vector<pipelines::MgPipelineEx> extends{};
 		extends.push_back(pipelines::MgPipelineEx::Counter_Clock_Wise);
@@ -202,7 +302,7 @@ struct PipelineHub
 
 		mg::pipelines::createPipeline(
 			shaderStages.data(), shaderStages.size(),
-			&colorBlendAttachment, 1,
+			colorBlends.data(), countBlend,
 			vertexInputSCI,
 			*piLayout,
 			renderPass,
@@ -226,6 +326,11 @@ struct PipelineHub
 		vkDestroyPipeline(device, pi_pbr_basic, nullptr);
 		vkDestroyPipeline(device, pi_pbr_IBL, nullptr);
 
+		vkDestroyPipeline(device, pi_hdr_offscreen, nullptr);
+		vkDestroyPipeline(device, pi_hdr_bloom, nullptr);
+		vkDestroyPipeline(device, pi_ldr, nullptr);
+		vkDestroyPipeline(device, pi_blend, nullptr);
+
 		vkDestroyPipelineLayout(device, piLayout_shadow_h, nullptr);
 		vkDestroyPipelineLayout(device, piLayout_shadow, nullptr);			//阴影渲染 灯光矩阵
 
@@ -233,11 +338,21 @@ struct PipelineHub
 		vkDestroyPipelineLayout(device, piLayout_pbrEnv, nullptr);
 		vkDestroyPipelineLayout(device, piLayout_pbrIBL, nullptr);
 
+		vkDestroyPipelineLayout(device, piLayout_hdr_offscreen, nullptr);
+		vkDestroyPipelineLayout(device, piLayout_hdr_bloom, nullptr);
+		vkDestroyPipelineLayout(device, piLayout_ldr, nullptr);
+		vkDestroyPipelineLayout(device, piLayout_blend, nullptr);
+
 		vkDestroyDescriptorSetLayout(device, setLayout_shadow, nullptr);
 		vkDestroyDescriptorSetLayout(device, setLayout_shadow_h, nullptr);
 
 		vkDestroyDescriptorSetLayout(device, setLayout_pbrBasic, nullptr);
 		vkDestroyDescriptorSetLayout(device, setLayout_pbrEnv, nullptr);
 		vkDestroyDescriptorSetLayout(device, setLayout_pbrTexs, nullptr);
+
+		vkDestroyDescriptorSetLayout(device, setLayout_hdr_offscreen, nullptr);
+		vkDestroyDescriptorSetLayout(device, setLayout_hdr_bloom, nullptr);
+		vkDestroyDescriptorSetLayout(device, setLayout_ldr, nullptr);
+		vkDestroyDescriptorSetLayout(device, setLayout_blend, nullptr);
 	}
 };

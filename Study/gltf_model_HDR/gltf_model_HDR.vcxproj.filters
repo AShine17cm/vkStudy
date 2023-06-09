@@ -101,6 +101,21 @@
     <None Include="shaders\pbr_ibl.frag">
       <Filter>shaders</Filter>
     </None>
+    <None Include="shaders\hdr_bloom.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\hdr_offscreen.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\screen.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\ldr.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\blend.frag">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="misc.h">

@@ -1,6 +1,15 @@
-﻿  Texture.cpp
-E:\VulkanProj\vkStudy\Study\base\Texture.cpp(34,19): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\base\Texture.cpp(51,105): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\base\Texture.cpp(51,32): warning C4244: “参数”: 从“VkDeviceSize”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\base\Texture.cpp(53,119): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+﻿  DebugPoints.cpp
+E:\VulkanProj\vkStudy\Study\base\DebugPoints.cpp(118,54): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  batches.cpp
+E:\VulkanProj\vkStudy\Study\base\batches.cpp(44,25): warning C4244: “=”: 从“uint32_t”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\batches.cpp(45,26): warning C4244: “=”: 从“uint32_t”转换到“float”，可能丢失数据
+  pipelines.cpp
+E:\VulkanProj\vkStudy\Study\base\pipelines.cpp(85,55): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\pipelines.cpp(139,57): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  shaders.cpp
+E:\VulkanProj\vkStudy\Study\base\shaders.cpp(48,136): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\shaders.cpp(57,64): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\shaders.cpp(103,37): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\shaders.cpp(153,37): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+  正在生成代码...
   base.vcxproj -> E:\VulkanProj\vkStudy\Study\x64\Debug\base.lib

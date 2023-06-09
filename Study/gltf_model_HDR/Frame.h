@@ -30,6 +30,11 @@ struct Frame
 	VkDescriptorSet pbr_IBL_ship1;
 	VkDescriptorSet pbr_IBL_ship2;
 
+	VkDescriptorSet hdr_offscreen;
+	VkDescriptorSet hdr_bloom;
+	VkDescriptorSet ldr;
+	VkDescriptorSet blend;
+
 	mg::Buffer ubo_scene;				//相机 灯光
 	mg::Buffer ubo_pbr_bg;
 
@@ -60,6 +65,11 @@ struct Frame
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrTexs, 1, descriptorPool, device, &pbr_IBL_dino);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrTexs, 1, descriptorPool, device, &pbr_IBL_ship1);
 		descriptors::allocateDescriptorSet(&pipes->setLayout_pbrTexs, 1, descriptorPool, device, &pbr_IBL_ship2);
+
+		descriptors::allocateDescriptorSet(&pipes->setLayout_hdr_offscreen, 1, descriptorPool, device, &hdr_offscreen);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_hdr_bloom, 1, descriptorPool, device, &hdr_bloom);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_ldr, 1, descriptorPool, device, &ldr);
+		descriptors::allocateDescriptorSet(&pipes->setLayout_blend, 1, descriptorPool, device, &blend);
 
 		vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -192,6 +202,30 @@ struct Frame
 		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), desc_set, device);
 
 		memcpy(ubo->mapped, &render->mat, sizeof(geos::PbrMaterial));
+	}
+
+	void add_hdr(VkDevice device,RenderPassHub* hub)
+	{
+		std::vector<VkDescriptorType> types;
+		std::vector<uint32_t> counts;
+		std::vector<void*> infos;
+
+		types = { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER };
+		counts = { 1 };
+		//高动态 映射 低动态，高亮分离
+		infos = { &hub->msaaTarget.color_resolved->descriptor };
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), hdr_offscreen, device);
+		//Bloom 的结果
+		infos = { &hub->bloomPass.color->descriptor };
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), blend, device);
+
+		types = { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ,VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER };
+		counts = { 1,1 };
+		//Bloom 的输入  高亮像素
+		infos = { &hub->offscreen.color0->descriptor,&hub->offscreen.color1->descriptor };
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), hdr_bloom, device);
+		//ldr 的输入  低动态 像素
+		mg::descriptors::writeDescriptorSet(types.data(), infos.data(), counts.data(), counts.size(), ldr, device);
 	}
 	/* 切换贴图格式 */
 	void update(VkDevice device, Resource* res)

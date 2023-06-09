@@ -12,6 +12,12 @@ set caster1=shadowCaster.vert
 set caster2=shadowCaster.geom
 set caster3=shadowCaster_gltf.vert
 
+set scr=screen.vert
+set hdr1=hdr_offscreen.frag
+set hdr2=hdr_bloom.frag
+set ldr=ldr.frag
+set bl=blend.frag
+
 %glslc% %u1% -o %u1%.spv
 %glslc% %u2% -o %u2%.spv
 %glslc% %p1% -o %p1%.spv
@@ -24,5 +30,11 @@ set caster3=shadowCaster_gltf.vert
 %glslc% %caster1% -o %caster1%.spv
 %glslc% %caster2% -o %caster2%.spv
 %glslc% %caster3% -o %caster3%.spv
+
+%glslc% %scr% -o %scr%.spv
+%glslc% %hdr1% -o %hdr1%.spv
+%glslc% %hdr2% -o %hdr2%.spv
+%glslc% %ldr% -o %ldr%.spv
+%glslc% %bl% -o %bl%.spv
 
 pause

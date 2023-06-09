@@ -7,3 +7,20 @@ pipeline bloom[0]  使用 使用输出的 renderPass   使用管线初始化参�
 pipeline bloom[1]  输出到单独的 浮点帧  使用管线初始化参数 dir=0
 
 pipeline bloom[0] 和 bloom[1] 都开启了 blend
+
+1. 使用 MSAA		
+	渲染到 32bit的浮点帧  
+	输出帧 color-resolved     	USGAE		+VK_IMAGE_USAGE_SAMPLED_BIT
+	输出帧 color-resolved	descriptor 	VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+	输出帧 color-resolved	attachment	VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+
+2. 高动态 映射 低动态		
+	曝光系数		将MSAA 浮点帧中 高动态像素  映射到 低动态范围，同时分离高亮像素 到一个单独的帧中
+	输出帧 0,1		USAGE	VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT| VK_IMAGE_USAGE_SAMPLED_BIT
+	输出帧 0,1		descriptor	VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+
+3. 低动态 输出	先将低动态 渲染到 呈现帧
+
+4. 做 Bloom	输出到 专用帧	一趟横，一趟竖，是 n*k+n*k, 更快
+5. 将 Bloom 结果	Blend 到 呈现帧上
+

@@ -10,6 +10,11 @@ namespace geos
 		glm::mat4 model;
 		glm::vec4 texIndex;
 	};
+	struct HdrPushData 
+	{
+		glm::vec4 dataA;
+		glm::ivec4 dataB;
+	};
 	struct PbrBasic
 	{
 		glm::vec4 rgba;

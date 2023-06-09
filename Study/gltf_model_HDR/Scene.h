@@ -25,13 +25,12 @@ using namespace mg;
 */
 struct  Scene
 {
-	static const int countTextureArray = 8;
 	const float instanceH = 1.3f;
 	VulkanDevice* vulkanDevice;
 	View* view;
 	Input* input;
 	UIData* uiData;
-	geos::PbrBasic pbrBasic_bg = { {0.7f,0.6f,0.5f,1},0.7f,0.15f };		//roughtness,metallic
+	geos::PbrBasic pbrBasic_bg = { {0.8f,0.8f,0.2f,1},0.7f,0.1f };		//roughtness,metallic
 
 	PbrEnv* env;
 	vks::gltfModel_pbr* helmet;
@@ -44,7 +43,7 @@ struct  Scene
 	geos::gltfPbrRender_spec* shipRender1;
 	geos::gltfPbrRender_spec* shipRender2;
 
-	geos::DebugPoints dxPoint;
+	//geos::DebugPoints dxPoint;
 
 	float deltaTime, timer = 0;
 	bool displayShadowMap = true;
@@ -95,9 +94,9 @@ struct  Scene
 		landscape = new vks::gltfModel_pbr(vulkanDevice, swapchainImgCount,env, landscapeInfo,true);
 
 
-		geos::DebugPoints::Point pt;
-		pt = { glm::mat4(1.0),view->lightPoses[0],{1,0,0,18} };
-		dxPoint.addPoint(pt);
+		//geos::DebugPoints::Point pt;
+		//pt = { glm::mat4(1.0),view->lightPoses[0],{1,0,0,18} };
+		//dxPoint.addPoint(pt);
 	}
 	void prepareStep2(VkDescriptorPool descriptorPool, VkRenderPass renderPass,std::vector<Frame>* frames, UIData* uiData)
 	{
@@ -112,12 +111,14 @@ struct  Scene
 		landscape->setup(descriptorPool);
 		landscape->preparePipelines(renderPass);
 
+		float exp = 4.5f;
 		//获取渲染参数
 		helmetRender = new geos::gltfPbrRender_spec();
 		helmetRender->isMetallic = true;
 		helmetRender->emptyImg = &env->empty.descriptor;
 		helmetRender->mat.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
 		helmetRender->mat.isMetallic = 1;
+		helmetRender->mat.exposure = exp;
 		helmet->getSpecRender(helmetRender);
 
 		dinoRender = new geos::gltfPbrRender_spec();
@@ -125,6 +126,7 @@ struct  Scene
 		dinoRender->emptyImg = &env->empty.descriptor;
 		dinoRender->mat.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
 		dinoRender->mat.isMetallic = 0;
+		dinoRender->mat.exposure = exp;
 		dinosaur->getSpecRender(dinoRender);
 
 		shipRender1 = new geos::gltfPbrRender_spec();
@@ -132,6 +134,7 @@ struct  Scene
 		shipRender1->emptyImg = &env->empty.descriptor;
 		shipRender1->mat.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
 		shipRender1->mat.isMetallic = 0;
+		shipRender1->mat.exposure = exp;
 		ship->getSpecRender(shipRender1,0);
 
 		shipRender2 = new geos::gltfPbrRender_spec();
@@ -139,9 +142,10 @@ struct  Scene
 		shipRender2->emptyImg = &env->empty.descriptor;
 		shipRender2->mat.prefilteredCubeMipLevels = env->prefilteredCubeMipLevels;
 		shipRender2->mat.isMetallic = 0;
+		shipRender2->mat.exposure = exp;
 		ship->getSpecRender(shipRender2,1);
 
-		dxPoint.prepare(vulkanDevice, renderPass,true);
+		//dxPoint.prepare(vulkanDevice, renderPass,true);
 		//添加 一个albedo 用于着色//恐龙
 		for (uint32_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
@@ -228,7 +232,7 @@ struct  Scene
 	void draw_points(VkCommandBuffer cmd)
 	{
 		glm::mat4  mvp = view->data.proj * view->data.view;
-		dxPoint.draw(cmd, mvp);
+		//dxPoint.draw(cmd, mvp);
 	}
 	/* 更新-UBO 资源 */
 	void update(Frame* pFrame, uint32_t imageIndex, float time, float deltaTime)
@@ -316,7 +320,7 @@ struct  Scene
 
 	void cleanup()
 	{
-		dxPoint.clean();
+		//dxPoint.clean();
 
 		env->clean();
 

@@ -201,6 +201,8 @@ namespace textures
 			case VK_FORMAT_D32_SFLOAT:
 			case VK_FORMAT_D32_SFLOAT_S8_UINT:
 				viewCI.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+				//if (format >= VK_FORMAT_D16_UNORM_S8_UINT)
+				//	aspectMask |=VK_IMAGE_ASPECT_STENCIL_BIT;
 				break;
 			default:
 				break;

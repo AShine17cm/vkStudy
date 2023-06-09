@@ -23,6 +23,8 @@ namespace mg
 
 			Counter_Clock_Wise=501,
 			Points=601,
+			Hdr_Offscreen=701,
+			Bloom_Blend=702
 			//DynamicState_A=61,
 			//ColorBlend=30,
 		};

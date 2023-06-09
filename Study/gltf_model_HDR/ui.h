@@ -16,6 +16,12 @@ struct UIData
 	int32_t equationCounter = 0;
 	int32_t inputsCounter = 0;
 
+	bool bloom = true;
+	float exposure = 4.0f;
+	float brightThreshold = 0.75f;
+	float blurScale = 0.003f;
+	float blurStength = 1.0f;
+
 	struct PushConstBlock {
 		glm::vec2 scale;
 		glm::vec2 translate;
