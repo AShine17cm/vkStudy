@@ -1,0 +1,53 @@
+色调分离	posterization	连续区域 转换成 色调系列
+GBuffer	Normal / Depth / ID
+DoG ( difference of Guassians ) 高斯滤波将图像处理两次，一个减去另一个
+
+
+
+边缘类型	
+boundary or border edge	未被2个三角面共享的
+crease edge (褶皱)		大于某个角度，比如山脊
+material edge 材质边缘	邻接三角面 材质不一样
+contour edge		基于观察方形
+silhouette edge		外形，区分物体与背景
+
+描边
+美式卡通	图像处理	stencil buffer 标记
+日式卡通	shell扩张 + z-bias	顶点色 控制描边细节
+	顶点色	R	控制  toon shading 的阈值	描边无关/着色相关
+	顶点色	G 	根据 视距控制 膨胀程度
+	顶点色	B	控制 z-bias	越大越不可见
+	顶点色	A	描边粗细
+
+Cell Shading	降低色阶	
+一维色阶表	dotNL		漫反射
+二维色阶表	dotNL  dotNV	漫反射/高光
+
+
+美式	军团要塞 2   	valve
+	漫反射 warpped	+环境光( N )  Ambient Cube
+	高光+菲涅尔
+日式	GUILTY GEAR Xrd	罪恶装备
+	冷暖着色
+
+高光变形	改变 半角向量H	du,dv	切空间的方向，切线 副法线
+平移	H + a du+ b dv
+缩放	H - s dot(H,du) du	沿着切线缩放
+分割	H - r1 sign( dot(H,du)) du -r2 sign( dot(H,dv)) dv	r1 不为0 在切线方形 切为两块
+方块化	ang=min( <H,du>,<H,dv> )
+	sqrnorm=pow ( sin( 2 ang),n)			n 越大越方
+	H- s sqrnorm ( dot(H,du) du + dot(H,dv) dv )	s 定义方形高光大小 范围 ( 0, 1)
+
+风格化的阴影
+精确阴影		在图像空间（相当于输出帧）	二值化
+有向距离场	距离最近阴影边界的 有向距离
+高斯模糊		对有向距离场 做 高斯模糊
+转移函数		将模糊后的有向距离场 重新映射为 阴影图
+阴影叠加		使用过滤后的阴影图
+
+三角面，轮廓边缘	分配ID？
+
+索贝尔 算子
+https://en.wikipedia.org/wiki/Sobel_operator
+
+Stroke Surface Stylization 笔划表面风格化		TAMs(tonal art maps)

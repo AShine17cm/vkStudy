@@ -18,6 +18,7 @@ void main()
 	vec4 color = texture(samplerScr, inUV);
 	//根据传入的 exposure 进行曝光
 	float exposure=pushs.dataA.x;
+	//高动态 映射 低动态
 	outColor0.rgb = vec3(1.0) - exp(-color.rgb * exposure);
 
 	//分离亮部

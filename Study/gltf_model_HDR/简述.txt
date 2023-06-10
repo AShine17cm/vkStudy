@@ -2,11 +2,7 @@
 bloom     一个浮点帧   两个输入 sampler <离屏渲染的两个帧>
 输出	离屏渲染的 曝光控制的像素  Bloom后的像素帧
 
-pipeline bloom[0]  使用 使用输出的 renderPass   使用管线初始化参数 dir=1 做vertical 方向的blur ?
-
-pipeline bloom[1]  输出到单独的 浮点帧  使用管线初始化参数 dir=0
-
-pipeline bloom[0] 和 bloom[1] 都开启了 blend
+pipeline bloom 	开启了 blend
 
 1. 使用 MSAA		
 	渲染到 32bit的浮点帧  

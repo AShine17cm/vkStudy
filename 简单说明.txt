@@ -11,5 +11,6 @@
 5. geometry_ShadowLayer
 6. deferred
 7. multi_threading
-8. gltfModel_pbr
-9. gltfModel_pbr 2
+8. gltfModel_pbr		基础的 pbr
+9. gltfModel_pbr 2		IBL 照明
+10. gltfModel_hdr		
