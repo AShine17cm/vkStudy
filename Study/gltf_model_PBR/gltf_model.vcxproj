@@ -176,17 +176,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\data\shaders\filtercube.vert" />
-    <None Include="..\data\shaders\genbrdflut.frag" />
-    <None Include="..\data\shaders\genbrdflut.vert" />
-    <None Include="..\data\shaders\irradiancecube.frag" />
-    <None Include="..\data\shaders\pbr.vert" />
-    <None Include="..\data\shaders\pbr_khr.frag" />
-    <None Include="..\data\shaders\prefilterenvmap.frag" />
-    <None Include="..\data\shaders\skybox.frag" />
-    <None Include="..\data\shaders\skybox.vert" />
-    <None Include="..\data\shaders\ui.frag" />
-    <None Include="..\data\shaders\ui.vert" />
     <None Include="shaders\part.constants.shader" />
     <None Include="shaders\part.shadow_layers.frag" />
     <None Include="shaders\pbr_basic.frag" />

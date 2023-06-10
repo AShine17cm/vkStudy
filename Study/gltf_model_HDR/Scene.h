@@ -97,11 +97,6 @@ struct  Scene
 	{
 		this->uiData = uiData;
 
-		helmet->setup(descriptorPool);
-		ship->setup(descriptorPool);
-		dinosaur->setup(descriptorPool);
-		landscape->setup(descriptorPool);
-
 		float exp = 4.5f;
 		//获取渲染参数
 		helmetRender = new geos::gltfPbrRender_spec();

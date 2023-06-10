@@ -103,11 +103,6 @@ struct  Scene
 	{
 		this->uiData = uiData;
 
-		helmet->setup(descriptorPool);
-		ship->setup(descriptorPool);
-		dinosaur->setup(descriptorPool);
-		landscape->setup(descriptorPool);
-
 		//获取渲染参数
 		helmetRender = new geos::gltfPbrRender_spec();
 		helmetRender->isMetallic = true;

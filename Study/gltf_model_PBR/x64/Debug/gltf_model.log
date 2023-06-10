@@ -19,8 +19,9 @@ E:\VulkanProj\vkStudy\Study\gltf_model_PBR\Frame.h(100,1): warning C4267: “参
 E:\VulkanProj\vkStudy\Study\gltf_model_PBR\Frame.h(106,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\gltf_model_PBR\Frame.h(111,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\gltf_model_PBR\Frame.h(113,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\gltf_model_PBR\Scene.h(172,33): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\gltf_model_PBR\Scene.h(178,31): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\gltf_model_PBR\Scene.h(167,33): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\gltf_model_PBR\Scene.h(173,31): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\gltf_model_PBR\mg_Pbr_1.cpp(164,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\gltf_model_PBR\mg_Pbr_1.cpp(212,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+LINK : warning LNK4098: 默认库“MSVCRT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
   gltf_model.vcxproj -> E:\VulkanProj\vkStudy\Study\gltf_model_PBR\gltf_model_PBR.exe

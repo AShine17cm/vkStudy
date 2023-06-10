@@ -51,18 +51,8 @@ namespace vks
 			float debugViewEquation = 0;
 		} shaderValuesParams;
 
-		//VkPipelineLayout pipelineLayout;
-
-		struct DescriptorSetLayouts {
-			VkDescriptorSetLayout scene;
-			VkDescriptorSetLayout material;
-			VkDescriptorSetLayout node;
-		} descriptorSetLayouts;
-
 		std::vector<VkDescriptorSet> descSet_Scene;
 		std::vector<UniformBufferSet> uniformBuffers;
-
-		enum PBRWorkflows { PBR_WORKFLOW_METALLIC_ROUGHNESS = 0, PBR_WORKFLOW_SPECULAR_GLOSINESS = 1 };
 
 		struct PushConstBlockMaterial {
 			glm::vec4 baseColorFactor;
@@ -82,7 +72,7 @@ namespace vks
 		} pushConstBlockMaterial;
 
 		gltfModel_pbr(mg::VulkanDevice* vulkanDevice,uint32_t swapchainImgCount,PbrEnv* env, ModelInfo modelInfo,bool msaa=false);
-		void setup(VkDescriptorPool pool);
+
 		void clean();
 		void getPrimitives(std::vector<vkglTF::Node*>* nodes,std::vector<vkglTF::Primitive*>* prims, std::vector<vkglTF::Node*>* nodeX);
 		void getSpecRender(geos::gltfPbrRender_spec* render,int idxNode=0);
@@ -91,10 +81,7 @@ namespace vks
 		void load_gltf();
 		void prepareUniformBuffers();
 		void updateUniformBuffers(uint32_t currentBuffer,glm::mat4 proj, glm::mat4 view, glm::vec3 camPos);
-		void setupDescriptors(VkDescriptorPool descriptorPool);
-		/* 到根节点的矩阵 的ubo */
-		void setupNodeDescriptorSet(vkglTF::Node* node, VkDescriptorPool descriptorPool);	
-		VkPipelineShaderStageCreateInfo loadShader(VkDevice device, std::string filename, VkShaderStageFlagBits stage);
+
 		//傻叉头文件问题
 		void createBuffer(mg::VulkanDevice* device, vks::saBuffer* buffer, VkBufferUsageFlagBits usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize size);
 		void destroyBuffer(vks::saBuffer* buffer);

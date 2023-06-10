@@ -120,11 +120,6 @@ struct  Scene
 	}
 	void prepareStep2(VkDescriptorPool descriptorPool, VkRenderPass renderPass,std::vector<Frame>* frames)
 	{
-		helmet->setup(descriptorPool);
-		ship->setup(descriptorPool);
-		dinosaur->setup(descriptorPool);
-		landscape->setup(descriptorPool);
-
 		dxPoint.prepare(vulkanDevice, renderPass,true);
 	}
 	/* 画一个 gltf 模型 */

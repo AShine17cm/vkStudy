@@ -16,9 +16,6 @@
     <Filter Include="shaders">
       <UniqueIdentifier>{68d3a1fb-e41e-4a64-a4cd-2068fb039301}</UniqueIdentifier>
     </Filter>
-    <Filter Include="pbr">
-      <UniqueIdentifier>{9289ba61-3004-4451-b1d7-8119e49b6b92}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mg_HDR.cpp">
@@ -43,39 +40,6 @@
     </None>
     <None Include="shaders\part.shadow_layers.frag">
       <Filter>shaders</Filter>
-    </None>
-    <None Include="..\data\shaders\filtercube.vert">
-      <Filter>pbr</Filter>
-    </None>
-    <None Include="..\data\shaders\genbrdflut.frag">
-      <Filter>pbr</Filter>
-    </None>
-    <None Include="..\data\shaders\genbrdflut.vert">
-      <Filter>pbr</Filter>
-    </None>
-    <None Include="..\data\shaders\irradiancecube.frag">
-      <Filter>pbr</Filter>
-    </None>
-    <None Include="..\data\shaders\pbr.vert">
-      <Filter>pbr</Filter>
-    </None>
-    <None Include="..\data\shaders\pbr_khr.frag">
-      <Filter>pbr</Filter>
-    </None>
-    <None Include="..\data\shaders\prefilterenvmap.frag">
-      <Filter>pbr</Filter>
-    </None>
-    <None Include="..\data\shaders\skybox.frag">
-      <Filter>pbr</Filter>
-    </None>
-    <None Include="..\data\shaders\skybox.vert">
-      <Filter>pbr</Filter>
-    </None>
-    <None Include="..\data\shaders\ui.frag">
-      <Filter>pbr</Filter>
-    </None>
-    <None Include="..\data\shaders\ui.vert">
-      <Filter>pbr</Filter>
     </None>
     <None Include="shaders\shadowCaster_gltf.vert">
       <Filter>shaders</Filter>
