@@ -51,15 +51,7 @@ namespace vks
 			float debugViewEquation = 0;
 		} shaderValuesParams;
 
-		VkPipelineLayout pipelineLayout;
-
-		struct Pipelines
-		{
-			VkPipeline pbr;
-			VkPipeline pbrDoubleSided;
-			VkPipeline pbrAlphaBlend;
-		} pipelines;
-		VkPipeline boundPipeline = VK_NULL_HANDLE;
+		//VkPipelineLayout pipelineLayout;
 
 		struct DescriptorSetLayouts {
 			VkDescriptorSetLayout scene;
@@ -94,7 +86,6 @@ namespace vks
 		void clean();
 		void getPrimitives(std::vector<vkglTF::Node*>* nodes,std::vector<vkglTF::Primitive*>* prims, std::vector<vkglTF::Node*>* nodeX);
 		void getSpecRender(geos::gltfPbrRender_spec* render,int idxNode=0);
-		void renderNode(VkCommandBuffer cmd, vkglTF::Node* node, uint32_t cbIndex, vkglTF::Material::AlphaMode alphaMode);
 		//管线提前绑定
 		void renderNode_ByXPipe(VkCommandBuffer cmd,vkglTF::Node* node, VkPipelineLayout pipeLayout, VkPipelineStageFlags stageFlags,vkglTF::Material::AlphaMode alphaMode,int idxNode=-1);
 		void load_gltf();
@@ -103,7 +94,6 @@ namespace vks
 		void setupDescriptors(VkDescriptorPool descriptorPool);
 		/* 到根节点的矩阵 的ubo */
 		void setupNodeDescriptorSet(vkglTF::Node* node, VkDescriptorPool descriptorPool);	
-		void preparePipelines(VkRenderPass renderPass);
 		VkPipelineShaderStageCreateInfo loadShader(VkDevice device, std::string filename, VkShaderStageFlagBits stage);
 		//傻叉头文件问题
 		void createBuffer(mg::VulkanDevice* device, vks::saBuffer* buffer, VkBufferUsageFlagBits usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize size);

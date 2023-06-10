@@ -4,7 +4,7 @@
 #include "part.shadow_layers.frag"
 
 layout(location = 0) in vec3 inUV;
-layout(location = 1) in vec3 inNormal;      //大部分时候 World-Space
+layout(location = 1) in vec3 inNormal;      //World-Space
 layout(location = 2) in vec3 inPos;
 layout(location = 3) in vec3 inColor;
 

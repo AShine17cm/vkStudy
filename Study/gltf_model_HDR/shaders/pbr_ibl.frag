@@ -65,7 +65,7 @@ layout (set = 2, binding = 5) uniform sampler2D emissiveMap;
 const float c_MinRoughness = 0.04;
 
 
-// From http://filmicgames.com/archives/75
+// http://filmicgames.com/archives/75
 vec3 Uncharted2Tonemap(vec3 color)
 {
 	float A = 0.15;
@@ -77,12 +77,14 @@ vec3 Uncharted2Tonemap(vec3 color)
 	float W = 11.2;
 	return ((color*(A*color+C*B)+D*E)/(color*(A*color+B)+D*F))-E/F;
 }
+
 vec4 tonemap(vec4 color)
 {
 	vec3 outcol = Uncharted2Tonemap(color.rgb * mat.exposure);
 	outcol = outcol * (1.0f / Uncharted2Tonemap(vec3(11.2f)));	
 	return vec4(pow(outcol, vec3(1.0f / mat.gamma)), color.a);
 }
+//色彩 转线性空间
 vec4 SRGBtoLINEAR(vec4 srgbIn)
 {
 	#ifdef MANUAL_SRGB
@@ -101,7 +103,7 @@ vec4 SRGBtoLINEAR(vec4 srgbIn)
 //切线方向 是 UV 的梯度差，UV 变化最大的方向
 vec3 getNormal()
 {
-	// Perturb normal, see http://www.thetenthplanet.de/archives/1180
+	//法线扰动, http://www.thetenthplanet.de/archives/1180
 	vec3 tangentNormal = texture(normalMap, inUV).xyz * 2.0 - 1.0;
 
 	vec3 q1 = dFdx(inPos);
@@ -116,45 +118,35 @@ vec3 getNormal()
 
 	return normalize(TBN * tangentNormal);
 }
-// Calculation of the lighting contribution from an optional Image Based Light source.
-// Precomputed Environment Maps are required uniform inputs and are computed as outlined in [1].
-// See our README.md on Environment Maps [3] for additional discussion.
+//IBL 的 漫反射/高光
 vec3 getIBLContribution(PBRInfo pbrInputs, vec3 n, vec3 reflection)
 {
-	float lod = (pbrInputs.perceptualRoughness * mat.prefilteredCubeMipLevels);
-	// retrieve a scale and bias to F0. See [1], Figure 3
-	vec3 brdf = (texture(samplerBRDFLUT, vec2(pbrInputs.NdotV, 1.0 - pbrInputs.perceptualRoughness))).rgb;
+	//IBL 的漫反射
 	vec3 diffuseLight = SRGBtoLINEAR(tonemap(texture(samplerIrradiance, n))).rgb;
-
-	vec3 specularLight = SRGBtoLINEAR(tonemap(textureLod(prefilteredMap, reflection, lod))).rgb;
-
 	vec3 diffuse = diffuseLight * pbrInputs.diffuseColor;
-	vec3 specular = specularLight * (pbrInputs.specularColor * brdf.x + brdf.y);
-
-	// For presentation, this allows us to disable IBL terms
-	// For presentation, this allows us to disable IBL terms
 	diffuse *= mat.scaleIBLAmbient;
+
+	//IBL 的高光
+	float lod = (pbrInputs.perceptualRoughness * mat.prefilteredCubeMipLevels);//粗糙度 映射 辐照图
+	vec3 specularLight = SRGBtoLINEAR(tonemap(textureLod(prefilteredMap, reflection, lod))).rgb;//高光第一部分 辐照度
+
+	vec3 brdf = (texture(samplerBRDFLUT, vec2(pbrInputs.NdotV, 1.0 - pbrInputs.perceptualRoughness))).rgb;//Lut 表中的坐标
+	vec3 specular = specularLight * (pbrInputs.specularColor * brdf.x + brdf.y);//高光第二部分 预计算的 F0
 	specular *= mat.scaleIBLAmbient;
 
 	return diffuse + specular;
 }
-// Basic Lambertian diffuse
-// Implementation from Lambert's Photometria https://archive.org/details/lambertsphotome00lambgoog
-// See also [1], Equation 1
+
 vec3 diffuseFunc(PBRInfo pbrInputs)
 {
 	return pbrInputs.diffuseColor / PI;
 }
-// The following equation models the Fresnel reflectance term of the spec equation (aka F())
-// Implementation of fresnel from [4], Equation 15
+//F 函数 菲尼尔反射
 vec3 specularReflection(PBRInfo pbrInputs)
 {
 	return pbrInputs.reflectance0 + (pbrInputs.reflectance90 - pbrInputs.reflectance0) * pow(clamp(1.0 - pbrInputs.VdotH, 0.0, 1.0), 5.0);
 }
-// This calculates the specular geometric attenuation (aka G()),
-// where rougher material will reflect less light back to the viewer.
-// This implementation is based on [1] Equation 4, and we adopt their modifications to
-// alphaRoughness as input as originally proposed in [2].
+//G 函数 几何遮挡
 float geometricOcclusion(PBRInfo pbrInputs)
 {
 	float NdotL = pbrInputs.NdotL;
@@ -165,16 +157,14 @@ float geometricOcclusion(PBRInfo pbrInputs)
 	float attenuationV = 2.0 * NdotV / (NdotV + sqrt(r * r + (1.0 - r * r) * (NdotV * NdotV)));
 	return attenuationL * attenuationV;
 }
-// The following equation(s) model the distribution of microfacet normals across the area being drawn (aka D())
-// Implementation from "Average Irregularity Representation of a Roughened Surface for Ray Reflection" by T. S. Trowbridge, and K. P. Reitz
-// Follows the distribution function recommended in the SIGGRAPH 2013 course notes from EPIC Games [1], Equation 3.
+//D 法线分布
 float microfacetDistribution(PBRInfo pbrInputs)
 {
 	float roughnessSq = pbrInputs.alphaRoughness * pbrInputs.alphaRoughness;
 	float f = (pbrInputs.NdotH * roughnessSq - pbrInputs.NdotH) * pbrInputs.NdotH + 1.0;
 	return roughnessSq / (PI * f * f);
 }
-// Gets metallic factor from specular glossiness workflow inputs 
+//将 高光参数 转换为 金属度参数
 float convertMetallic(vec3 diffuse, vec3 specular, float maxSpecular) 
 {
 	float perceivedDiffuse = sqrt(0.299 * diffuse.r * diffuse.r + 0.587 * diffuse.g * diffuse.g + 0.114 * diffuse.b * diffuse.b);
@@ -199,14 +189,11 @@ vec4 shade( )
 
 	vec3 f0 = vec3(0.04);
 
-	baseColor = SRGBtoLINEAR(texture(colorMap,inUV )) * mat.baseColorFactor;
+	//baseColor = SRGBtoLINEAR(texture(colorMap,inUV )) * mat.baseColorFactor;
 
 	//metallic/////// 金属流
 	if(mat.isMetallic==1)
 	{
-		// Metallic and Roughness material properties are packed together
-		// In glTF, these factors can be specified by fixed scalar values
-		// or from a metallic-roughness map
 		perceptualRoughness = mat.roughnessFactor;
 		metallic = mat.metallicFactor;
 
@@ -215,9 +202,6 @@ vec4 shade( )
 		perceptualRoughness = mrSample.g * perceptualRoughness;
 		metallic = mrSample.b * metallic;
 
-		// Roughness is authored as perceptual roughness; as is convention,
-		// convert to material roughness by squaring the perceptual roughness [2].
-
 		// The albedo may be defined from a base texture or a flat color
 		baseColor = SRGBtoLINEAR(texture(colorMap, inUV)) * mat.baseColorFactor;
 	}
@@ -225,15 +209,15 @@ vec4 shade( )
 	//specular///////  高光流
 	if(mat.isMetallic==0)
 	{
-		// Values from specular glossiness workflow are converted to metallic roughness
-		//高光流 转 金属流
-		perceptualRoughness = 1.0 - texture(physicalDescriptorMap, inUV).a;// a通道 光泽度
+		//光泽度 转 粗糙度
+		vec4 pPixel=texture(physicalDescriptorMap, inUV);
+		perceptualRoughness = 1.0 - pPixel.a;
 		const float epsilon = 1e-6;
 
 		vec4 diffuse = SRGBtoLINEAR(texture(colorMap, inUV));
-		vec3 specular = SRGBtoLINEAR(texture(physicalDescriptorMap, inUV)).rgb;
+		vec3 specular = SRGBtoLINEAR(pPixel).rgb;
 		float maxSpecular = max(max(specular.r, specular.g), specular.b);
-		// Convert metallic value from specular glossiness inputs
+
 		//光泽度 转为 金属度
 		metallic = convertMetallic(diffuse.rgb, specular, maxSpecular);
 
@@ -245,11 +229,9 @@ vec4 shade( )
 	diffuseColor = baseColor.rgb * (vec3(1.0) - f0);
 	diffuseColor *= 1.0 - metallic;
 	float alphaRoughness = perceptualRoughness * perceptualRoughness;
-	vec3 specularColor = mix(f0, baseColor.rgb, metallic);
-	// Compute reflectance.
+	vec3 specularColor = mix(f0, baseColor.rgb, metallic);//F0
+	//反射比
 	float reflectance = max(max(specularColor.r, specularColor.g), specularColor.b);
-	// For typical incident reflectance range (between 4% to 100%) set the grazing reflectance to 100% for typical fresnel effect.
-	// For very low reflectance range on highly diffuse objects (below 4%), incrementally reduce grazing reflecance to 0%.
 	float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);
 	vec3 specularEnvironmentR0 = specularColor.rgb;
 	vec3 specularEnvironmentR90 = vec3(1.0, 1.0, 1.0) * reflectance90;
@@ -279,21 +261,22 @@ vec4 shade( )
 		specularColor
 	);
 
-	// Calculate the shading terms for the microfacet specular shading model
+	//反射方程的 F G D
 	vec3 F = specularReflection(pbrInputs);
 	float G = geometricOcclusion(pbrInputs);
 	float D = microfacetDistribution(pbrInputs);
 
 	const vec3 u_LightColor = scene.lights[0].color.rgb*scene.lights[0].color.a;
-	// Calculation of analytical lighting contribution
+	//直接光  漫反射
 	vec3 diffuseContrib = (1.0 - F) * diffuseFunc(pbrInputs);
+	//直接光  高光
 	vec3 specContrib = F * G * D / (4.0 * NdotL * NdotV);
-	// Obtain final intensity as reflectance (BRDF) scaled by the energy of the light (cosine law)
+	//直接光
 	vec3 color = NdotL * u_LightColor * (diffuseContrib + specContrib);
-	// Calculate lighting contribution from image based lighting source (IBL)
+	//IBL 的漫反射+高光
 	color += getIBLContribution(pbrInputs, n, reflection);
 
-	// Apply optional PBR terms for additional (optional) shading
+	//OC 遮蔽
 	if (mat.occlusionTextureSet > -1) 
 	{
 		float ao = texture(aoMap, (mat.occlusionTextureSet == 0 ? inUV : inUV1)).r;

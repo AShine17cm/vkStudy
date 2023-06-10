@@ -121,59 +121,13 @@ struct  Scene
 	void prepareStep2(VkDescriptorPool descriptorPool, VkRenderPass renderPass,std::vector<Frame>* frames)
 	{
 		helmet->setup(descriptorPool);
-		helmet->preparePipelines(renderPass);
 		ship->setup(descriptorPool);
-		ship->preparePipelines(renderPass);
 		dinosaur->setup(descriptorPool);
-		dinosaur->preparePipelines(renderPass);
 		landscape->setup(descriptorPool);
-		landscape->preparePipelines(renderPass);
 
 		dxPoint.prepare(vulkanDevice, renderPass,true);
 	}
 	/* 画一个 gltf 模型 */
-	void draw_gltf(VkCommandBuffer cmd, uint32_t cmd_idx, int modelIdx)
-	{
-		vks::gltfModel_pbr* gltf = nullptr;
-		switch (modelIdx)
-		{
-		case 0:
-			gltf = helmet;
-			break;
-		case 1:
-			gltf = ship;
-			break;
-		case 2:
-			gltf = dinosaur;
-			break;
-		case 3:
-			gltf = landscape;
-			break;
-		}
-		vkglTF::Model& model = gltf->scene;
-		VkDeviceSize offsets[1] = { 0 };
-		/* 顶点，三角面数据 */
-		vkCmdBindVertexBuffers(cmd, 0, 1, &model.vertices.buffer, offsets);
-		if (model.indices.buffer != VK_NULL_HANDLE)
-		{
-			vkCmdBindIndexBuffer(cmd, model.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-		}
-
-		gltf->boundPipeline = VK_NULL_HANDLE;
-		/* 渲染顺序 opaque-mask-blend */
-		for (auto node : model.nodes)
-		{
-			gltf->renderNode(cmd, node, cmd_idx, vkglTF::Material::ALPHAMODE_OPAQUE);
-		}
-		for (auto node : model.nodes)
-		{
-			gltf->renderNode(cmd, node, cmd_idx, vkglTF::Material::ALPHAMODE_MASK);
-		}
-		for (auto node : model.nodes)
-		{
-			gltf->renderNode(cmd, node, cmd_idx, vkglTF::Material::ALPHAMODE_BLEND);
-		}
-	}
 	void draw_gltf_ByXPipe(VkCommandBuffer cmd, VkPipelineLayout pipeLayout, int modelIdx)
 	{
 		vks::gltfModel_pbr* gltf = nullptr;
@@ -198,7 +152,6 @@ struct  Scene
 		vkCmdBindVertexBuffers(cmd, 0, 1, &model.vertices.buffer, offsets);
 		vkCmdBindIndexBuffer(cmd, model.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 		VkShaderStageFlags stageVGF = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_GEOMETRY_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-		gltf->boundPipeline = VK_NULL_HANDLE;
 		for (auto node : model.nodes)
 		{
 			gltf->renderNode_ByXPipe(cmd, node, pipeLayout, stageVGF, vkglTF::Material::ALPHAMODE_OPAQUE);
