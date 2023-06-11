@@ -1,0 +1,5 @@
+Kajiya-Kay  经验模型		非能量守恒
+发丝方向	与 Shift Map / 偏移贴图 的 V 方向一致
+Binormal  用 偏移贴图 * N 做偏移，实现 W 形高光
+
+N.L sin(pi/2 - ang) = sqrt( 1- dotT.L^2  )
