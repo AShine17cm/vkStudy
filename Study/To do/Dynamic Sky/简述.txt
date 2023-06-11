@@ -1,0 +1,21 @@
+Procedural Sky	Physcial Sky	Dynamic Sky
+
+地球半径		6378.1
+大气厚度		160/100/30	(1.025-1) * 6378.1
+
+大气颜色
+臭氧  紫外线	水蒸气/二氧化碳    远红外线
+Mie Scattering	颗粒物大小 和 光的波长差不多(花粉，粉尘，污染物 )	导致云显示为白色  米氏散射
+Rayleigh Scattering	碰到的半径 比光的波长 小很多的颗粒 (氮气分子)	瑞利散射
+
+S(波长 k, 角度 ang, 高度 h)	pi^2  折射系数  (n^2-1)^2 	密度比率 p(h)
+Rayleigh Scaterring	可拆解为两部分	散射系数 B(波长,高度)  可预计算
+				相位函数 R（角度） 3/(16*Pi)  (1+cos ang 的平方)
+	密度比率  exp(-h/H0)
+
+
+散射	Out-scattering	光路上的 光线  没有到达摄像机
+	Tranmittance	 Ip=Ic T(c p)	透射函数
+
+散射	In-scattering	光路外的 光线 到达摄像机
+	Scattering		Ip-a=Ip S(k,ang,h) T(p-a)	散射函数
