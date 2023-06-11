@@ -1,0 +1,21 @@
+Hue( 色度 )	Saturation		Value
+Hue( 色调 )  	光谱颜色   0-360 角度量
+饱和度 		0 - 1
+亮度		0 - 1
+
+HSV 模型 对应 圆柱坐标系的一个 圆锥形子集
+补色相差 180
+HSV 的 V 轴 对应 RGB 空间的 主对角线
+
+
+RGB 转 HSV
+max = max (R, G, B)
+min = min (R, G, B)
+V=max(R,G,B)
+
+S=(max-min)/max
+
+if  R =max, H=( G-B )/(max-min) * 60
+if  G =max, H=120+ (B-R)/(max-min) * 60
+if  B =max, H=240+(R-G)/(max-min) *60
+if  H <0, H=H+360
