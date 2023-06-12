@@ -1,0 +1,11 @@
+Material Capture   ZBrush
+光源,材质  离线烘焙   成纹理	Blend  ZB   MaCrea
+
+假光照	 轮廓光，方向光，定光，补光
+风格化	光影，头发高光，眼球，皮肤
+
+法线转到 ViewSpace
+对平面模型，法线一样，出现同一颜色
+mat cap  固定，难以与环境交互， 只能作为补光
+
+https://zhuanlan.zhihu.com/p/420473327

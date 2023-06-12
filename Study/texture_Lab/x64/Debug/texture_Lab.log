@@ -24,7 +24,6 @@ E:\VulkanProj\vkStudy\Study\texture_Lab\Frame.h(112,1): warning C4267: “参数
 E:\VulkanProj\vkStudy\Study\texture_Lab\Frame.h(116,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\texture_Lab\Scene.h(92,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\texture_Lab\Scene.h(173,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\texture_Lab\dx_Textures.cpp(168,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\texture_Lab\dx_Textures.cpp(216,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-LINK : warning LNK4098: 默认库“MSVCRT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
+E:\VulkanProj\vkStudy\Study\texture_Lab\dx_Textures.cpp(169,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\texture_Lab\dx_Textures.cpp(217,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
   texture_Lab.vcxproj -> E:\VulkanProj\vkStudy\Study\texture_Lab\texture_Lab.exe

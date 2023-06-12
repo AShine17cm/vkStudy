@@ -17,8 +17,8 @@ E:\VulkanProj\vkStudy\Study\imgui\Frame.h(71,1): warning C4267: “参数”: �
 E:\VulkanProj\vkStudy\Study\imgui\Frame.h(75,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\imgui\Scene.h(69,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\imgui\Scene.h(150,17): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\imgui\dx_baseGeo.cpp(172,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\imgui\dx_baseGeo.cpp(220,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\imgui\dx_baseGeo.cpp(173,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\imgui\dx_baseGeo.cpp(221,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
   ui.cpp
 E:\VulkanProj\vkStudy\Study\imgui\ui.cpp(182,132): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\imgui\ui.cpp(189,149): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据

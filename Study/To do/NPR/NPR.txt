@@ -2,8 +2,6 @@
 GBuffer	Normal / Depth / ID
 DoG ( difference of Guassians ) 高斯滤波将图像处理两次，一个减去另一个
 
-
-
 边缘类型	
 boundary or border edge	未被2个三角面共享的
 crease edge (褶皱)		大于某个角度，比如山脊
@@ -18,6 +16,9 @@ silhouette edge		外形，区分物体与背景
 	顶点色	G 	根据 视距控制 膨胀程度
 	顶点色	B	控制 z-bias	越大越不可见
 	顶点色	A	描边粗细
+日式卡通   本村线   将边缘UV 横平竖直的平铺，用UV2
+
+
 
 Cell Shading	降低色阶	
 一维色阶表	dotNL		漫反射
@@ -51,3 +52,4 @@ Cell Shading	降低色阶
 https://en.wikipedia.org/wiki/Sobel_operator
 
 Stroke Surface Stylization 笔划表面风格化		TAMs(tonal art maps)
+

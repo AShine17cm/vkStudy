@@ -35,11 +35,6 @@ E:\VulkanProj\vkStudy\Study\gltf_model_HDR\Scene.h(205,45): warning C4244: “=�
 E:\VulkanProj\vkStudy\Study\gltf_model_HDR\Scene.h(206,45): warning C4244: “=”: 从“int32_t”转换到“float”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\gltf_model_HDR\Scene.h(210,46): warning C4244: “=”: 从“int32_t”转换到“float”，可能丢失数据
 E:\VulkanProj\vkStudy\Study\gltf_model_HDR\Scene.h(211,44): warning C4244: “=”: 从“int32_t”转换到“float”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\gltf_model_HDR\mg_HDR.cpp(171,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\gltf_model_HDR\mg_HDR.cpp(219,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-  ui.cpp
-E:\VulkanProj\vkStudy\Study\gltf_model_HDR\ui.cpp(182,132): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-E:\VulkanProj\vkStudy\Study\gltf_model_HDR\ui.cpp(189,149): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
-  正在生成代码...
-LINK : warning LNK4098: 默认库“MSVCRT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
+E:\VulkanProj\vkStudy\Study\gltf_model_HDR\mg_HDR.cpp(172,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\gltf_model_HDR\mg_HDR.cpp(220,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
   gltf_model_HDR.vcxproj -> E:\VulkanProj\vkStudy\Study\gltf_model_HDR\gltf_model_HDR.exe

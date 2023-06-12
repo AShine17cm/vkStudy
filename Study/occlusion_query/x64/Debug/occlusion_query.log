@@ -1,1 +1,31 @@
-﻿
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(499,5): warning MSB8004: Output 目录未以斜杠结尾。  此生成实例将添加斜杠，因为必须有这个斜杠才能正确计算 Output 目录。
+  dx_query.cpp
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(85,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(87,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(106,1): warning C4267: “初始化”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(108,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(139,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(171,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(192,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\base\VulkanFrameBuffer.hpp(287,1): warning C4267: “return”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\occlusion_query\PipelineHub.h(27,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\occlusion_query\PipelineHub.h(45,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\occlusion_query\PipelineHub.h(61,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\occlusion_query\PipelineHub.h(110,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\occlusion_query\PipelineHub.h(159,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\occlusion_query\Frame.h(90,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\occlusion_query\Frame.h(96,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\occlusion_query\Frame.h(100,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\occlusion_query\Frame.h(106,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\occlusion_query\dx_query.cpp(171,1): warning C4267: “=”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\occlusion_query\dx_query.cpp(219,1): warning C4267: “参数”: 从“size_t”转换到“uint32_t”，可能丢失数据
+E:\VulkanProj\vkStudy\Study\occlusion_query\dx_query.cpp(410,20): warning C4477: “printf”: 格式字符串“%lu”需要类型“unsigned long”的参数，但可变参数 1 拥有了类型“uint64_t”
+E:\VulkanProj\vkStudy\Study\occlusion_query\dx_query.cpp(410,20): message : 请考虑在格式字符串中使用“%llu”
+E:\VulkanProj\vkStudy\Study\occlusion_query\dx_query.cpp(410,20): message : 请考虑在格式字符串中使用“%Iu”
+E:\VulkanProj\vkStudy\Study\occlusion_query\dx_query.cpp(410,20): message : 请考虑在格式字符串中使用“%I64u”
+E:\VulkanProj\vkStudy\Study\occlusion_query\dx_query.cpp(412,20): warning C4477: “printf”: 格式字符串“%lu”需要类型“unsigned long”的参数，但可变参数 1 拥有了类型“uint64_t”
+E:\VulkanProj\vkStudy\Study\occlusion_query\dx_query.cpp(412,20): message : 请考虑在格式字符串中使用“%llu”
+E:\VulkanProj\vkStudy\Study\occlusion_query\dx_query.cpp(412,20): message : 请考虑在格式字符串中使用“%Iu”
+E:\VulkanProj\vkStudy\Study\occlusion_query\dx_query.cpp(412,20): message : 请考虑在格式字符串中使用“%I64u”
+LINK : warning LNK4098: 默认库“MSVCRT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
+  occlusion_query.vcxproj -> E:\VulkanProj\vkStudy\Study\occlusion_query\occlusion_query.exe
