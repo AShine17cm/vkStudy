@@ -1,0 +1,23 @@
+GPGPU  通用图形处理器  General-purpose computing on graphics processing units
+相比 CPU   	compute units 更多更高效  GPGPU
+相比 vertex+fragment	可利用线程同步，共享现存数据	
+
+Compute units  SIMD	最小计算单元 threads  2个层级
+
+compute space 抽象， 不是 object 或者 world 等等
+
+
+work group 或者 thread group ( higher level )	Dispatch(x,y,z) 定义一个三维的 thread group 组  通常64
+numthreads ( lower level )			定义了 每个 thread group的大小
+
+numthreads  ( 8, 8,1 ) * Dispatch (4,4,1)   thread count为 64 * 16=1024
+thread 可交流( Local data share )， thread group 不能相互交流
+
+dispatch call 激活 thread group,  每个 thread-group 被分配可用的 compute unit,	compute-unit 被分配 SIMD
+
+uniform  		使用 对每个 thread 只有一个 copy , 存储在 scale register
+非uniform		对每个thread 有一个copy, vector register
+
+尽量使用  uniforn 变量进行 分支判定
+
+后处理效果  pixel shader更有效

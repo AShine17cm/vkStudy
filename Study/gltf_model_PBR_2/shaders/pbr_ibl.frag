@@ -167,6 +167,9 @@ float microfacetDistribution(PBRInfo pbrInputs)
 //将 高光参数 转换为 金属度参数
 float convertMetallic(vec3 diffuse, vec3 specular, float maxSpecular) 
 {
+//	float xx=dot(vec3(0.3,0.6,0.1),diffuse.rgb*diffuse.rgb);
+//	float perceived=sqrt(xx);
+
 	float perceivedDiffuse = sqrt(0.299 * diffuse.r * diffuse.r + 0.587 * diffuse.g * diffuse.g + 0.114 * diffuse.b * diffuse.b);
 	float perceivedSpecular = sqrt(0.299 * specular.r * specular.r + 0.587 * specular.g * specular.g + 0.114 * specular.b * specular.b);
 	if (perceivedSpecular < c_MinRoughness) {
