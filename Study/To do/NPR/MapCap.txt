@@ -8,4 +8,7 @@ Material Capture   ZBrush
 对平面模型，法线一样，出现同一颜色
 mat cap  固定，难以与环境交互， 只能作为补光
 
+float3 matCap=tex2D(_MatCap, normalVS)
+color=color*matCap
+
 https://zhuanlan.zhihu.com/p/420473327

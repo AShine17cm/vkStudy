@@ -6,7 +6,7 @@ DoG ( difference of Guassians ) 高斯滤波将图像处理两次，一个减去
 boundary or border edge	未被2个三角面共享的
 crease edge (褶皱)		大于某个角度，比如山脊
 material edge 材质边缘	邻接三角面 材质不一样
-contour edge		基于观察方形
+contour edge		基于观察方向
 silhouette edge		外形，区分物体与背景
 
 描边
