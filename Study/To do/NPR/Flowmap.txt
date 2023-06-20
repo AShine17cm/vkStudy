@@ -1,0 +1,13 @@
+https://zhuanlan.zhihu.com/p/511518080
+
+float2 dir=tex2D(_FlowMap,uv).xy
+dir=dir*2-1;
+
+color=tex2D(_MainTex,uv+dir*_Time.x)
+
+//采样 2 次，连续混合
+float phase0=frac(_Time * speed )
+float phase1=frac(_Time * speed )
+
+color0=tex2D(_MainTex,uv+dir * phase0 )
+color1=tex2D(_MainTex,uv+dir * phase1 )
