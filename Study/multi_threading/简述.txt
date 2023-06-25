@@ -19,7 +19,7 @@ render-pass 只能 begin/end 一次，不然内容会被clear ?
 如果Fence使用 in-Flights 数组, 因为线程中的次级cmd 的关系,线程池对象也需要使用等位的数组
 
 
-在工作线程上 
+在工作线程上 (secondary)
 1. 不需要  BeginRenderPass  不需要绑定 FrameBuffer
 2. Command Buffer Begin Info的flags 需要设定为 Render_Pass_Continue
 3. Command Buffer 的 Level 是 Secondary

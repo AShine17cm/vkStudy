@@ -1,0 +1,75 @@
+glfw 窗口创建
+glfw 扩展	extension : 字符串列表
+-----------初始化vulkan--------------
+input类
+glfw 获取鼠标状态，位置
+glfw 获取按键
+
+InstanceCreateInfo
+glfw 扩展 	+ VK_EXT_debug_utils 调试层
+层信息		VK_LAYER_KHRONOS_validation
+调试层		VkInstance 进程地址		关联调试信息
+
+VkSurface KHR		从glfw 获取
+----------------物理显卡----------------
+VkPhysicalDevice		枚举显卡
+			queueFamily : Graphics , Compute , Transfer , Sparse_Binding , Protected ( 加密保护 ) 
+			format数量，presentMode数量
+扩展匹配			exntension数量  包含  glfw的扩展
+呈现匹配		
+
+-------------- 逻辑Device---------------
+准备Feature		geometry  samplerAnisotropy   sampleRateShading   widelines	
+属性 值类型		api version, 极限数据   最大尺寸，image的层数， pushConstants大小
+Feature数据 Bool类型	cubeArray,  纹理压缩格式 ASTC, ETC2,BC   geometryShader   tessellationShader
+内存类型			堆的数量， 内存类型数量
+Queue 类型
+扩展			字符串数组
+
+createInfo
+Queue创建信息		graphics, compute, transfer
+Feature 信息
+Extension 扩展
+
+创建 CommandPool
+
+--------------- Pass Hub -----------------
+SwapChain		VkSurfaceFormat	VkPresentMode
+SwapChain		VkImage
+MSAA			VkImage: Color+Depth
+RenderPass		VkAttachmentDescription: Color + Depth   		MSAA 需要翻倍，可用透明内存
+		SubpassDependency
+阴影的RenderPass		
+FrameBuffer		VkImageView: color+depth   MSAA需要翻倍
+--------------- Graphics Pipeline -------------------------------
+DescriptorSetLayout	阴影生成 shadow,  阴影合成 shadow_h   PBR 基础  PBR 环境   PBR 纹理
+PipelineLayout		阴影生成	阴影合成  
+Pipeline			shadow  pbr_basic   pbr_IBL
+
+ShaderModule
+顶点布局		Pos,Normal,UV,Color	
+ColorBlend	
+栅格化: frontFace,polygonMode    
+Assembly: 三角形
+深度模板
+ViewPort
+Multisample
+DynamicState: Viewport,Scissor
+
+---------------- Scene -------------------
+加载模型
+
+
+-------------- 创建资源 ----------------
+DescriptorPool
+纹理资源
+DescriptorSet	
+Buffer
+
+----------  创建 CommandBuffer ------------
+
+
+---------- 创建同步对象 Semaphores ---------------
+
+
+----------- 渲染场景 ---------------------
