@@ -265,9 +265,9 @@ private:
         uint32_t batchIdx = 0;
 
         /* 虚拟贴图 */
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_SolidTex);
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.pi_VirtualTex);
         dstSet = 1;
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solidTex, dstSet, 1, &frame->set_ground, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, piHub.piLayout_solidTex, dstSet, 1, &frame->set_virtualTex, 0, nullptr);
         batchIdx = 0;
         scene.draw(cmd, piHub.piLayout_solidTex, batchIdx);
 
@@ -320,6 +320,7 @@ private:
         float deltaTime = time - lastTime;
         lastTime = time;
         /* 更新 模型和Camera */
+        resource.update(input->GetKey());   //更新虚表
         scene.update(pFrame,time,deltaTime,input->GetKey());
     }
 

@@ -39,7 +39,7 @@ struct  Scene
 		uiPts[4] = uiPts[0];
 		uiPts[5] = uiPts[2];
 		/* 相机控制 */
-		view = new View({ 0,0,1 }, 9.0f, { -3.0f,6.0f }, extent);
+		view = new View({ 0,0,1 }, 9.0f, { -9.0f,60.0f }, extent);
 		ground = new geos::GeoPlane(8, { 0,0,-2 });
 		ground->prepareBuffer(vulkanDevice);
 		sphere = new geos::GeoSphere(0.6f, { 0.2f,0.2f }, 32, 24);
@@ -79,7 +79,7 @@ struct  Scene
 		VkDeviceSize offsets[] = { 0 };
 		switch (batchIdx)
 		{
-			case 110:
+			case 0:
 			{
 				//最后画ground 故意的
 				pod.model = ground->modelMatrix;

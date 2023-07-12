@@ -4,6 +4,7 @@
 #include "VulkanDevice.h"
 #include "textures.h"
 #include <cmath>
+#include <random>
 
 //#include <glm.hpp>
 
@@ -329,5 +330,229 @@ struct VirtualTextureHub
 		texture.descriptor.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		texture.descriptor.imageView = texture.view;
 		texture.descriptor.sampler = texture.sampler;
+	}
+
+	//上传加载一个 Page
+	void uploadContent(VirtualTexturePage page, VkImage image)
+	{
+		//分配一个 page大小的临时内存
+		const size_t bufferSize = 4 * page.extent.width * page.extent.height;
+
+		mg::Buffer imageBuffer;
+		MG_CHECK_RESULT(vulkanDevice->createBuffer(
+			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			bufferSize,
+			&imageBuffer
+			));
+		imageBuffer.map();
+		//随机数据 填充临时内存
+		uint8_t* data = (uint8_t*)imageBuffer.mapped;
+		randomPattern(data, page.extent.height, page.extent.width,page.mipLevel, false);
+
+		VkCommandBuffer copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+		mg::textures::setImageLayout(copyCmd, image, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &texture.subRange, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
+		VkBufferImageCopy region{};
+		region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		region.imageSubresource.layerCount = 1;
+		region.imageSubresource.mipLevel = page.mipLevel;
+		region.imageOffset = page.offset;
+		region.imageExtent = page.extent;
+		//将内存/Buffer 和 Image关联
+		vkCmdCopyBufferToImage(copyCmd, imageBuffer.buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+		mg::textures::setImageLayout(copyCmd, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, &texture.subRange, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
+		vulkanDevice->flushCommandBuffer(copyCmd, queue);
+
+		imageBuffer.destroy();
+	}
+	void fillRandomPages()
+	{
+		vkDeviceWaitIdle(device);
+
+		std::default_random_engine rndEngine(std::random_device{}());
+		std::uniform_real_distribution<float> rndDist(0.0f, 1.0f);
+
+		std::vector<VirtualTexturePage> updatedPages;
+		std::vector<VirtualTexturePage> bindingChangedPages;
+		for (auto& page : texture.pages) 
+		{
+			if (rndDist(rndEngine) < 0.5f)//不做变化
+			{
+				continue;
+			}
+			if (page.allocate(device, texture.memoryTypeIndex))//如果还未分配内存, 为一个Page分配内存
+			{
+				bindingChangedPages.push_back(page);
+			}
+			updatedPages.push_back(page);//已经分配了内存的 page
+		}
+
+		// Update sparse queue binding
+		texture.updateSparseBindInfo(bindingChangedPages);		//更新绑定信息 VkBindSparseInfo
+		VkFenceCreateInfo fenceInfo{};
+		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+		fenceInfo.flags = VK_FLAGS_NONE;
+		VkFence fence;
+		MG_CHECK_RESULT(vkCreateFence(device, &fenceInfo, nullptr, &fence));
+		vkQueueBindSparse(queue, 1, &texture.bindSparseInfo, fence);//推送到队列
+		vkWaitForFences(device, 1, &fence, VK_TRUE, UINT64_MAX);
+		vkDestroyFence(device, fence, nullptr);
+
+		for (auto& page : updatedPages) 
+		{
+			uploadContent(page, texture.image);					//产生 随机内容
+		}
+	}
+	//释放一些 Page
+	void flushRandomPages()
+	{
+		vkDeviceWaitIdle(device);
+
+		std::default_random_engine rndEngine(std::random_device{}());
+		std::uniform_real_distribution<float> rndDist(0.0f, 1.0f);
+
+		std::vector<VirtualTexturePage> updatedPages;
+		std::vector<VirtualTexturePage> bindingChangedPages;
+		for (auto& page : texture.pages)
+		{
+			if (rndDist(rndEngine) < 0.5f) {
+				continue;
+			}
+			//已经加载，释放掉
+			if (page.imageMemoryBind.memory != VK_NULL_HANDLE) {
+				page.del = true;
+				bindingChangedPages.push_back(page);
+			}
+		}
+
+		// Update sparse queue binding
+		texture.updateSparseBindInfo(bindingChangedPages, true);
+		VkFenceCreateInfo fenceInfo{};
+		fenceInfo.sType=VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+		fenceInfo.flags = VK_FLAGS_NONE;
+		VkFence fence;
+		MG_CHECK_RESULT(vkCreateFence(device, &fenceInfo, nullptr, &fence));
+		vkQueueBindSparse(queue, 1, &texture.bindSparseInfo, fence);
+		vkWaitForFences(device, 1, &fence, VK_TRUE, UINT64_MAX);
+		vkDestroyFence(device, fence, nullptr);
+		for (auto& page : texture.pages)
+		{
+			if (page.del)
+			{
+				page.release(device);
+			}
+		}
+	}
+	//随机颜色
+	void randomPattern(uint8_t* buffer, uint32_t width, uint32_t height,uint32_t mipLevel, bool isMipTail)
+	{
+		uint8_t rndVal[4] = { 0, 0, 0, 0 };
+		uint8_t mipColor = 1;
+		if (isMipTail)
+		{
+			int levels = texture.mipLevels;//最大等级
+			float k = 1.0f - (float)mipLevel / levels;
+			k = (k + 0.3f) / 1.3f;
+			mipColor = (uint8_t)(255 * k);
+			rndVal[0] = mipColor;
+			rndVal[1] = mipColor;
+			rndVal[2] = mipColor;
+		}
+		else
+		{
+			//假定 4096, mip-tail从6开始
+			switch (mipLevel)
+			{
+			case 0:
+				rndVal[0] = 255;
+				break;
+			case 1:
+				rndVal[1] = 255;
+				break;
+			case 2:
+				rndVal[2] = 255;
+				break;
+			case 3:
+				rndVal[0] = 127;
+				rndVal[1] = 127;
+				break;
+			case 4:
+				rndVal[1] = 127;
+				rndVal[2] = 127;
+				break;
+			case 5:
+				rndVal[0] = 127;
+				rndVal[2] = 127;
+				break;
+			}
+		}
+		rndVal[3] = 255;
+		for (uint32_t y = 0; y < height; y++) {
+			for (uint32_t x = 0; x < width; x++) {
+				for (uint32_t c = 0; c < 4; c++, ++buffer) {
+					*buffer = rndVal[c];
+				}
+			}
+		}
+	}
+	void fillMipTail()
+	{
+		// Clean up previous mip tail memory allocation
+		if (texture.mipTailimageMemoryBind.memory != VK_NULL_HANDLE) {
+			vkFreeMemory(device, texture.mipTailimageMemoryBind.memory, nullptr);
+		}
+
+		//@todo: WIP
+		VkDeviceSize imageMipTailSize = texture.sparseImageMemoryRequirements.imageMipTailSize;
+		VkDeviceSize imageMipTailOffset = texture.sparseImageMemoryRequirements.imageMipTailOffset;
+		// Stride between memory bindings for each mip level if not single mip tail (VK_SPARSE_IMAGE_FORMAT_SINGLE_MIPTAIL_BIT not set)
+		VkDeviceSize imageMipTailStride = texture.sparseImageMemoryRequirements.imageMipTailStride;
+
+		VkMemoryAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocInfo.allocationSize = imageMipTailSize;
+		allocInfo.memoryTypeIndex = texture.memoryTypeIndex;
+		MG_CHECK_RESULT(vkAllocateMemory(device, &allocInfo, nullptr, &texture.mipTailimageMemoryBind.memory));
+
+		uint32_t mipLevel = texture.sparseImageMemoryRequirements.imageMipTailFirstLod;
+		uint32_t width = std::max(texture.width >> texture.sparseImageMemoryRequirements.imageMipTailFirstLod, 1u);
+		uint32_t height = std::max(texture.height >> texture.sparseImageMemoryRequirements.imageMipTailFirstLod, 1u);
+		uint32_t depth = 1;
+
+		for (uint32_t i = texture.mipTailStart; i < texture.mipLevels; i++) {
+
+			const uint32_t width = std::max(texture.width >> i, 1u);
+			const uint32_t height = std::max(texture.height >> i, 1u);
+
+			//mip的大小
+			const size_t bufferSize = 4 * width * height;
+
+			mg::Buffer imageBuffer;
+			MG_CHECK_RESULT(vulkanDevice->createBuffer(
+				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+				bufferSize,
+				&imageBuffer
+				));
+			imageBuffer.map();
+
+			//随机填充颜色
+			uint8_t* data = (uint8_t*)imageBuffer.mapped;
+			randomPattern(data, width, height,i,true);
+
+			VkCommandBuffer copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+			mg::textures::setImageLayout(copyCmd, texture.image, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &texture.subRange, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
+			VkBufferImageCopy region{};
+			region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			region.imageSubresource.layerCount = 1;
+			region.imageSubresource.mipLevel = i;
+			region.imageOffset = {};
+			region.imageExtent = { width, height, 1 };
+			vkCmdCopyBufferToImage(copyCmd, imageBuffer.buffer, texture.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+			mg::textures::setImageLayout(copyCmd, texture.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, &texture.subRange, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
+			vulkanDevice->flushCommandBuffer(copyCmd, queue);
+
+			imageBuffer.destroy();
+		}
 	}
 };

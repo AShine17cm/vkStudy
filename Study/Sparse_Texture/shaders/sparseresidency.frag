@@ -19,27 +19,28 @@ layout (location = 0) out vec4 outFragColor;
 void main() 
 {
 	vec4 color = vec4(0.0);
-
+	float xLod=inLodBias;
+	xLod=0;
 	// Get residency code for current texel
-	int residencyCode = sparseTextureARB(samplerColor, inUV, color, inLodBias);
+	int residencyCode = sparseTextureARB(samplerColor, inUV, color, xLod);
 
 	// Fetch sparse until we get a valid texel
-	/*
+	
 	float minLod = 1.0;
 	while (!sparseTexelsResidentARB(residencyCode)) 
 	{
 		residencyCode = sparseTextureClampARB(samplerColor, inUV, minLod, color);
 		minLod += 1.0f;
 	}
-	*/
+	
 
 	// Check if texel is resident
-	bool texelResident = sparseTexelsResidentARB(residencyCode);
-
-	if (!texelResident)
-	{
-		color = vec4(0.0, 0.0, 0.0, 0.0);
-	}
+//	bool texelResident = sparseTexelsResidentARB(residencyCode);
+//
+//	if (!texelResident)
+//	{
+//		color = vec4(0.0, 0.0, 0.0, 0.0);
+//	}
 
 	outFragColor = color;
 }

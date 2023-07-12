@@ -43,7 +43,7 @@ struct  View
 		/* 灯光 */
 		data.light = { 0,0,6,4 };
 		/* 初始值 */
-		vAngle = 45;
+		vAngle = 2;
 		hAngle = 0;
 		radius = baseRadius;
 	}
@@ -53,7 +53,7 @@ struct  View
 		if (hAngle > 360)hAngle -= 360;
 		if (hAngle < -360)hAngle += 360;
 		this->hAngle = hAngle;
-		this->vAngle = glm::clamp(vAngle, 15.0f, 75.0f);
+		this->vAngle = glm::clamp(vAngle, 2.0f, 75.0f);
 		this->radius = glm::clamp(radius, baseRadius + range.x, baseRadius + range.y);
 		float arcH = glm::radians(hAngle);
 		float arcV = glm::radians(vAngle);
@@ -89,10 +89,10 @@ struct  View
 		switch (op)
 		{
 		case 'a'://左右
-			deltaHAngle = deltaTime * speedHAngle;
+			deltaVAngle = deltaTime * speedVAngle;
 			break;
 		case 'd':
-			deltaHAngle = -deltaTime * speedHAngle;
+			deltaVAngle = -deltaTime * speedVAngle;
 			break;
 		case 'w'://前后
 			deltaRadius = -deltaTime * speedRadius;
@@ -101,10 +101,10 @@ struct  View
 			deltaRadius = deltaTime * speedRadius;
 			break;
 		case 'z'://上下
-			deltaVAngle = deltaTime * speedVAngle;
+			deltaHAngle = deltaTime * speedHAngle;
 			break;
 		case 'x':
-			deltaVAngle = -deltaTime * speedVAngle;
+			deltaHAngle = -deltaTime * speedHAngle;
 			break;
 		default:
 			//acc = 1.0f;

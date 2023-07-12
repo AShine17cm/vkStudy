@@ -47,6 +47,20 @@ struct Resource
         vt_TextureHub = new VirtualTextureHub(vulkanDevice);
         vt_TextureHub->prepareSparseTexture(4096, 4096, 1, VK_FORMAT_R8G8B8A8_UNORM);
     }
+    void update(int numKey) {
+        switch (numKey)
+        {
+        case 1:
+            vt_TextureHub->fillRandomPages();
+            break;
+        case 2:
+            vt_TextureHub->flushRandomPages();
+            break;
+        case 3:
+            vt_TextureHub->fillMipTail();
+            break;
+        }
+    }
     void cleanup() 
     {
         tex_ui->destroy();

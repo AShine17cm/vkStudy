@@ -1,0 +1,18 @@
+1	随机加载 page
+2	随机卸载 page
+3	加载 mip-tail
+
+mip-0	红色
+mip-1	绿色
+mip-2	蓝色
+mip-3	红色 127, 绿色 127
+mip-4	绿色 127, 蓝色 127
+mip-5	蓝色 127, 红色 127
+
+mip-6 一下	白到灰色
+
+如果出现黑色	应该是对应的 page 没有加载
+		应该加载对应的 mip-tail 才对
+
+使用 vulkan的 API 和 shader采样
+虚表的维护 ， 在shader中的查询  被简化了
