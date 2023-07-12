@@ -1,4 +1,4 @@
-需要配置每个项目的 VulkanSDK 路径 （不人性化，菜菜）
+需要配置每个项目的 VulkanSDK 路径
 好几个工程共享了一个 ../gli-master
 
 

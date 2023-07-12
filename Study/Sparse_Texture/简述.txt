@@ -1,0 +1,52 @@
+firstMipmapInTail
+https://developer.apple.com/documentation/metal/mtltexture/3043999-firstmipmapintail
+
+mip-tail	所有大于一个lod 等级的 mip, 可以放到一个 page内的 mip
+	假定page 128，tail 从64开始计算
+
+比如粒度	虚拟纹理是 4096, 粒度 是128
+	那么tail 就从 128的一般开始，对应等级 是 6
+	4096	0
+	2048	1
+	1024	2
+	512	3
+	256	4
+	128	5
+	64	6	mip tail的开始
+
+------------------ Feature --------------------
+enabledFeatures	sparseBinding
+enabledFeatures	sparseResidencyImage2D
+
+------------------
+准备虚纹理	根据大小，判断 mip数量
+创建 Image	大小，mip等级 
+创建 Image	不分配内存
+创建 Image	image create flags: VK_IMAGE_CREATE_SPARSE_BINDING_BIT|VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT
+设定Image-Layout	此时还没有分配内存
+
+获取内存大小-属性		检查需要多少的内存，内存类型		
+获取内存大小-属性		page/粒度 128,  RGBA, 128*128*4  		Page需要65,536 字节大小
+获取内存大小-属性		根据总内存大小，计算虚纹理的page总数量， 	4096 是1366， 包括一个mip-tail
+获取mip-tail内存 属性	粒度, mip-tail的第一个lod等级
+
+Page划分		将每一 层/Layer，每一个大于mip-tail的Mip等级 
+		划分为Page对象，并记录Offset,mip-level,layer 和 根据添加顺序得到的index
+Page划分		虚纹理保存这些 Page对象
+
+mip-tail		每一层划分完之后，会产生一个mip-tail, 放到 opaqueMemory中
+mip-tail		只有一个的话，可以分配内存
+
+queue		提前绑定 page的内存分配信息到 queue
+----------------------------------------------------------------
+正常创建		Sampler 和 ImageView
+使用		将虚拟纹理当正常的纹理使用, 使用VkDescriptorImageInfo 进行关联
+
+shader		sparseTextureARB		sparseTexelsResidentARB
+
+
+------------------- Page ----------------------
+分配内存		分配一个Page大小的内存，并设定 VkSparseIamgeMemoryBind 中的 Offset,mip-level, layer信息
+是否已经加载	根据内存是否已经分配，判定
+
+
