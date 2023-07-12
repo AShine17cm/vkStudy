@@ -1,0 +1,29 @@
+1. 确定 粒度128
+2. 准备虚拟纹理
+	塌陷场景的多层纹理
+	根据粒度 划分每一个 Mip等级, 编号
+
+mip-tail	划分page之后，小于 粒度128 的部分称为 mip-tail
+	可以放到一个page大小的内存中，常驻
+
+2. 准备虚拟纹理-Runtime
+	根据粒度，Mip等级，添加 Page 对象到 page集合
+	每个page包含 layer, mip, offset3D, extent3D, 编号/index
+	
+2. 添加 VkImage对象，完整的世界地图大小
+	不分配内存
+
+3. 加载一个 Page	
+	a. 分配内存, 更新绑定信息 (虚表)
+	b. 实际加载page纹理， 绑定到 image
+
+-----------------------------------------------------------------------------
+shader采样	使用 0-1 (uv）  世界坐标转换
+		使用 sparseTextureARB 采样，并判断是否加载，否则使用 高一级的mip, 比如mip-tail
+------------------------------------------------------------------------------
+Vulkan 封装了虚表, 虚表查询
+	每个Page 		VkSparseImageMemoryBind	layer, mip, offset3D,  extent3D, 内存
+	更新虚表		vkQueueBindSparse
+	更新完虚表后	当前不需要的Page, 释放内存
+			
+
